@@ -1,0 +1,12 @@
+FROM continuumio/miniconda3:4.8.2
+
+RUN apt-get update && \
+    apt-get install -y build-essential libz-dev libcurl3-dev
+
+ADD environment.kipoi.yml /tmp/environment.kipoi.yml
+
+RUN conda env create -f /tmp/environment.kipoi.yml
+
+# Pull the environment name out of the environment.kipoi.yml
+RUN echo "source activate kipoi-env" > ~/.bashrc
+ENV PATH /opt/conda/envs/kipoi-env/bin:$PATH

@@ -1,0 +1,12 @@
+FROM kipoi-base-env:0.1
+
+SHELL ["conda", "run", "-n", "kipoi-env", "/bin/bash", "-c"]
+
+RUN kipoi env create rbp_eclip --verbose
+
+RUN echo "source activate kipoi-rbp_eclip" > ~/.bashrc
+ENV PATH /opt/conda/envs/kipoi-rbp_eclip/bin:$PATH
+
+SHELL ["conda", "run", "-n", "kipoi-rbp_eclip", "/bin/bash", "-c"]
+
+RUN pip install h5py==2.10.0

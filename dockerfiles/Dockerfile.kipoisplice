@@ -1,0 +1,12 @@
+FROM kipoi-base-env:0.1
+
+SHELL ["conda", "run", "-n", "kipoi-env", "/bin/bash", "-c"]
+
+RUN kipoi env create KipoiSplice --verbose
+
+RUN echo "source activate kipoi-KipoiSplice" > ~/.bashrc
+ENV PATH /opt/conda/envs/kipoi-KipoiSplice/bin:$PATH
+
+SHELL ["conda", "run", "-n", "kipoi-KipoiSplice", "/bin/bash", "-c"]
+
+RUN pip install sklearn_pandas==1.8.0 tensorflow==1.13.1

@@ -1,0 +1,12 @@
+FROM kipoi-base-env:0.1
+
+ADD ./tests/test-attentivechrome.py /tmp/test-attentivechrome.py
+
+SHELL ["conda", "run", "-n", "kipoi-env", "/bin/bash", "-c"]
+
+RUN kipoi env create AttentiveChrome --verbose
+
+RUN echo "source activate kipoi-AttentiveChrome" > ~/.bashrc
+ENV PATH /opt/conda/envs/kipoi-AttentiveChrome/bin:$PATH
+
+SHELL ["conda", "run", "-n", "kipoi-AttentiveChrome", "/bin/bash", "-c"]

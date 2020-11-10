@@ -1,0 +1,10 @@
+FROM kipoi-base-env:0.1
+
+SHELL ["conda", "run", "-n", "kipoi-env", "/bin/bash", "-c"]
+
+RUN kipoi env create extended_coda --verbose
+
+RUN echo "source activate kipoi-extended_coda" > ~/.bashrc
+ENV PATH /opt/conda/envs/kipoi-extended_coda/bin:$PATH
+
+SHELL ["conda", "run", "-n", "kipoi-extended_coda", "/bin/bash", "-c"]

@@ -1,0 +1,10 @@
+FROM kipoi-base-env:0.1
+
+SHELL ["conda", "run", "-n", "kipoi-env", "/bin/bash", "-c"]
+
+RUN kipoi env create Framepool --verbose
+
+RUN echo "source activate kipoi-Framepool" > ~/.bashrc
+ENV PATH /opt/conda/envs/kipoi-Framepool/bin:$PATH
+
+SHELL ["conda", "run", "-n", "kipoi-Framepool", "/bin/bash", "-c"]

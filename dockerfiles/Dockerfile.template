@@ -1,0 +1,10 @@
+FROM kipoi-base-env:0.1
+
+SHELL ["conda", "run", "-n", "kipoi-env", "/bin/bash", "-c"]
+
+RUN kipoi env create modelname --verbose
+
+RUN echo "source activate kipoi-modelname" > ~/.bashrc
+ENV PATH /opt/conda/envs/kipoi-modelname/bin:$PATH
+
+SHELL ["conda", "run", "-n", "kipoi-modelname", "/bin/bash", "-c"]

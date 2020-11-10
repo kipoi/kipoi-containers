@@ -1,0 +1,12 @@
+from time import sleep
+import kipoi
+
+
+models = ['rbp_eclip/AARS', 'rbp_eclip/AGGF1', 'rbp_eclip/AKAP8L', 'rbp_eclip/AUH', 'rbp_eclip/BCCIP', 'rbp_eclip/BUD13', 'rbp_eclip/CDC40', 'rbp_eclip/CPSF6', 'rbp_eclip/CSTF2', 'rbp_eclip/CSTF2T', 'rbp_eclip/DDX24', 'rbp_eclip/DDX3X', 'rbp_eclip/DDX42', 'rbp_eclip/DDX55', 'rbp_eclip/DDX59', 'rbp_eclip/DDX6', 'rbp_eclip/DGCR8', 'rbp_eclip/DHX30', 'rbp_eclip/DKC1', 'rbp_eclip/DROSHA', 'rbp_eclip/EFTUD2', 'rbp_eclip/EIF3D', 'rbp_eclip/EIF4G2', 'rbp_eclip/EWSR1', 'rbp_eclip/FAM120A', 'rbp_eclip/FASTKD2', 'rbp_eclip/FKBP4', 'rbp_eclip/FMR1', 'rbp_eclip/FTO', 'rbp_eclip/FUBP3', 'rbp_eclip/FXR1', 'rbp_eclip/FXR2', 'rbp_eclip/GEMIN5', 'rbp_eclip/GNL3', 'rbp_eclip/GPKOW', 'rbp_eclip/GRSF1', 'rbp_eclip/GRWD1', 'rbp_eclip/GTF2F1', 'rbp_eclip/HLTF', 'rbp_eclip/HNRNPA1', 'rbp_eclip/HNRNPC', 'rbp_eclip/HNRNPK', 'rbp_eclip/HNRNPM', 'rbp_eclip/HNRNPU', 'rbp_eclip/HNRNPUL1', 'rbp_eclip/IGF2BP1', 'rbp_eclip/IGF2BP2', 'rbp_eclip/IGF2BP3', 'rbp_eclip/ILF3', 'rbp_eclip/KHDRBS1', 'rbp_eclip/KHSRP', 'rbp_eclip/LARP4', 'rbp_eclip/LARP7', 'rbp_eclip/LIN28B', 'rbp_eclip/LSM11', 'rbp_eclip/METAP2', 'rbp_eclip/MTPAP', 'rbp_eclip/NCBP2', 'rbp_eclip/NKRF', 'rbp_eclip/NOL12', 'rbp_eclip/NONO', 'rbp_eclip/NPM1', 'rbp_eclip/NSUN2', 'rbp_eclip/PCBP2', 'rbp_eclip/PPIG', 'rbp_eclip/PPIL4', 'rbp_eclip/PRPF8', 'rbp_eclip/PTBP1', 'rbp_eclip/PUM2', 'rbp_eclip/PUS1', 'rbp_eclip/QKI', 'rbp_eclip/RBFOX2', 'rbp_eclip/RBM15', 'rbp_eclip/RBM22', 'rbp_eclip/RBM27', 'rbp_eclip/RPS11', 'rbp_eclip/RPS5', 'rbp_eclip/SAFB2', 'rbp_eclip/SBDS', 'rbp_eclip/SERBP1', 'rbp_eclip/SF3A3', 'rbp_eclip/SF3B1', 'rbp_eclip/SF3B4', 'rbp_eclip/SFPQ', 'rbp_eclip/SLBP', 'rbp_eclip/SLTM', 'rbp_eclip/SMNDC1', 'rbp_eclip/SND1', 'rbp_eclip/SRSF1', 'rbp_eclip/SRSF7', 'rbp_eclip/SRSF9', 'rbp_eclip/SUB1', 'rbp_eclip/SUGP2', 'rbp_eclip/SUPV3L1', 'rbp_eclip/TAF15', 'rbp_eclip/TARDBP', 'rbp_eclip/TBRG4', 'rbp_eclip/TIA1', 'rbp_eclip/TNRC6A', 'rbp_eclip/TRA2A', 'rbp_eclip/TROVE2', 'rbp_eclip/U2AF1', 'rbp_eclip/U2AF2', 'rbp_eclip/UCHL5', 'rbp_eclip/UPF1', 'rbp_eclip/XPO5', 'rbp_eclip/XRCC6', 'rbp_eclip/XRN2', 'rbp_eclip/YBX3', 'rbp_eclip/YWHAG', 'rbp_eclip/ZNF622', 'rbp_eclip/ZRANB2']
+
+for index, model in enumerate(models):
+	model_obj = kipoi.get_model(model)
+	pred = model_obj.pipeline.predict_example()
+	print(pred)
+	if index%10 == 0:
+		sleep(5)

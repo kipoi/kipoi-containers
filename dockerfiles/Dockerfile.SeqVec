@@ -1,0 +1,10 @@
+FROM kipoi-base-env:0.1
+
+SHELL ["conda", "run", "-n", "kipoi-env", "/bin/bash", "-c"]
+
+RUN kipoi env create SeqVec --verbose
+
+RUN echo "source activate kipoi-SeqVec" > ~/.bashrc
+ENV PATH /opt/conda/envs/kipoi-SeqVec/bin:$PATH
+
+SHELL ["conda", "run", "-n", "kipoi-SeqVec", "/bin/bash", "-c"]

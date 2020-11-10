@@ -1,0 +1,12 @@
+FROM kipoi-base-env:0.1
+
+ADD ./tests/test-shared-py3-keras12.py /tmp/test-shared-py3-keras12.py
+
+SHELL ["conda", "run", "-n", "kipoi-env", "/bin/bash", "-c"]
+
+RUN kipoi ls && kipoi env create shared/envs/kipoi-py3-keras1.2
+
+RUN echo "source activate kipoi-shared__envs__kipoi-py3-keras1.2" > ~/.bashrc
+ENV PATH /opt/conda/envs/kipoi-shared__envs__kipoi-py3-keras1.2/bin:$PATH
+
+SHELL ["conda", "run", "-n", "kipoi-shared__envs__kipoi-py3-keras1.2", "/bin/bash", "-c"]
