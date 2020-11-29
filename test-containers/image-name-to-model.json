@@ -2149,5 +2149,9 @@
         "AttentiveChrome/E123",
         "AttentiveChrome/E127",
         "AttentiveChrome/E128"
+    ],
+    "haimasree/kipoi-docker:bpnet-oskn": [
+        "BPNet-OSKN"
     ]
+
 }
