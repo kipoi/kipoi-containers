@@ -1,6 +1,5 @@
-FROM kipoi-base-env:0.1
+FROM haimasree/kipoi-docker:kipoi-base-env
 
-ADD ./tests/test-attentivechrome.py /tmp/test-attentivechrome.py
 
 SHELL ["conda", "run", "-n", "kipoi-env", "/bin/bash", "-c"]
 
