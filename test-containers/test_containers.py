@@ -11,9 +11,13 @@ def test_containers_and_models():
     for image_name, model_group in image_to_model_dict.items():
         for model in model_group:
             print(f"image name = {image_name}, model_name={model}")
+            if model == "Basenji":
+                test_cmd = f'kipoi test {model} --source=kipoi --batch_size=2'
+            else:
+                test_cmd = f'kipoi test {model} --source=kipoi'
             client = docker.from_env()
             try:
-                container_log = client.containers.run(image=image_name, command=f'kipoi test {model} --source=kipoi')
+                container_log = client.containers.run(image=image_name, command=test_cmd)
             except docker.errors.ImageNotFound:
                 raise(f"Image {image_name} is not found")
             except docker.errors.ContainerError as e:
