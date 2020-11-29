@@ -11,9 +11,9 @@ docker build -f Dockerfile.base -t haimasree/kipoi-docker:kipoi-base-env ..
 Note: The model specific Dockefiles are sensitive to the name and tag of the base image right now. 
 After the base image is built, build any other image using the following template
 ```
-docker build -f Dockerfile.<model-group-name-in-lowercase> -t haiamsree/kipoi-docker:<image-name> ..
+docker build -f Dockerfile.<model-group-name-in-lowercase> -t haimasree/kipoi-docker:<image-name> ..
 ```
-For more information on grouping, see the section Groups and Images below
+For more information on which model group (or model) can be run with which docker image, see ```test-containers/image-name-to-models.json``` where each  image in docker hub repository haimasree/kipoi-docker is mapped to models they can run. 
 
 # Running the images
 For an interactive experience, run the following -
@@ -32,10 +32,13 @@ docker run -v <aboslute_path_on_host_directory>:<host_directory> haimasree/kipoi
 
 ## Model groups not working
 
+### BPNet-OSKN
+
+Cannot create the environment with the docker base container. 
+
 ### SeqVec
 
-Does not work :(
-
+Some files are missing. I have notfied the lab.
 
 ### rbp_eclip
 

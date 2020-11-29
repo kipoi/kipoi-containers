@@ -1,6 +1,5 @@
 FROM haimasree/kipoi-docker:kipoi-base-env
 
-
 COPY ./envfiles/sharedpy3keras2.yml ./app
 
 RUN conda env create -n kipoi-shared__envs__kipoi-py3-keras2 -f ./app/sharedpy3keras2.yml

@@ -1,12 +1,10 @@
-FROM kipoi-base-env:0.1
+FROM haimasree/kipoi-docker:kipoi-base-env
 
-SHELL ["conda", "run", "-n", "kipoi-env", "/bin/bash", "-c"]
+COPY ./envfiles/mmsplicemtsplice.yml ./app
 
-RUN kipoi env create MMSplice/mtsplice --verbose   
+RUN conda env create -n kipoi-MMSplice__mtsplice -f ./app/mmsplicemtsplice.yml
 
 RUN echo "source activate kipoi-MMSplice__mtsplice" > ~/.bashrc
 ENV PATH /opt/conda/envs/kipoi-MMSplice__mtsplice/bin:$PATH
 
 SHELL ["conda", "run", "-n", "kipoi-MMSplice__mtsplice", "/bin/bash", "-c"]
-
-RUN pip install h5py==2.10.0

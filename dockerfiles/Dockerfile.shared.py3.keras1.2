@@ -1,6 +1,4 @@
-FROM kipoi-base-env:0.1
-
-ADD ./tests/test-shared-py3-keras12.py /tmp/test-shared-py3-keras12.py
+FROM haimasree/kipoi-docker:kipoi-base-env
 
 SHELL ["conda", "run", "-n", "kipoi-env", "/bin/bash", "-c"]
 
