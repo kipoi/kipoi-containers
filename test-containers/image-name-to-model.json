@@ -2093,7 +2093,7 @@
     "haimasree/kipoi-docker:deeptarget": [
         "deepTarget"
     ],
-    "haimasree/kipoi-docker:tttentivechrome": [
+    "haimasree/kipoi-docker:attentivechrome": [
         "AttentiveChrome/E003",
         "AttentiveChrome/E004",
         "AttentiveChrome/E005",

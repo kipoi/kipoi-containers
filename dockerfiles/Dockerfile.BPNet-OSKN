@@ -7,5 +7,4 @@ RUN kipoi env create BPNet-OSKN --verbose
 RUN echo "source activate kipoi-BPNet-OSKN" > ~/.bashrc
 ENV PATH /opt/conda/envs/kipoi-BPNet-OSKN/bin:$PATH
 
-RUN pip install kipoiseq 
 SHELL ["conda", "run", "-n", "kipoi-BPNet-OSKN", "/bin/bash", "-c"]

@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 
 docker-output/
+
+test-containers/__pycache__
