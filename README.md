@@ -5,28 +5,29 @@ This is an attempt to reduce  and eventully eliminate complexities related to cr
 
 First, we need to build the base image which activates a conda environment made with python 3.6 with kipoi installed in it.
 ```
-cd dockers
-docker build -f Dockerfile.base -t kipoi-base-env:0.1 ..
+cd dockerfiles
+docker build -f Dockerfile.base -t haimasree/kipoi-docker:kipoi-base-env ..
 ```
 Note: The model specific Dockefiles are sensitive to the name and tag of the base image right now. 
 After the base image is built, build any other image using the following template
 ```
-docker build -f Dockerfile.<model-group-name-in-lowercase> -t <image-name>:<image-tag> ..
+docker build -f Dockerfile.<model-group-name-in-lowercase> -t haiamsree/kipoi-docker:<image-name> ..
 ```
+For more information on grouping, see the section Groups and Images below
 
 # Running the images
-For an iteractive experience, run the following -
+For an interactive experience, run the following -
 ```
-docker run -it kipoisplice-env:0.1
+docker run -it haimasree
 ```
 This will give you an interactive shell with the relevant conda environment kipoi-KipoiSplice.
 To run your custom kipoi cli calls directly,
 ```
-docker run kipoisplice-env:0.1 kipoi test KipoiSplice/4 --source=kipoi
+docker run haimasree/kipoi-docker:kipoisplice kipoi test KipoiSplice/4 --source=kipoi
 ```
 The users can also map their own directory using -v option. Assuming the host directory contains a file named test-kipoisplice.py, the following command will enable the user to run their own script directly inside the docker image.
 ```
-docker run -v <aboslute_path_on_host_directory>:/tmp/ kipoisplice-env:0.1 python /tmp/test-kipoisplice.py
+docker run -v <aboslute_path_on_host_directory>:<host_directory> haimasree/kipoi-docker:kipoisplice python ./test-kipoisplice.py
 ```
 
 ## Model groups not working
@@ -35,30 +36,6 @@ docker run -v <aboslute_path_on_host_directory>:/tmp/ kipoisplice-env:0.1 python
 
 Does not work :(
 
-
-### Basenji
-
-Environment created with ```kipoi env create Basenji``` does not work.
-Tested inside shared-envs-py3-keras2 environment. The errors are -  
-```
-Traceback (most recent call last):
-  File "/tmp/test-basenji.py", line 9, in <module>
-    pred = model_obj.pipeline.predict_example()
-  File "/opt/conda/envs/kipoi-shared__envs__kipoi-py3-keras2/lib/python3.6/site-packages/kipoi/pipeline.py", line 137, in predict_example
-    pred_batch = self.model.predict_on_batch(batch['inputs'])
-  File "/opt/conda/envs/kipoi-shared__envs__kipoi-py3-keras2/lib/python3.6/site-packages/kipoi/model.py", line 1579, in predict_on_batch
-    feed_dict=merge_dicts(feed_dict, self.const_feed_dict))
-  File "/opt/conda/envs/kipoi-shared__envs__kipoi-py3-keras2/lib/python3.6/site-packages/tensorflow/python/client/session.py", line 889, in run
-    run_metadata_ptr)
-  File "/opt/conda/envs/kipoi-shared__envs__kipoi-py3-keras2/lib/python3.6/site-packages/tensorflow/python/client/session.py", line 1096, in _run
-    % (np_val.shape, subfeed_t.name, str(subfeed_t.get_shape())))
-ValueError: Cannot feed value of shape (10, 131072, 4) for Tensor 'inputs:0', which has shape '(2, 131072, 4)'
-```
-
-### extended_coda
-
-```kipoi env create extended_coda``` does not work.
-Update: I have fixed this on 
 
 ### rbp_eclip
 
@@ -172,9 +149,6 @@ ValueError: bad marshal data (unknown type code)
 ```
 Seems eerily similar to https://github.com/kipoi/models/issues/65
 
-### DeepSea/Beluga
-
-Runs with shared-py3-keras2 environment like the other two models in group DeepSEA but this is not specified here - https://github.com/kipoi/models/blob/master/shared/envs/models.yaml.
 
 ### KipoiSplice
 
