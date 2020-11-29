@@ -25,3 +25,4 @@ def test_containers_and_models():
             except docker.errors.APIError as e:
                 raise(e)
             print(container_log.decode("utf-8"))
+            client.images.prune(filters={'dangling': False})
