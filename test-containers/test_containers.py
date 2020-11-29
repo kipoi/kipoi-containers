@@ -24,4 +24,4 @@ def test_containers_and_models():
                 raise(e)
             except docker.errors.APIError as e:
                 raise(e)
-            print(container_log.decode("utf-8") )
+            print(container_log.decode("utf-8"))
