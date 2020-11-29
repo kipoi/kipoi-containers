@@ -27,7 +27,7 @@ docker run haimasree/kipoi-docker:kipoisplice kipoi test KipoiSplice/4 --source=
 ```
 The users can also map their own directory using -v option. Assuming the host directory contains a file named test-kipoisplice.py, the following command will enable the user to run their own script directly inside the docker image.
 ```
-docker run -v <aboslute_path_on_host_directory>:<host_directory> haimasree/kipoi-docker:kipoisplice python ./test-kipoisplice.py
+docker run -v <aboslute_path_on_host_directory>:<host_directory> haimasree/kipoi-docker:kipoisplice python ./tests/test-kipoisplice.py
 ```
 
 ## Model groups not working
