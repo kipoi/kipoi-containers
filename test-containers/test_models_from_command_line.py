@@ -3,20 +3,19 @@ import docker
 
 def run_test(model_name, image_name):
     if model_name == "Basenji":
-        test_cmd = f'kipoi test {model_name} --source=kipoi --batch_size=2'
+        test_cmd = f"kipoi test {model_name} --source=kipoi --batch_size=2"
     else:
-        test_cmd = f'kipoi test {model_name} --source=kipoi'
+        test_cmd = f"kipoi test {model_name} --source=kipoi"
     client = docker.from_env()
     try:
-        container_log = client.containers.run(
-            image=image_name, command=test_cmd)
+        container_log = client.containers.run(image=image_name, command=test_cmd)
     except docker.errors.ImageNotFound:
-        raise(f"Image {image_name} is not found")
+        raise (f"Image {image_name} is not found")
     except docker.errors.ContainerError as e:
-        raise(e)
+        raise (e)
     except docker.errors.APIError as e:
-        raise(e)
-    client.images.prune(filters={'dangling': False})
+        raise (e)
+    client.images.prune(filters={"dangling": False})
     print(container_log.decode("utf-8"))
 
 
@@ -26,14 +25,15 @@ class TestServerCode(object):
     list_of_models = []
 
     def get_image_name(self, model):
-        assert model in self.model_group_to_image_dict or model.split(
-            '/')[0] in self.model_group_to_image_dict
+        assert (
+            model in self.model_group_to_image_dict
+            or model.split("/")[0] in self.model_group_to_image_dict
+        )
         if model in self.model_group_to_image_dict:  # For MMSplice/mtsplice
             image_name = self.model_group_to_image_dict.get(model)
             print(f"model_name={model}, image_name={image_name}")
-        elif model.split('/')[0] in self.model_group_to_image_dict:
-            image_name = self.model_group_to_image_dict.get(
-                model.split('/')[0])
+        elif model.split("/")[0] in self.model_group_to_image_dict:
+            image_name = self.model_group_to_image_dict.get(model.split("/")[0])
             print(f"model_name={model}, image_name={image_name}")
         return image_name
 

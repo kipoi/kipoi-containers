@@ -131,3 +131,5 @@ dmypy.json
 docker-output/
 
 test-containers/__pycache__
+
+.vscode/
