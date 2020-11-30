@@ -18,7 +18,7 @@ For more information on which model group (or model) can be run with which docke
 # Running the images
 For an interactive experience, run the following -
 ```
-docker run -it haimasree
+docker run -it haimasree/kipoi-docker:kipoisplice
 ```
 This will give you an interactive shell with the relevant conda environment kipoi-KipoiSplice.
 To run your custom kipoi cli calls directly,
