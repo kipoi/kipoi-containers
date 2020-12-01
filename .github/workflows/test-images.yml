@@ -33,5 +33,6 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        pytest -s test-containers/test_models_from_command_line.py --model=DeepCpG_DNA/Hou2016_HepG2_dna
-        sudo rm -rf /root/.kipoi/models/DeepCpG_DNA
+        pytest -s test-containers/test_models_from_command_line.py --model=DeepCpG_DNA/Hou2016_HCC_dna
+        sudo rm -rf /root/.kipoi/models/DeepCpG_DNA/Hou2016_HCC_dna/downloaded
+        docker system prune -a -f
