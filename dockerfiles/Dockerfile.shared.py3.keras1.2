@@ -1,8 +1,8 @@
 FROM haimasree/kipoi-docker:kipoi-base-env
 
-SHELL ["conda", "run", "-n", "kipoi-env", "/bin/bash", "-c"]
+COPY ./envfiles/sharedpy3keras12.yml ./app
 
-RUN kipoi ls && kipoi env create shared/envs/kipoi-py3-keras1.2
+RUN conda env create -n kipoi-shared__envs__kipoi-py3-keras1.2 -f ./app/sharedpy3keras12.yml
 
 RUN echo "source activate kipoi-shared__envs__kipoi-py3-keras1.2" > ~/.bashrc
 ENV PATH /opt/conda/envs/kipoi-shared__envs__kipoi-py3-keras1.2/bin:$PATH
