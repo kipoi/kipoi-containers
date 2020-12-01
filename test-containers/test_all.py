@@ -2,7 +2,6 @@ import json
 from pathlib import Path
 
 import docker
-import pytest
 
 
 def test_containers_and_models():
@@ -33,4 +32,3 @@ def test_containers_and_models():
             client.images.prune(filters={"dangling": True})
             client.volumes.prune()
             client.containers.prune()
-

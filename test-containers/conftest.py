@@ -52,4 +52,3 @@ def pytest_generate_tests(metafunc):
         model_from_cmd_line = metafunc.config.getoption("model")
         if model_from_cmd_line and hasattr(metafunc.cls, "model_name"):
             metafunc.cls.model_name = model_from_cmd_line[0]
-

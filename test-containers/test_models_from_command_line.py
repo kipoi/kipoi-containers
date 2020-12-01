@@ -8,7 +8,9 @@ def run_test(model_name, image_name):
         test_cmd = f"kipoi test {model_name} --source=kipoi"
     client = docker.from_env()
     try:
-        container_log = client.containers.run(image=image_name, command=test_cmd)
+        container_log = client.containers.run(
+            image=image_name, command=test_cmd
+        )
     except docker.errors.ImageNotFound:
         raise (f"Image {image_name} is not found")
     except docker.errors.ContainerError as e:
@@ -35,12 +37,14 @@ class TestServerCode(object):
             image_name = self.model_group_to_image_dict.get(model)
             print(f"model_name={model}, image_name={image_name}")
         elif model.split("/")[0] in self.model_group_to_image_dict:
-            image_name = self.model_group_to_image_dict.get(model.split("/")[0])
+            image_name = self.model_group_to_image_dict.get(
+                model.split("/")[0]
+            )
             print(f"model_name={model}, image_name={image_name}")
         return image_name
 
     def test_parameters(self):
-        assert self.model_name != None or self.list_of_models != []
+        assert self.model_name is not None or self.list_of_models != []
         assert self.model_group_to_image_dict != {}
 
     def test_models(self):
@@ -48,6 +52,6 @@ class TestServerCode(object):
             for model in self.list_of_models:
                 image_name = self.get_image_name(model=model)
                 run_test(model_name=model, image_name=image_name)
-        elif self.model_name != None:
+        elif self.model_name is not None:
             image_name = self.get_image_name(model=self.model_name)
             run_test(model_name=self.model_name, image_name=image_name)
