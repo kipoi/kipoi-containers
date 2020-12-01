@@ -15,7 +15,9 @@ def run_test(model_name, image_name):
         raise (e)
     except docker.errors.APIError as e:
         raise (e)
-    client.images.prune(filters={"dangling": False})
+    client.images.prune(filters={"dangling": True})
+    client.volumes.prune()
+    client.containers.prune()
     print(container_log.decode("utf-8"))
 
 

@@ -1,0 +1,112 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Test each model group with one representative model per group with compatible docker images
+
+on:
+  push:
+    branches: [ '**' ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Test with pytest
+      run: |
+        pytest -s test-containers/test_models_from_command_line.py --model=CpGenie/A549_ENCSR000DDI
+        sudo rm -rf /root/.kipoi/models/CpGenie/A549_ENCSR000DDI/downloaded
+        pytest -s test-containers/test_models_from_command_line.py --model=Divergent421
+        sudo rm -rf /root/.kipoi/models/Divergent421/downloaded
+        pytest -s test-containers/test_models_from_command_line.py --model=DeepCpG_DNA/Hou2016_HCC_dna
+        sudo rm -rf /root/.kipoi/models/DeepCpG_DNA/Hou2016_HCC_dna/downloaded
+        docker system prune -a -f
+
+        pytest -s test-containers/test_models_from_command_line.py --model=Basenji
+        sudo rm -rf /root/.kipoi/models/Basenji/downloaded
+        pytest -s test-containers/test_models_from_command_line.py --model=Basset
+        sudo rm -rf /root/.kipoi/models/Basset/downloaded
+        pytest -s test-containers/test_models_from_command_line.py --model=HAL
+        sudo rm -rf /root/.kipoi/models/HAL/downloaded
+        pytest -s test-containers/test_models_from_command_line.py --model=DeepSEA/variantEffects
+        sudo rm -rf /root/.kipoi/models/DeepSEA/variantEffects/downloaded
+        pytest -s test-containers/test_models_from_command_line.py --model=Optimus_5Prime
+        sudo rm -rf /root/.kipoi/models/Optimus_5Prime/downloaded
+        pytest -s test-containers/test_models_from_command_line.py --model=labranchor
+        sudo rm -rf /root/.kipoi/models/labranchor/downloaded
+        pytest -s test-containers/test_models_from_command_line.py --model=CleTimer/customBP
+        sudo rm -rf /root/.kipoi/models/CleTimer/customBP/downloaded
+        pytest -s test-containers/test_models_from_command_line.py --model=SiSp
+        sudo rm -rf /root/.kipoi/models/SiSp/downloaded
+        pytest -s test-containers/test_models_from_command_line.py --model=FactorNet/FOXA2/onePeak_Unique35_DGF
+        sudo rm -rf /root/.kipoi/models/FactorNet/FOXA2/onePeak_Unique35_DGF/downloaded
+        pytest -s test-containers/test_models_from_command_line.py --model=MaxEntScan/5prime
+        sudo rm -rf /root/.kipoi/models/MaxEntScan/5prime/downloaded
+        pytest -s test-containers/test_models_from_command_line.py --model=pwm_HOCOMOCO/human/AHR
+        sudo rm -rf /root/.kipoi/models/pwm_HOCOMOCO/human/AHR/downloaded
+        pytest -s test-containers/test_models_from_command_line.py --model=DeepBind/Arabidopsis_thaliana/RBP/D00283.001_RNAcompete_At_0284
+        sudo rm -rf /root/.kipoi/models/DeepBind/Arabidopsis_thaliana/RBP/D00283.001_RNAcompete_At_0284/downloaded
+        pytest -s test-containers/test_models_from_command_line.py --model=lsgkm-SVM/Chip/OpenChrom/Cmyc/K562
+        sudo rm -rf /root/.kipoi/models/lsgkm-SVM/Chip/OpenChrom/Cmyc/K562/downloaded
+        pytest -s test-containers/test_models_from_command_line.py --model=rbp_eclip/AARS
+        sudo rm -rf /root/.kipoi/models/rbp_eclip/AARS/downloaded
+        docker system prune -a -f
+        
+        pytest -s test-containers/test_models_from_command_line.py --model=MPRA-DragoNN/DeepFactorizedModel
+        sudo rm -rf /root/.kipoi/models/MPRA-DragoNN/DeepFactorizedModel/downloaded
+        docker system prune -a -f
+        
+        pytest -s test-containers/test_models_from_command_line.py --model=extended_coda
+        sudo rm -rf /root/.kipoi/models/extended_coda/downloaded
+        docker system prune -a -f
+        
+        pytest -s test-containers/test_models_from_command_line.py --model=MMSplice/mtsplice
+        sudo rm -rf /root/.kipoi/models/MMSplice/mtsplice/downloaded
+        docker system prune -a -f
+        
+        pytest -s test-containers/test_models_from_command_line.py --model=MMSplice/deltaLogitPSI
+        sudo rm -rf /root/.kipoi/models/MMSplice/deltaLogitPSI/downloaded
+        docker system prune -a -f
+        
+        pytest -s test-containers/test_models_from_command_line.py --model=DeepMEL
+        sudo rm -rf /root/.kipoi/models/DeepMEL/downloaded
+        docker system prune -a -f
+        
+        pytest -s test-containers/test_models_from_command_line.py --model=Framepool
+        sudo rm -rf /root/.kipoi/models/Framepool/downloaded
+        docker system prune -a -f
+
+        pytest -s test-containers/test_models_from_command_line.py --model=KipoiSplice/4cons
+        sudo rm -rf /root/.kipoi/models/KipoiSplice/4cons/downloaded
+        docker system prune -a -f
+
+        pytest -s test-containers/test_models_from_command_line.py --model=deepTarget
+        sudo rm -rf /root/.kipoi/models/deepTarget/downloaded
+        docker system prune -a -f
+
+        pytest -s test-containers/test_models_from_command_line.py --model=AttentiveChrome/E003
+        sudo rm -rf /root/.kipoi/models/AttentiveChrome/E003/downloaded
+        docker system prune -a -f
+        
+        pytest -s test-containers/test_models_from_command_line.py --model=BPNet-OSKN
+        sudo rm -rf /root/.kipoi/models/BPNet-OSKN/downloaded
+        docker system prune -a -f
