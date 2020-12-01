@@ -5,8 +5,8 @@ modelNames=(CpGenie/A549_ENCSR000DDI Divergent421 DeepCpG_DNA/Hou2016_HepG2_dna 
 
 for i in ${!modelNames[@]}; do
         #pytest -s test-containers/test_models_from_command_line.py --model=${modelNames[$i]}
-        if (( $i -lt ${#envNames[@]} )) ; then
-          if (( ${envNames[$i]} -ne ${envNames[$i+1]} )) ; then
+        if [[ $i -lt ${#envNames[@]} ]] ; then
+          if [[ ${envNames[$i]} -ne ${envNames[$i+1]} ]] ; then
             echo ${envNames[$i]}
             docker system prune -a -f
           fi
