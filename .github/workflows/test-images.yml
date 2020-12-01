@@ -33,6 +33,14 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
+        pytest -s test-containers/test_models_from_command_line.py --model=CpGenie/A549_ENCSR000DDI
+        sudo rm -rf /root/.kipoi/models/CpGenie/A549_ENCSR000DDI/downloaded
+        pytest -s test-containers/test_models_from_command_line.py --model=Divergent421
+        sudo rm -rf /root/.kipoi/models/Divergent421/downloaded
+        pytest -s test-containers/test_models_from_command_line.py --model=DeepCpG_DNA/Hou2016_HCC_dna
+        sudo rm -rf /root/.kipoi/models/DeepCpG_DNA/Hou2016_HCC_dna/downloaded
+        docker system prune -a -f
+
         pytest -s test-containers/test_models_from_command_line.py --model=Basenji
         sudo rm -rf /root/.kipoi/models/Basenji/downloaded
         pytest -s test-containers/test_models_from_command_line.py --model=Basset
