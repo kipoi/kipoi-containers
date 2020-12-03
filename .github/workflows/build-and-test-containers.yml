@@ -28,4 +28,4 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Build and test the containers
         run: |
-          ./test-containers/build-and-test-images.sh
+          ./build-and-test-images.sh
