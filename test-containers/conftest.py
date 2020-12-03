@@ -5,6 +5,7 @@ import json
 def pytest_addoption(parser):
     """ attaches optional cmd-line args to the pytest machinery """
     parser.addoption("--model", action="append", default=[], help="model name")
+    parser.addoption("--image", action="append", default=[], help="Image name")
     parser.addoption(
         "--all",
         action="store_true",
@@ -17,6 +18,11 @@ def pytest_generate_tests(metafunc):
         Path.cwd() / "test-containers" / "model-group-to-image-name.json", "r"
     ) as infile:
         metafunc.cls.model_group_to_image_dict = json.load(infile)
+
+    with open(
+        Path.cwd() / "test-containers" / "image-name-to-model.json", "r"
+    ) as infile:
+        metafunc.cls.image_to_model_dict = json.load(infile)
 
     if metafunc.config.getoption("all"):
         metafunc.cls.list_of_models = [
@@ -48,7 +54,11 @@ def pytest_generate_tests(metafunc):
             "AttentiveChrome/E003",
             "BPNet-OSKN",
         ]
-    else:
+    elif metafunc.config.getoption("model"):
         model_from_cmd_line = metafunc.config.getoption("model")
         if model_from_cmd_line and hasattr(metafunc.cls, "model_name"):
             metafunc.cls.model_name = model_from_cmd_line[0]
+    elif metafunc.config.getoption("image"):
+        image_from_cmd_line = metafunc.config.getoption("image")
+        if image_from_cmd_line and hasattr(metafunc.cls, "image_name"):
+            metafunc.cls.image_name = image_from_cmd_line[0]
