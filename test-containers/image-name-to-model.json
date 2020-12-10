@@ -2152,5 +2152,8 @@
     ],
     "haimasree/kipoi-docker:bpnet-oskn": [
         "BPNet-OSKN"
+    ],
+    "haimasree/kipoi-docker:seqvec": [
+        "SeqVec/structure"
     ]
 }
