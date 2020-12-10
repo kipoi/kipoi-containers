@@ -28,6 +28,6 @@
     "KipoiSplice": "haimasree/kipoi-docker:kipoisplice",
     "deepTarget": "haimasree/kipoi-docker:deeptarget",
     "AttentiveChrome": "haimasree/kipoi-docker:attentivechrome",
-    "BPNet-OSKN": "haimasree/kipoi-docker:bpnet-oskn"
-
+    "BPNet-OSKN": "haimasree/kipoi-docker:bpnet-oskn",
+    "SeqVec": "haimasree/kipoi-docker:seqvec"
 }

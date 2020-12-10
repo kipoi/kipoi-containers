@@ -35,12 +35,10 @@ class TestServerCode(object):
         )
         if model in self.model_group_to_image_dict:  # For MMSplice/mtsplice
             image_name = self.model_group_to_image_dict.get(model)
-            print(f"model_name={model}, image_name={image_name}")
         elif model.split("/")[0] in self.model_group_to_image_dict:
             image_name = self.model_group_to_image_dict.get(
                 model.split("/")[0]
             )
-            print(f"model_name={model}, image_name={image_name}")
         return image_name
 
     def test_parameters(self):

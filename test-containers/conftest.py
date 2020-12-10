@@ -53,6 +53,7 @@ def pytest_generate_tests(metafunc):
             "deepTarget",
             "AttentiveChrome/E003",
             "BPNet-OSKN",
+            "SeqVec/structure",
         ]
     elif metafunc.config.getoption("model"):
         model_from_cmd_line = metafunc.config.getoption("model")
