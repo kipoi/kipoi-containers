@@ -34,4 +34,6 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        ./test-containers/test-all-models.sh
+        pytest -s test-containers/test_models_from_command_line.py --model=SeqVec/embedding2structure 
+        pytest -s test-containers/test_models_from_command_line.py --model=SeqVec/structure,SeqVec/embedding
+        docker system prune -a -f
