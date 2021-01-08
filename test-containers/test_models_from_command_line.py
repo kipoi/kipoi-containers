@@ -51,5 +51,6 @@ class TestServerCode(object):
                 image_name = self.get_image_name(model=model)
                 run_test(model_name=model, image_name=image_name)
         elif self.model_name is not None:
-            image_name = self.get_image_name(model=self.model_name)
-            run_test(model_name=self.model_name, image_name=image_name)
+            for model in self.model_name:
+                image_name = self.get_image_name(model=model)
+                run_test(model_name=model, image_name=image_name)
