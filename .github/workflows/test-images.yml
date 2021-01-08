@@ -11,14 +11,10 @@ on:
 
 jobs:
   build:
-     strategy:
-      fail-fast: false
-      matrix:
-        model: [CpGenie/A549_ENCSR000DDI, Divergent421]
 
-     runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-  steps:
+    steps:
     - uses: actions/checkout@v2
     - uses: psf/black@stable
     - name: Set up Python 3.8
@@ -38,4 +34,4 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        pytest -s test-containers/test_models_from_command_line.py --model=${{ matrix.model }}
+        ./test-containers/test-all-models.sh

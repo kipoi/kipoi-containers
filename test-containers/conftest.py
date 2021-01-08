@@ -4,7 +4,9 @@ import json
 
 def pytest_addoption(parser):
     """ attaches optional cmd-line args to the pytest machinery """
-    parser.addoption("--model", action="append", default=[], help="model name")
+    parser.addoption(
+        "--model", action="append", default=[], help="Model name(s)"
+    )
     parser.addoption("--image", action="append", default=[], help="Image name")
     parser.addoption(
         "--all",
@@ -58,7 +60,9 @@ def pytest_generate_tests(metafunc):
     elif metafunc.config.getoption("model"):
         model_from_cmd_line = metafunc.config.getoption("model")
         if model_from_cmd_line and hasattr(metafunc.cls, "model_name"):
-            metafunc.cls.model_name = model_from_cmd_line[0]
+            models_to_test = model_from_cmd_line[0].split(",")
+            print(models_to_test)
+            metafunc.cls.model_name = models_to_test
     elif metafunc.config.getoption("image"):
         image_from_cmd_line = metafunc.config.getoption("image")
         if image_from_cmd_line and hasattr(metafunc.cls, "image_name"):
