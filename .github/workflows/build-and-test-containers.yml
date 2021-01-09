@@ -33,7 +33,7 @@ jobs:
                 "seqvec"
                 ]
     runs-on: ubuntu-latest
-
+    timeout-minutes: 720
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -48,7 +48,6 @@ jobs:
           pip install pytest
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Build and test ${{ matrix.image }}
-        timeout-minutes: 720
         run: |
           docker build -f dockerfiles/Dockerfile.kipoi-base-env -t haimasree/kipoi-docker:kipoi-base-env . 
           docker build -f dockerfiles/Dockerfile.${{ matrix.image }} -t haimasree/kipoi-docker:${{ matrix.image }} . 

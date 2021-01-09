@@ -2155,6 +2155,7 @@
     ],
     "haimasree/kipoi-docker:seqvec": [
         "SeqVec/structure",
-        "SeqVec/embedding",
+        "SeqVec/embedding"
     ]
 }
+
