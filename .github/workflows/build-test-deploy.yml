@@ -7,16 +7,11 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  buildandpushkipoibaseimage:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - uses: actions/checkout@v2
-      - uses: psf/black@stable
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
@@ -24,14 +19,52 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flake8 pytest
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      # Runs a single command using the runners shell
-      - name: Start the monthly build
+      - name: Build and push kipoi base image to dockerhub
+        run: |
+          docker build -f dockerfiles/Dockerfile.kipoi-base-env -t haimasree/kipoi-docker:kipoi-base-env . 
+          docker push haimasree:kipoi-base-env 
+
+  buildtestdeploy:
+    needs: buildandpushkipoibaseimage
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [
+                "sharedpy3keras1.2", 
+                "sharedpy3keras2",
+                "mpra-dragonn",
+                "extended_coda",
+                "mmsplice",
+                "mmsplice-mtsplice",
+                "deepmel",
+                "framepool",
+                "kipoisplice",
+                "deeptarget",
+                "attentivechrome",
+                "bpnet-oskn",
+                "seqvec"
+                ]
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install pytest
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      # Runs a set of commands using the runners shell
-      - name: Build,test and push the containers to dockerhub
+      - name: Build,test and push ${{ matrix.image }} to dockerhub
+        timeout-minutes: 720
         run: |
-          ./build-test-and-deploy-images.sh
+          docker build -f dockerfiles/Dockerfile.${{ matrix.image }} -t haimasree/kipoi-docker:${{ matrix.image }} . 
+          pytest -s test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:${{ matrix.image }} 
+          docker push haimasree/kipoi-docker:${{ matrix.image }} 
+          docker system prune -a -f 
