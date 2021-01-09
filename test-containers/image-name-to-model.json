@@ -2154,6 +2154,7 @@
         "BPNet-OSKN"
     ],
     "haimasree/kipoi-docker:seqvec": [
-        "SeqVec/structure"
+        "SeqVec/structure",
+        "SeqVec/embedding",
     ]
 }
