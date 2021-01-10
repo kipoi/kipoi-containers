@@ -1,4 +1,5 @@
 import docker
+import shutil
 
 
 def run_test(model_name, image_name, clean=False):
@@ -41,3 +42,9 @@ class TestServerCode(object):
                 run_test(
                     model_name=model, image_name=self.image_name, clean=True
                 )
+                try:
+                    shutil.rmtree(
+                        f"~/.kipoi/models/{model}/downloaded/example_files/"
+                    )
+                except OSError as e:
+                    print(f"Error: {e.filename} - {e.strerror}.")
