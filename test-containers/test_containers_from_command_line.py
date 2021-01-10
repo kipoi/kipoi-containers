@@ -44,7 +44,7 @@ class TestServerCode(object):
                 )
                 try:
                     shutil.rmtree(
-                        f"~/.kipoi/models/{model}/downloaded/example_files/"
+                        f"/root/.kipoi/models/{model}/downloaded/example_files/"
                     )
                 except OSError as e:
                     print(f"Error: {e.filename} - {e.strerror}.")
