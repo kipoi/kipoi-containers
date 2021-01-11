@@ -59,3 +59,4 @@ Due to conflicting package requirements, all models in group MMSplice could not 
 ## Singularity support
 
 The images in ```haimasree/kipoi-docker``` repo in dockerhub can be easily converted into a local singularity image using ```./build-singularity-container.sh```. If no argument is provided, all existing images will be converted and a sample model will be tested against the singularity image as a sanity check. Otherwise, ```./build-singularity-container.sh -i <name of the docker image> -m <suitable model group name>``` will convert a docker image in ```haimasree/kipoi-docker``` repo into a singularity image and test the named model. For example,  ```./build-singularity-container.sh -i sharedpy3keras2 -m Basset``` will test Basset with the singularity container made locally from haimasree/kipoi-docker:sharedpy3keras2
+This script is meant to support systems where docker is not available due to security reasons or otherwise.
