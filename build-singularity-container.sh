@@ -10,6 +10,12 @@ while getopts 'i:m:' flag; do
   esac
 done
 
+if [[ ($imageName = "" && $modelName != "") || ($imageName != "" && $modelName = "") ]]
+then
+    echo "Please enter both image and model name"
+    exit 1
+fi
+
 if [$imageName = ""] && [$modelName = ""]
 then
     imageNames=(sharedpy3keras1.2 sharedpy3keras2 mpra-dragonn extended_coda mmsplice mmsplice-mtsplice deepmel framepool kipoisplice deeptarget attentivechrome bpnet-oskn)
