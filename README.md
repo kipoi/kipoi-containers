@@ -1,5 +1,6 @@
 # kipoi-docker
-This is an attempt to reduce  and eventully eliminate complexities related to creating and invoking model specific conda environments 
+This is an attempt to reduce  and eventully eliminate complexities related to creating and invoking model specific conda environments. The docker images are hosted 
+[here](https://hub.docker.com/repository/docker/haimasree/kipoi-docker).
 
 # Building the docker images
 
@@ -54,3 +55,8 @@ Currently, there are two ways to test the containers along with the models.
 To know which model group/model is represented by which docker image pleae take a look at https://github.com/haimasree/kipoi-containers/blob/main/test-containers/model-group-to-image-name.json
 
 Due to conflicting package requirements, all models in group MMSplice could not be represented by a single docker image. MMSplice/mtsplice has its own docker image named haimasree/kipoi-docker:mmsplice-mtsplice and the rest can be tested with haimasree/kipoi-docker:mmsplice
+
+## Singularity support
+
+This feature is meant to support systems where docker is not available due to security reasons or otherwise. There is no need for installing docker. However, singularity must be installed.
+The images in [haimasree/kipoi-docker](https://hub.docker.com/repository/docker/haimasree/kipoi-docker) can be easily converted into a local singularity image using ```build-singularity-container.sh```. If no argument is provided, all existing images will be converted and a sample model will be tested against the singularity image as a sanity check. Otherwise, ```./build-singularity-container.sh -i <name of the docker image> -m <compatible model name>``` will convert a docker image in ```haimasree/kipoi-docker``` repo into a singularity image and test the named model. For example,  ```./build-singularity-container.sh -i sharedpy3keras2 -m Basset``` will test Basset with the singularity container made locally from haimasree/kipoi-docker:sharedpy3keras2
