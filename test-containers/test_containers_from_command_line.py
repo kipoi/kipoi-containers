@@ -1,8 +1,7 @@
 import docker
-import shutil
 
 
-def run_test(model_name, image_name, clean=False):
+def run_test(model_name, image_name):
     if model_name == "Basenji":
         test_cmd = f"kipoi test {model_name} --source=kipoi --batch_size=2"
     else:
@@ -18,9 +17,9 @@ def run_test(model_name, image_name, clean=False):
         raise (e)
     except docker.errors.APIError as e:
         raise (e)
-    if clean:
-        client.containers.prune()
-        # client.images.prune(filters={"dangling": False})
+    client.containers.prune()
+    client.networks.prune()
+    client.volumes.prune()
     print(container_log.decode("utf-8"))
 
 
@@ -34,17 +33,7 @@ class TestServerCode(object):
 
     def test_images(self):
         if self.image_name not in [None, "kipoi-base-env"]:
-            print(self.image_name)
             models = self.image_to_model_dict.get(self.image_name)
-            print(f"models are {models}")
             for model in models:
                 print(f"Testing {model} with {self.image_name}")
-                run_test(
-                    model_name=model, image_name=self.image_name, clean=True
-                )
-                try:
-                    shutil.rmtree(
-                        f"/root/.kipoi/models/{model}/downloaded/example_files/"
-                    )
-                except OSError as e:
-                    print(f"Error: {e.filename} - {e.strerror}.")
+                run_test(model_name=model, image_name=self.image_name)
