@@ -50,6 +50,7 @@ jobs:
           pytest -s test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:${{ matrix.image }} 
           docker system prune -a -f
 
+
   # Need to create two separate jobs for sharedpy3keras2 as it is not possible to test all the compatible model groups within the allotted time of 6 hours
   buildandtestsharedpy3keras2:
     # The type of runner that the job will run on
@@ -61,8 +62,8 @@ jobs:
                 "sharedpy3keras2"
         ]
         modelgroup: [
-            "Basenji,Basset,HAL,DeepSEA,Optimus_5Prime,labranchor,CleTimer,SiS,FactorNet,MaxEntScan,pwm_HOCOMOCO,DeepBind",
-            "lsgkm-SVM,rbp_eclip"
+            "Basenji,Basset,HAL,DeepSEA,Optimus_5Prime,labranchor,CleTimer,SiSp,FactorNet,MaxEntScan,pwm_HOCOMOCO",
+            "DeepBind,lsgkm-SVM,rbp_eclip"
         ]
     runs-on: ubuntu-latest
     # Steps represent a sequence of tasks that will be executed as part of the job
