@@ -57,10 +57,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [
-                "sharedpy3keras2", 
-                "sharedpy3keras2"
-        ]
         modelgroup: [
             "Basenji,Basset,HAL,DeepSEA,Optimus_5Prime,labranchor,CleTimer,SiSp,FactorNet,MaxEntScan,pwm_HOCOMOCO",
             "DeepBind,lsgkm-SVM,rbp_eclip"
@@ -78,9 +74,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Build and test ${{ matrix.image }} with ${{ matrix.modelgroup }}
+      - name: Build and test sharedpy3keras2 with ${{ matrix.modelgroup }}
         run: |
           docker build -f dockerfiles/Dockerfile.kipoi-base-env -t haimasree/kipoi-docker:kipoi-base-env . 
-          docker build -f dockerfiles/Dockerfile.${{ matrix.image }} -t haimasree/kipoi-docker:${{ matrix.image }} . 
-          pytest -s test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:${{ matrix.image }} --modelgroup=${{ matrix.modelgroup }}
+          docker build -f dockerfiles/Dockerfile.sharedpy3keras2 -t haimasree/kipoi-docker:sharedpy3keras2 . 
+          pytest -s test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:sharedpy3keras2 --modelgroup=${{ matrix.modelgroup }}
           docker system prune -a -f
