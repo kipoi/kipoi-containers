@@ -25,14 +25,27 @@ def run_test(model_name, image_name):
 
 class TestServerCode(object):
     image_name = None
+    modelgroup_name = None
     image_to_model_dict = {}
 
     def test_parameters(self):
         assert self.image_name not in [None, "kipoi-base-env"]
+        assert not self.modelgroup_name or (
+            self.modelgroup_name
+            and self.image_name not in [None, "kipoi-base-env"]
+        )
         assert self.image_to_model_dict != {}
 
     def test_images(self):
-        if self.image_name not in [None, "kipoi-base-env"]:
+        if self.modelgroup_name and self.image_name not in [
+            None,
+            "kipoi-base-env",
+        ]:
+            models = self.image_to_model_dict.get(self.image_name)
+            for model in models:
+                if model.split("/")[0] in self.modelgroup_name:
+                    run_test(model_name=model, image_name=self.image_name)
+        elif self.image_name not in [None, "kipoi-base-env"]:
             models = self.image_to_model_dict.get(self.image_name)
             for model in models:
                 print(f"Testing {model} with {self.image_name}")
