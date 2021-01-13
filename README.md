@@ -60,3 +60,9 @@ Due to conflicting package requirements, all models in group MMSplice could not 
 
 This feature is meant to support systems where docker is not available due to security reasons or otherwise. There is no need for installing docker. However, singularity must be installed.
 The images in [haimasree/kipoi-docker](https://hub.docker.com/repository/docker/haimasree/kipoi-docker) can be easily converted into a local singularity image using ```build-singularity-container.sh```. If no argument is provided, all existing images will be converted and a sample model will be tested against the singularity image as a sanity check. Otherwise, ```./build-singularity-container.sh -i <name of the docker image> -m <compatible model name>``` will convert a docker image in ```haimasree/kipoi-docker``` repo into a singularity image and test the named model. For example,  ```./build-singularity-container.sh -i sharedpy3keras2 -m Basset``` will test Basset with the singularity container made locally from haimasree/kipoi-docker:sharedpy3keras2
+
+## Models not working
+
+Following models are missing their respective dataloader.pkl files -
+```rbp_eclip/U2AF1, rbp_eclip/U2AF2, rbp_eclip/U2AF2, rbp_eclip/UCHL5, rbp_eclip/UPF1, rbp_eclip/XPO5, rbp_eclip/XRN2, rbp_eclip/YBX3, rbp_eclip/YWHAG, rbp_eclip/ZNF622, rbp_eclip/ZRANB2```
+They have been removed from test-containers/image-name-to-model.json.
