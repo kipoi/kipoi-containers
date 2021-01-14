@@ -5,7 +5,7 @@ name: Test each model group with one representative model per group with compati
 
 on:
   push:
-    branches: [ '**' ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
