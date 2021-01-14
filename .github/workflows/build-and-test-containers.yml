@@ -59,7 +59,8 @@ jobs:
       matrix:
         modelgroup: [
             "Basenji,Basset,HAL,DeepSEA,Optimus_5Prime,labranchor,CleTimer,SiSp,FactorNet,MaxEntScan,pwm_HOCOMOCO",
-            "DeepBind,lsgkm-SVM,rbp_eclip"
+            "DeepBind,lsgkm-SVM",
+            "rbp_eclip"
         ]
     runs-on: ubuntu-latest
     # Steps represent a sequence of tasks that will be executed as part of the job
