@@ -18,10 +18,13 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+            python-version: 3.8
       # Runs a set of commands using the runners shell
       - name: Run 
-        run: |
-          echo $currentHead
+        run: 
+          python model-updater/update.py $currentHead
         env:
           currentHead: git ls-remote https://github.com/kipoi/models HEAD  
