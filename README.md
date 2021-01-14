@@ -65,4 +65,4 @@ The images in [haimasree/kipoi-docker](https://hub.docker.com/repository/docker/
 
 Following models are missing their respective dataloader.pkl files -
 ```rbp_eclip/U2AF1, rbp_eclip/U2AF2, rbp_eclip/U2AF2, rbp_eclip/UCHL5, rbp_eclip/UPF1, rbp_eclip/XPO5, rbp_eclip/XRN2, rbp_eclip/YBX3, rbp_eclip/YWHAG, rbp_eclip/ZNF622, rbp_eclip/ZRANB2```
-They have been removed from test-containers/image-name-to-model.json.
+They have been removed from ```test-containers/image-name-to-model.json```.
