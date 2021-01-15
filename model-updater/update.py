@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 import subprocess
 import sys
 
@@ -26,8 +28,23 @@ def get_list_of_updated_models(
     )
 
 
+def update(model):
+    print(f"Updating {model}")
+
+
+def add(model):
+    print(f"Adding {model}")
+
+
 def update_or_add_model_container(model):
-    print(model)
+    with open(
+        Path.cwd() / "test-containers" / "model-group-to-image-name.json", "r"
+    ) as infile:
+        model_group_to_image_dict = json.load(infile)
+    if model in model_group_to_image_dict:
+        update(model)
+    else:
+        add(model)
 
 
 if __name__ == "__main__":
@@ -43,6 +60,7 @@ if __name__ == "__main__":
             access_token=sys.argv[1],
         )
         for model in list_of_updated_models:
-            update_or_add_model_container(model=model)
+            if model != "shared":
+                update_or_add_model_container(model=model)
     else:
         print("No need to update the repo")
