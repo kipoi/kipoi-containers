@@ -27,4 +27,4 @@ jobs:
         run: 
           python model-updater/update.py $currentHead
         env:
-          currentHead: echo "git ls-remote https://github.com/kipoi/models HEAD"  
+          currentHead: "echo git ls-remote https://github.com/kipoi/models HEAD"  
