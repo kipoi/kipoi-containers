@@ -6,6 +6,7 @@ import sys
 
 import docker
 from github import Github
+import pytest
 
 
 def get_kipoi_model_head():
@@ -41,13 +42,18 @@ def update(model, name_of_docker_image):
         with open(dockerfile_path, "r") as dockerfile:
             dockerfile_obj = BytesIO(dockerfile.read().encode("utf-8"))
         try:
-            build_log = [
-                line
-                for line in client.images.build(
-                    fileobj=dockerfile_obj, tag=name_of_docker_image
-                )
-            ]
+            build_log = client.images.build(
+                fileobj=dockerfile_obj, tag=name_of_docker_image
+            )
             print(build_log)
+            exitcode = pytest.main(
+                [
+                    "-s",
+                    "test-containers/test_containers_from_command_line.py",
+                    f"--image={name_of_docker_image}",
+                ]
+            )
+            print(exitcode)
         except docker.errors.BuildError as e:
             raise (e)
         except docker.errors.APIError as e:
