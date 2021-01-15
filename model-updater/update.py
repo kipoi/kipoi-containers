@@ -1,8 +1,10 @@
+from io import BytesIO
 import json
 from pathlib import Path
 import subprocess
 import sys
 
+import docker
 from github import Github
 
 
@@ -28,8 +30,30 @@ def get_list_of_updated_models(
     )
 
 
-def update(model):
-    print(f"Updating {model}")
+def update(model, name_of_docker_image):
+    # TODO: Add provision for mmsplice and mmsplice/mtsplice
+    print(f"Updating {model} and {name_of_docker_image}")
+    client = docker.from_env()
+    dockerfile_path = (
+        Path.cwd() / "dockerfiles" / f"Dockerfile.{model.lower()}"
+    )
+    if dockerfile_path.exists():
+        with open(dockerfile_path, "r") as dockerfile:
+            dockerfile_obj = BytesIO(dockerfile.read().encode("utf-8"))
+        try:
+            build_log = [
+                line
+                for line in client.images.build(
+                    fileobj=dockerfile_obj, tag=name_of_docker_image
+                )
+            ]
+            print(build_log)
+        except docker.errors.BuildError as e:
+            raise (e)
+        except docker.errors.APIError as e:
+            raise (e)
+    else:
+        print(f"{model} needs to be containerized first")
 
 
 def add(model):
@@ -42,7 +66,7 @@ def update_or_add_model_container(model):
     ) as infile:
         model_group_to_image_dict = json.load(infile)
     if model in model_group_to_image_dict:
-        update(model)
+        update(model, model_group_to_image_dict[model])
     else:
         add(model)
 
