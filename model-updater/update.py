@@ -6,9 +6,12 @@ def get_kipoi_model_head():
         ["git", "ls-remote", "https://github.com/kipoi/models", "HEAD"],
         stdout=subprocess.PIPE,
     )
-    output = process.communicate()[0].decode("utf-8")
-    return output.split("\t")[0]
-
-
+    output = process.communicate()[0].decode("utf-8").split("\t")[0]
+    return output
+            
 if __name__ == "__main__":
-    print(get_kipoi_model_head())
+    with open('./model-updater/kipoi-model-repo-hash', 'r') as kipoimodelrepohash:
+        if kipoimodelrepohash.readline() != get_kipoi_model_head():
+            print("No need to update the repo")
+        else:
+            print("The repo must be updated")
