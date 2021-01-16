@@ -7,6 +7,8 @@ import sys
 import docker
 from github import Github
 import pytest
+import ruamel.yaml
+from ruamel.yaml.scalarstring import DoubleQuotedScalarString
 
 
 def get_list_of_updated_models(
@@ -65,19 +67,21 @@ def add(model_group, kipoi_model_repo, kipoi_container_repo):
 
     # Create a new dockerfile
     subprocess.call(
-        ["sh", "./dockerfiles/dockerfile-generator.sh", f"{model_group}"],
+        [
+            "sh",
+            "./dockerfiles/dockerfile-generator.sh",
+            f"{model_group.lower()}",
+        ],
     )
 
     # Build a docker image
     client = docker.from_env()
-    dockerfile_path = f"./dockerfiles/Dockerfile.{model_group}"
-    image_name = f"haimasree/kipoi-docker:{model_group}"
+    dockerfile_path = f"./dockerfiles/Dockerfile.{model_group.lower()}"
+    image_name = f"haimasree/kipoi-docker:{model_group.lower()}"
     with open(dockerfile_path, "r") as dockerfile:
         dockerfile_obj = BytesIO(dockerfile.read().encode("utf-8"))
     try:
-        client.images.build(
-            fileobj=dockerfile_obj, tag=f"haimasree/kipoi-docker:{model_group}"
-        )
+        client.images.build(fileobj=dockerfile_obj, tag=image_name)
     except docker.errors.BuildError as e:
         raise (e)
     except docker.errors.APIError as e:
@@ -149,6 +153,32 @@ def add(model_group, kipoi_model_repo, kipoi_container_repo):
         json.dump(image_name_to_model_dict, fp)
 
     # Update github workflow files
+    with open(
+        ".github/workflows/build-and-test-containers.yml",
+        "r",
+    ) as f:
+        data = ruamel.yaml.round_trip_load(f, preserve_quotes=True)
+    data["jobs"]["buildandtest"]["strategy"]["matrix"]["image"].append(
+        DoubleQuotedScalarString(image_name)
+    )
+    with open(".github/workflows/build-and-test-containers.yml", "w") as f:
+        ruamel.yaml.round_trip_dump(data, f)
+
+    with open(
+        ".github/workflows/test-images.yml",
+        "r",
+    ) as f:
+        data = ruamel.yaml.round_trip_load(f, preserve_quotes=True)
+    if list_of_models:
+        data["jobs"]["test"]["strategy"]["matrix"]["model"].append(
+            DoubleQuotedScalarString(list_of_models[0])
+        )
+    else:
+        data["jobs"]["test"]["strategy"]["matrix"]["model"].append(
+            DoubleQuotedScalarString(model_group)
+        )
+    with open(".github/workflows/test-images.yml", "w") as f:
+        ruamel.yaml.round_trip_dump(data, f)
 
 
 def update_or_add_model_container(
