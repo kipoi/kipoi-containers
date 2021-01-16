@@ -53,7 +53,10 @@ def update(model, name_of_docker_image):
                     f"--image={name_of_docker_image}",
                 ]
             )
-            print(exitcode)
+            if exitcode != 0:
+                print(
+                    f"Updated docker image {name_of_docker_image} for {model} did not pass relevant tests"
+                )
         except docker.errors.BuildError as e:
             raise (e)
         except docker.errors.APIError as e:
