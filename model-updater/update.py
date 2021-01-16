@@ -9,20 +9,9 @@ from github import Github
 import pytest
 
 
-def get_kipoi_model_head():
-    process = subprocess.Popen(
-        ["git", "ls-remote", "https://github.com/kipoi/models", "HEAD"],
-        stdout=subprocess.PIPE,
-    )
-    output = process.communicate()[0].decode("utf-8").split("\t")[0]
-    return output
-
-
 def get_list_of_updated_models(
-    source_commit_hash, target_commit_hash, access_token
+    source_commit_hash, target_commit_hash, kipoi_model_repo
 ):
-    g = Github(access_token)
-    kipoi_model_repo = g.get_organization("kipoi").get_repo("models")
     comparison_obj = kipoi_model_repo.compare(
         base=source_commit_hash, head=target_commit_hash
     )
@@ -76,21 +65,24 @@ def update_or_add_model_container(model):
         model_group_to_image_dict = json.load(infile)
     if model in model_group_to_image_dict:
         update(model, model_group_to_image_dict[model])
+        # TODO: Strategy for updating kipoi-model-repo-hash
     else:
         add(model)
 
 
 if __name__ == "__main__":
+    g = Github(sys.argv[1])
+    kipoi_model_repo = g.get_organization("kipoi").get_repo("models")
+    target_commit_hash = kipoi_model_repo.get_branch("master").commit.sha
     with open(
         "./model-updater/kipoi-model-repo-hash", "r"
     ) as kipoimodelrepohash:
         source_commit_hash = kipoimodelrepohash.readline()
-        target_commit_hash = get_kipoi_model_head()
     if source_commit_hash != target_commit_hash:
         list_of_updated_models = get_list_of_updated_models(
             source_commit_hash=source_commit_hash,
             target_commit_hash=target_commit_hash,
-            access_token=sys.argv[1],
+            kipoi_model_repo=kipoi_model_repo,
         )
         for model in list_of_updated_models:
             if model != "shared":
