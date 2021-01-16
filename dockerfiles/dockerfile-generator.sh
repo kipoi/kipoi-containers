@@ -1,2 +1,2 @@
 newmodelname=$1
-sed "s/modelname/$newmodelname/g" Dockerfile.template > Dockerfile.${newmodelname}
+sed "s/modelname/$newmodelname/g" ./dockerfiles/Dockerfile.template > ./dockerfiles/Dockerfile.${newmodelname}

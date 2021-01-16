@@ -31,10 +31,9 @@ def update(model, name_of_docker_image):
         with open(dockerfile_path, "r") as dockerfile:
             dockerfile_obj = BytesIO(dockerfile.read().encode("utf-8"))
         try:
-            build_log = client.images.build(
+            client.images.build(
                 fileobj=dockerfile_obj, tag=name_of_docker_image
             )
-            print(build_log)
             exitcode = pytest.main(
                 [
                     "-s",
@@ -55,21 +54,106 @@ def update(model, name_of_docker_image):
         # TODO: Edge cases
 
 
-def add(model, kipoi_container_repo):
-    print(f"Adding {model}")
-    sb = kipoi_container_repo.get_branch("master")
+def add(model_group, kipoi_model_repo, kipoi_container_repo):
+    print(f"Adding {model_group}")
+
+    # Create a new branch called add-{model_group}
+    sb = kipoi_container_repo.get_branch("main")
     kipoi_container_repo.create_git_ref(
-        ref="refs/heads/" + f"add-{model}", sha=sb.commit.sha
+        ref="refs/heads/" + f"add-{model_group}", sha=sb.commit.sha
     )
-    process = subprocess.Popen(
-        ["./dockerfiles/dockerfile-generator.sh", f"{model}"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+
+    # Create a new dockerfile
+    subprocess.call(
+        ["sh", "./dockerfiles/dockerfile-generator.sh", f"{model_group}"],
     )
-    stdout, stderr = process.communicate()
+
+    # Build a docker image
+    client = docker.from_env()
+    dockerfile_path = f"./dockerfiles/Dockerfile.{model_group}"
+    image_name = f"haimasree/kipoi-docker:{model_group}"
+    with open(dockerfile_path, "r") as dockerfile:
+        dockerfile_obj = BytesIO(dockerfile.read().encode("utf-8"))
+    try:
+        client.images.build(
+            fileobj=dockerfile_obj, tag=f"haimasree/kipoi-docker:{model_group}"
+        )
+    except docker.errors.BuildError as e:
+        raise (e)
+    except docker.errors.APIError as e:
+        raise (e)
+
+    # Test the newly created container
+    list_of_models = get_list_of_models_from_repo(
+        model_group=model_group, kipoi_model_repo=kipoi_model_repo
+    )
+    if list_of_models:
+        for model_name in list_of_models:
+            try:
+                container_log = client.containers.run(
+                    image=image_name,
+                    command=f"kipoi test {model_name} --source=kipoi",
+                )
+            except docker.errors.ImageNotFound:
+                raise (f"Image {image_name} is not found")
+            except docker.errors.ContainerError as e:
+                raise (e)
+            except docker.errors.APIError as e:
+                raise (e)
+            client.containers.prune()
+            client.networks.prune()
+            client.volumes.prune()
+            print(container_log.decode("utf-8"))
+    else:
+        try:
+            container_log = client.containers.run(
+                image=image_name,
+                command=f"kipoi test {model_group} --source=kipoi",
+            )
+        except docker.errors.ImageNotFound:
+            raise (f"Image {image_name} is not found")
+        except docker.errors.ContainerError as e:
+            raise (e)
+        except docker.errors.APIError as e:
+            raise (e)
+        client.containers.prune()
+        client.networks.prune()
+        client.volumes.prune()
+        print(container_log.decode("utf-8"))
+
+    # TODO: Push the newly created container
+
+    # Update tests and json files
+    with open(
+        Path.cwd() / "test-containers" / "model-group-to-image-name.json", "r"
+    ) as infile:
+        model_group_to_image_dict = json.load(infile)
+    model_group_to_image_dict.update({f"{model_group}": f"{image_name}"})
+    with open(
+        Path.cwd() / "test-containers" / "model-group-to-image-name.json", "w"
+    ) as fp:
+        json.dump(model_group_to_image_dict, fp)
+
+    with open(
+        Path.cwd() / "test-containers" / "image-name-to-model.json", "r"
+    ) as infile:
+        image_name_to_model_dict = json.load(infile)
+    image_name_to_model_dict.update(
+        {image_name: list_of_models}
+        if list_of_models
+        else {image_name: [model_group]}
+    )
+    with open(
+        Path.cwd() / "test-containers" / "image-name-to-model.json", "w"
+    ) as fp:
+        json.dump(image_name_to_model_dict, fp)
+
+    # Update github workflow files
 
 
-def update_or_add_model_container(model, kipoi_container_repo):
+def update_or_add_model_container(
+    model, kipoi_model_repo, kipoi_container_repo
+):
     with open(
         Path.cwd() / "test-containers" / "model-group-to-image-name.json", "r"
     ) as infile:
@@ -78,7 +162,21 @@ def update_or_add_model_container(model, kipoi_container_repo):
         update(model, model_group_to_image_dict[model])
         # TODO: Strategy for updating kipoi-model-repo-hash
     else:
-        add(model, kipoi_container_repo)
+        add(
+            model=model,
+            kipoi_model_repo=kipoi_model_repo,
+            kipoi_container_repo=kipoi_container_repo,
+        )
+
+
+def get_list_of_models_from_repo(model_group, kipoi_model_repo):
+    contents = kipoi_model_repo.get_contents(model_group)
+    list_of_models = [
+        f"{model_group}/{content_file.name}"
+        for content_file in contents
+        if content_file.type == "dir"
+    ]
+    return list_of_models
 
 
 if __name__ == "__main__":
@@ -96,10 +194,13 @@ if __name__ == "__main__":
             target_commit_hash=target_commit_hash,
             kipoi_model_repo=kipoi_model_repo,
         )
+
         for model in list_of_updated_models:
             if model != "shared":
                 update_or_add_model_container(
-                    model=model, kipoi_container_repo=kipoi_container_repo
+                    model=model,
+                    kipoi_model_repo=kipoi_model_repo,
+                    kipoi_container_repo=kipoi_container_repo,
                 )
     else:
         print("No need to update the repo")
