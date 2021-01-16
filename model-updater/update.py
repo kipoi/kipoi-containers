@@ -52,13 +52,24 @@ def update(model, name_of_docker_image):
             raise (e)
     else:
         print(f"{model} needs to be containerized first")
+        # TODO: Edge cases
 
 
-def add(model):
+def add(model, kipoi_container_repo):
     print(f"Adding {model}")
+    sb = kipoi_container_repo.get_branch("master")
+    kipoi_container_repo.create_git_ref(
+        ref="refs/heads/" + f"add-{model}", sha=sb.commit.sha
+    )
+    process = subprocess.Popen(
+        ["./dockerfiles/dockerfile-generator.sh", f"{model}"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    stdout, stderr = process.communicate()
 
 
-def update_or_add_model_container(model):
+def update_or_add_model_container(model, kipoi_container_repo):
     with open(
         Path.cwd() / "test-containers" / "model-group-to-image-name.json", "r"
     ) as infile:
@@ -67,11 +78,12 @@ def update_or_add_model_container(model):
         update(model, model_group_to_image_dict[model])
         # TODO: Strategy for updating kipoi-model-repo-hash
     else:
-        add(model)
+        add(model, kipoi_container_repo)
 
 
 if __name__ == "__main__":
     g = Github(sys.argv[1])
+    kipoi_container_repo = g.get_user().get_repo("kipoi-containers")
     kipoi_model_repo = g.get_organization("kipoi").get_repo("models")
     target_commit_hash = kipoi_model_repo.get_branch("master").commit.sha
     with open(
@@ -86,6 +98,8 @@ if __name__ == "__main__":
         )
         for model in list_of_updated_models:
             if model != "shared":
-                update_or_add_model_container(model=model)
+                update_or_add_model_container(
+                    model=model, kipoi_container_repo=kipoi_container_repo
+                )
     else:
         print("No need to update the repo")
