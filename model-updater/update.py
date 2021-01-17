@@ -59,12 +59,6 @@ def update(model, name_of_docker_image):
 def add(model_group, kipoi_model_repo, kipoi_container_repo):
     print(f"Adding {model_group}")
 
-    # Create a new branch called add-{model_group}
-    sb = kipoi_container_repo.get_branch("main")
-    kipoi_container_repo.create_git_ref(
-        ref="refs/heads/" + f"add-{model_group}", sha=sb.commit.sha
-    )
-
     # Create a new dockerfile
     subprocess.call(
         [
@@ -234,3 +228,9 @@ if __name__ == "__main__":
                 )
     else:
         print("No need to update the repo")
+
+    # If everything has gone well so far update kipoi-model-hash
+    with open(
+        "./model-updater/kipoi-model-repo-hash", "w"
+    ) as kipoimodelrepohash:
+        kipoimodelrepohash.write(target_commit_hash)
