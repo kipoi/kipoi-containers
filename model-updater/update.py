@@ -88,7 +88,7 @@ def update_github_workflow_files(image_name, list_of_models, model_group):
     ) as f:
         data = round_trip_load(f, preserve_quotes=True)
     data["jobs"]["buildandtest"]["strategy"]["matrix"]["image"].append(
-        DoubleQuotedScalarString(image_name)
+        DoubleQuotedScalarString(image_name.split(":")[1])
     )
     with open(".github/workflows/build-and-test-containers.yml", "w") as f:
         round_trip_dump(data, f)
@@ -118,7 +118,7 @@ def add(model_group, kipoi_model_repo, kipoi_container_repo):
         [
             "sh",
             "./dockerfiles/dockerfile-generator.sh",
-            f"{model_group.lower()}",
+            f"{model_group}",
         ],
     )
 
@@ -151,7 +151,7 @@ def add(model_group, kipoi_model_repo, kipoi_container_repo):
     with open(
         Path.cwd() / "test-containers" / "model-group-to-image-name.json", "w"
     ) as fp:
-        json.dump(model_group_to_image_dict, fp)
+        json.dump(model_group_to_image_dict, fp, indent=2)
 
     with open(
         Path.cwd() / "test-containers" / "image-name-to-model.json", "r"
@@ -165,7 +165,7 @@ def add(model_group, kipoi_model_repo, kipoi_container_repo):
     with open(
         Path.cwd() / "test-containers" / "image-name-to-model.json", "w"
     ) as fp:
-        json.dump(image_name_to_model_dict, fp)
+        json.dump(image_name_to_model_dict, fp, indent=2)
 
     # Update github workflow files
     update_github_workflow_files(
