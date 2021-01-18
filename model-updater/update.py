@@ -1,5 +1,6 @@
 from io import BytesIO
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -7,7 +8,7 @@ import sys
 import docker
 from github import Github
 import pytest
-import ruamel.yaml
+from ruamel.yaml import round_trip_load, round_trip_dump
 from ruamel.yaml.scalarstring import DoubleQuotedScalarString
 
 
@@ -85,18 +86,18 @@ def update_github_workflow_files(image_name, list_of_models, model_group):
         ".github/workflows/build-and-test-containers.yml",
         "r",
     ) as f:
-        data = ruamel.yaml.round_trip_load(f, preserve_quotes=True)
+        data = round_trip_load(f, preserve_quotes=True)
     data["jobs"]["buildandtest"]["strategy"]["matrix"]["image"].append(
         DoubleQuotedScalarString(image_name)
     )
     with open(".github/workflows/build-and-test-containers.yml", "w") as f:
-        ruamel.yaml.round_trip_dump(data, f)
+        round_trip_dump(data, f)
 
     with open(
         ".github/workflows/test-images.yml",
         "r",
     ) as f:
-        data = ruamel.yaml.round_trip_load(f, preserve_quotes=True)
+        data = round_trip_load(f, preserve_quotes=True)
     if list_of_models:
         data["jobs"]["test"]["strategy"]["matrix"]["model"].append(
             DoubleQuotedScalarString(list_of_models[0])
@@ -106,7 +107,7 @@ def update_github_workflow_files(image_name, list_of_models, model_group):
             DoubleQuotedScalarString(model_group)
         )
     with open(".github/workflows/test-images.yml", "w") as f:
-        ruamel.yaml.round_trip_dump(data, f)
+        round_trip_dump(data, f)
 
 
 def add(model_group, kipoi_model_repo, kipoi_container_repo):
@@ -203,7 +204,7 @@ def get_list_of_models_from_repo(model_group, kipoi_model_repo):
 
 
 if __name__ == "__main__":
-    g = Github(sys.argv[1])
+    g = Github(os.environ["GITHUB_PAT"])
     kipoi_container_repo = g.get_user().get_repo("kipoi-containers")
     kipoi_model_repo = g.get_organization("kipoi").get_repo("models")
     target_commit_hash = kipoi_model_repo.get_branch("master").commit.sha
