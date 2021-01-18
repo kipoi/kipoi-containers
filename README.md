@@ -6,15 +6,21 @@ This is an attempt to reduce  and eventully eliminate complexities related to cr
 
 First, we need to build the base image which activates a conda environment made with python 3.6 with kipoi installed in it.
 ```
-cd dockerfiles
-docker build -f dockerfiles/Dockerfile.base -t haimasree/kipoi-docker:kipoi-base-env ..
+docker build -f dockerfiles/Dockerfile.base -t haimasree/kipoi-docker:kipoi-base-env .
 ```
 Note: The model specific Dockefiles are sensitive to the name and tag of the base image right now. 
 After the base image is built, build any other image using the following template
 ```
-docker build -f Dockerfile.<model-group-name-in-lowercase> -t haimasree/kipoi-docker:<image-name> ..
+docker build -f dockerfiles/Dockerfile.<model-group-name-in-lowercase> -t haimasree/kipoi-docker:<image-name> .
 ```
-For more information on which model group (or model) can be run with which docker image, see ```test-containers/image-name-to-models.json``` where each  image in docker hub repository haimasree/kipoi-docker is mapped to models they can run. 
+# Map between model group and docker images
+
+See [here](https://github.com/haimasree/kipoi-containers/blob/main/test-containers/model-group-to-image-name.json)
+
+# Map between docker image and model(s)
+
+See [here](https://github.com/haimasree/kipoi-containers/blob/main/test-containers/image-name-to-model.json)
+
 
 # Running the images
 For an interactive experience, run the following -
@@ -22,6 +28,7 @@ For an interactive experience, run the following -
 docker run -it haimasree/kipoi-docker:kipoisplice
 ```
 This will give you an interactive shell with the relevant conda environment kipoi-KipoiSplice.
+
 To run your custom kipoi cli calls directly,
 ```
 docker run haimasree/kipoi-docker:kipoisplice kipoi test KipoiSplice/4 --source=kipoi
@@ -29,7 +36,7 @@ docker run haimasree/kipoi-docker:kipoisplice kipoi test KipoiSplice/4 --source=
 
 ## Testing the containers
 
-### Manual
+### Manual and CI
 
 We use pytest and docker-py to test the containers.
 First in an isolated conda environment or pipenv do the following -
@@ -37,22 +44,27 @@ First in an isolated conda environment or pipenv do the following -
 pip install -r requirements.txt
 ```
 
-Currently, there are two ways to test the containers along with the models.
-- Test all of 2137 models in their respective containers using the following
-  - ```pytest test-containers/test_all.py ```
-- Test any one model at a time
+Currently, there are two ways to test the docker images along with the models.
+
+- Test model(s) at a time or model group(s) if it contains only one model.
   - ```pytest test-containers/test_models_from_command_line.py --model=KipoiSplice/4,Basenji```
   - ```pytest test-containers/test_models_from_command_line.py --model=HAL```
-- Test all model groups with one representative model per group
-  - ```pytest test-containers/test_models_from_command_line.py --all```
-  
- ### CI
- 
- Alternatively, look into the job named test in the workflow in ```.github/workflows/test-images.yml```
 
+For the corresponding CI (github actions) version, look [here](https://github.com/haimasree/kipoi-containers/blob/main/.github/workflows/test-images.yml).
+This workflow gets triggered with every commit to every branch and each pull request to master.
+ 
+ 
+- Test any docker image which tests all compatible models or with a specific model group
+  - ```pytest test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:sharedpy3keras2```
+  - ```pytest test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:sharedpy3keras2 --modelgroup=HAL```
+  
+For the corresponding CI (github actions) version, look [here](https://github.com/haimasree/kipoi-containers/blob/main/.github/workflows/build-and-test-containers.yml).
+This workflow gets triggered on the 1st of every month. It can also be trigerred manually.
+  
+  
 ## Mapping between model and docker images
 
-To know which model group/model is represented by which docker image pleae take a look at https://github.com/haimasree/kipoi-containers/blob/main/test-containers/model-group-to-image-name.json
+To know which model group/model is represented by which docker image pleae take a look at https://github.com/haimasree/kipoi-containers/blob/main/test-containers/model-group-to-image-name.json.
 
 Due to conflicting package requirements, all models in group MMSplice could not be represented by a single docker image. MMSplice/mtsplice has its own docker image named haimasree/kipoi-docker:mmsplice-mtsplice and the rest can be tested with haimasree/kipoi-docker:mmsplice
 
@@ -63,7 +75,7 @@ The images in [haimasree/kipoi-docker](https://hub.docker.com/repository/docker/
 
 ## Adding new containers
 
-If new models are added to kipoi repository it is prudent to add all the necessary files in this repo and build, test and push a container to kipoi-docker dockerhub repo. For this purpose, I have provided ```model-updater/update.py```. A Personal Access Token is required since we will read from and write to github repos using PyGithub. Please add it as an environment variable named ```GITHUB_PAT```. This script will update existing images and rerun the tests. Also, if necessary, add a new dockerfile for model group which has not been containerized yet, build the docker  image, run tests to ensure all corresponding models in the group are compatible with this image, update the json files, update github workflow files, and finally update ```model-updater/kipoi-model-repo-hash```.  If everything goes well, at this point feel free to push the image and create a PR on github.
+If new models are added to kipoi repository it is prudent to add all the necessary files in this repo and build, test and push a container to kipoi-docker dockerhub repo. For this purpose, I have provided ```model-updater/update.py```. Run it as ```python model-updater/update.py```. A Personal Access Token is required since we will read from and write to github repos using PyGithub. Please add it as an environment variable named ```GITHUB_PAT```. This script will update existing images and rerun the tests. Also, if necessary, add a new dockerfile for model group which has not been containerized yet, build the docker  image, run tests to ensure all corresponding models in the group are compatible with this image, update the json files, update github workflow files, and finally update ```model-updater/kipoi-model-repo-hash```.  If everything goes well, at this point feel free to push the image and create a PR on github.
 
 ## Models not working
 
