@@ -58,7 +58,7 @@ This workflow gets triggered with every commit to every branch and each pull req
   - ```pytest test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:sharedpy3keras2```
   - ```pytest test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:sharedpy3keras2 --modelgroup=HAL```
   
-For the corresponding CI (github actions) version, look [here](https://github.com/haimasree/kipoi-containers/blob/main/.github/workflows/build-and-test-containers.yml).
+For the corresponding CI (github actions) version, look [here](https://github.com/haimasree/kipoi-containers/blob/main/.github/workflows/build-and-test-images.yml).
 This workflow gets triggered on the 1st of every month. It can also be trigerred manually.
   
   
