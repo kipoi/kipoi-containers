@@ -22,38 +22,91 @@ def get_list_of_updated_models(
     )
 
 
+def build_docker_image(dockerfile_path, name_of_docker_image):
+    client = docker.from_env()
+    with open(dockerfile_path, "r") as dockerfile:
+        dockerfile_obj = BytesIO(dockerfile.read().encode("utf-8"))
+    try:
+        client.images.build(fileobj=dockerfile_obj, tag=name_of_docker_image)
+    except docker.errors.BuildError as e:
+        raise (e)
+    except docker.errors.APIError as e:
+        raise (e)
+
+
 def update(model, name_of_docker_image):
     # TODO: Add provision for mmsplice and mmsplice/mtsplice
     print(f"Updating {model} and {name_of_docker_image}")
-    client = docker.from_env()
     dockerfile_path = (
         Path.cwd() / "dockerfiles" / f"Dockerfile.{model.lower()}"
     )
     if dockerfile_path.exists():
-        with open(dockerfile_path, "r") as dockerfile:
-            dockerfile_obj = BytesIO(dockerfile.read().encode("utf-8"))
-        try:
-            client.images.build(
-                fileobj=dockerfile_obj, tag=name_of_docker_image
+        build_docker_image(
+            dockerfile_path=dockerfile_path,
+            name_of_docker_image=name_of_docker_image,
+        )
+        exitcode = pytest.main(
+            [
+                "-s",
+                "test-containers/test_containers_from_command_line.py",
+                f"--image={name_of_docker_image}",
+            ]
+        )
+        if exitcode != 0:
+            raise ValueError(
+                f"Updated docker image {name_of_docker_image} for {model} did not pass relevant tests"
             )
-            exitcode = pytest.main(
-                [
-                    "-s",
-                    "test-containers/test_containers_from_command_line.py",
-                    f"--image={name_of_docker_image}",
-                ]
-            )
-            if exitcode != 0:
-                print(
-                    f"Updated docker image {name_of_docker_image} for {model} did not pass relevant tests"
-                )
-        except docker.errors.BuildError as e:
-            raise (e)
-        except docker.errors.APIError as e:
-            raise (e)
     else:
         print(f"{model} needs to be containerized first")
         # TODO: Edge cases
+
+
+def run_docker_image(image_name, model_name):
+    client = docker.from_env()
+    try:
+        container_log = client.containers.run(
+            image=image_name,
+            command=f"kipoi test {model_name} --source=kipoi",
+        )
+    except docker.errors.ImageNotFound:
+        raise (f"Image {image_name} is not found")
+    except docker.errors.ContainerError as e:
+        raise (e)
+    except docker.errors.APIError as e:
+        raise (e)
+    client.containers.prune()
+    client.networks.prune()
+    client.volumes.prune()
+    print(container_log.decode("utf-8"))
+
+
+def update_github_workflow_files(image_name, list_of_models, model_group):
+    with open(
+        ".github/workflows/build-and-test-containers.yml",
+        "r",
+    ) as f:
+        data = ruamel.yaml.round_trip_load(f, preserve_quotes=True)
+    data["jobs"]["buildandtest"]["strategy"]["matrix"]["image"].append(
+        DoubleQuotedScalarString(image_name)
+    )
+    with open(".github/workflows/build-and-test-containers.yml", "w") as f:
+        ruamel.yaml.round_trip_dump(data, f)
+
+    with open(
+        ".github/workflows/test-images.yml",
+        "r",
+    ) as f:
+        data = ruamel.yaml.round_trip_load(f, preserve_quotes=True)
+    if list_of_models:
+        data["jobs"]["test"]["strategy"]["matrix"]["model"].append(
+            DoubleQuotedScalarString(list_of_models[0])
+        )
+    else:
+        data["jobs"]["test"]["strategy"]["matrix"]["model"].append(
+            DoubleQuotedScalarString(model_group)
+        )
+    with open(".github/workflows/test-images.yml", "w") as f:
+        ruamel.yaml.round_trip_dump(data, f)
 
 
 def add(model_group, kipoi_model_repo, kipoi_container_repo):
@@ -69,17 +122,11 @@ def add(model_group, kipoi_model_repo, kipoi_container_repo):
     )
 
     # Build a docker image
-    client = docker.from_env()
     dockerfile_path = f"./dockerfiles/Dockerfile.{model_group.lower()}"
     image_name = f"haimasree/kipoi-docker:{model_group.lower()}"
-    with open(dockerfile_path, "r") as dockerfile:
-        dockerfile_obj = BytesIO(dockerfile.read().encode("utf-8"))
-    try:
-        client.images.build(fileobj=dockerfile_obj, tag=image_name)
-    except docker.errors.BuildError as e:
-        raise (e)
-    except docker.errors.APIError as e:
-        raise (e)
+    build_docker_image(
+        dockerfile_path=dockerfile_path, name_of_docker_image=image_name
+    )
 
     # Test the newly created container
     list_of_models = get_list_of_models_from_repo(
@@ -87,37 +134,10 @@ def add(model_group, kipoi_model_repo, kipoi_container_repo):
     )
     if list_of_models:
         for model_name in list_of_models:
-            try:
-                container_log = client.containers.run(
-                    image=image_name,
-                    command=f"kipoi test {model_name} --source=kipoi",
-                )
-            except docker.errors.ImageNotFound:
-                raise (f"Image {image_name} is not found")
-            except docker.errors.ContainerError as e:
-                raise (e)
-            except docker.errors.APIError as e:
-                raise (e)
-            client.containers.prune()
-            client.networks.prune()
-            client.volumes.prune()
-            print(container_log.decode("utf-8"))
+            # Run the newly created container
+            run_docker_image(image_name=image_name, model_name=model_name)
     else:
-        try:
-            container_log = client.containers.run(
-                image=image_name,
-                command=f"kipoi test {model_group} --source=kipoi",
-            )
-        except docker.errors.ImageNotFound:
-            raise (f"Image {image_name} is not found")
-        except docker.errors.ContainerError as e:
-            raise (e)
-        except docker.errors.APIError as e:
-            raise (e)
-        client.containers.prune()
-        client.networks.prune()
-        client.volumes.prune()
-        print(container_log.decode("utf-8"))
+        run_docker_image(image_name=image_name, model_name=model_group)
 
     # TODO: Push the newly created container
 
@@ -147,32 +167,11 @@ def add(model_group, kipoi_model_repo, kipoi_container_repo):
         json.dump(image_name_to_model_dict, fp)
 
     # Update github workflow files
-    with open(
-        ".github/workflows/build-and-test-containers.yml",
-        "r",
-    ) as f:
-        data = ruamel.yaml.round_trip_load(f, preserve_quotes=True)
-    data["jobs"]["buildandtest"]["strategy"]["matrix"]["image"].append(
-        DoubleQuotedScalarString(image_name)
+    update_github_workflow_files(
+        image_name=image_name,
+        list_of_models=list_of_models,
+        model_group=model_group,
     )
-    with open(".github/workflows/build-and-test-containers.yml", "w") as f:
-        ruamel.yaml.round_trip_dump(data, f)
-
-    with open(
-        ".github/workflows/test-images.yml",
-        "r",
-    ) as f:
-        data = ruamel.yaml.round_trip_load(f, preserve_quotes=True)
-    if list_of_models:
-        data["jobs"]["test"]["strategy"]["matrix"]["model"].append(
-            DoubleQuotedScalarString(list_of_models[0])
-        )
-    else:
-        data["jobs"]["test"]["strategy"]["matrix"]["model"].append(
-            DoubleQuotedScalarString(model_group)
-        )
-    with open(".github/workflows/test-images.yml", "w") as f:
-        ruamel.yaml.round_trip_dump(data, f)
 
 
 def update_or_add_model_container(
