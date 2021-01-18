@@ -1,4 +1,4 @@
-name: Build and test containers once a month
+name: Build and test images once a month
 
 # Controls when the action will run. 
 on:
