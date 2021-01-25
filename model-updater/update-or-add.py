@@ -28,7 +28,9 @@ def build_docker_image(dockerfile_path, name_of_docker_image):
     with open(dockerfile_path, "r") as dockerfile:
         dockerfile_obj = BytesIO(dockerfile.read().encode("utf-8"))
     try:
-        client.images.build(fileobj=dockerfile_obj, tag=name_of_docker_image)
+        client.images.build(
+            fileobj=dockerfile_obj, tag=name_of_docker_image, nocache=True
+        )
     except docker.errors.BuildError as e:
         raise (e)
     except docker.errors.APIError as e:
