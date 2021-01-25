@@ -11,10 +11,12 @@ class TestServerCode(object):
         assert self.model_group_to_update
         assert self.image_to_update
         client = docker.from_env()
-        assert client.images.get(self.image_to_update).tags == [
-            "haimasree/kipoi-docker:attentivechrome"
-        ]
+        original_shortid = client.images.get(self.image_to_update).short_id
         update(
             model=self.model_group_to_update,
             name_of_docker_image=self.image_to_update,
+        )
+        assert (
+            client.images.get(self.image_to_update).short_id
+            != original_shortid
         )

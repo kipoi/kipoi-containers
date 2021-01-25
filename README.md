@@ -79,7 +79,13 @@ If new models are added to kipoi repository it is prudent to add all the necessa
 
 ### Tests
 
-I have provided some unit tests for testing basic features of this framework. For running these tests, install the requirements and run the following
+I have provided some unit tests for testing basic features of this framework. For running these tests, first pull the test image
+
+```bash
+docker pull haimasree/kipoi-docker:deepmel
+```
+
+Then, install the requirements and run the tests -
 
 ```bash
 pip install -r requirements.txt
