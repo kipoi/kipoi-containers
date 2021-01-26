@@ -115,17 +115,23 @@ def update_github_workflow_files(image_name, list_of_models, model_group):
 def add(model_group, kipoi_model_repo, kipoi_container_repo):
     print(f"Adding {model_group}")
 
+    dockerfile_generator_path = (
+        Path(__file__).resolve().parent / "dockerfiles/dockerfile-generator.sh"
+    )
     # Create a new dockerfile
     subprocess.call(
         [
             "sh",
-            "./dockerfiles/dockerfile-generator.sh",
+            dockerfile_generator_path,
             f"{model_group}",
         ],
     )
 
     # Build a docker image
-    dockerfile_path = f"./dockerfiles/Dockerfile.{model_group.lower()}"
+    dockerfile_path = (
+        Path(__file__).resolve().parent
+        / f"dockerfiles/Dockerfile.{model_group.lower()}"
+    )
     image_name = f"haimasree/kipoi-docker:{model_group.lower()}"
     build_docker_image(
         dockerfile_path=dockerfile_path, name_of_docker_image=image_name
