@@ -116,17 +116,13 @@ def add(model_group, kipoi_model_repo, kipoi_container_repo):
     print(f"Adding {model_group}")
 
     # Create a new dockerfile
-    write_docker_file = subprocess.Popen(
+    subprocess.call(
         [
             "sh",
             "./dockerfiles/dockerfile-generator.sh",
             f"{model_group}",
         ],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
     )
-    (done, fail) = write_docker_file.communicate()
-    write_docker_file.wait()
 
     # Build a docker image
     dockerfile_path = f"./dockerfiles/Dockerfile.{model_group.lower()}"
