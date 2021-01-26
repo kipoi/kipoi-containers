@@ -86,5 +86,6 @@ jobs:
       - name: Test with pytest
         run: |
           docker pull haimasree/kipoi-docker:deepmel
+          docker build -f dockerfiles/Dockerfile.kipoi-base-env -t haimasree/kipoi-docker:kipoi-base-env . 
           ./dockerfiles/dockerfile-generator.sh cletimer
           python -m pytest -s test-modelupdater/test_updateoradd.py
