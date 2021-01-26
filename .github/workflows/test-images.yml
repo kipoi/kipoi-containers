@@ -89,4 +89,5 @@ jobs:
           docker build -f dockerfiles/Dockerfile.kipoi-base-env -t haimasree/kipoi-docker:kipoi-base-env . 
           ./dockerfiles/dockerfile-generator.sh cletimer
           chmod u+x ./dockerfiles/Dockerfile.cletimer
+          docker build -f dockerfiles/Dockerfile.cletimer -t haimasree/kipoi-docker:cletimer . 
           python -m pytest -s test-modelupdater/test_updateoradd.py
