@@ -33,7 +33,7 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
   
-  test:
+  testimages:
     strategy:
       fail-fast: false
       matrix:
@@ -69,3 +69,21 @@ jobs:
         run: |
           pytest -s test-containers/test_models_from_command_line.py --model=${{ matrix.model }}
           docker system prune -a -f  
+
+  testuploadoradd:
+    runs-on: ubuntu-latest      
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Test with pytest
+        run: |
+          docker pull haimasree/kipoi-docker:deepmel
+          python -m pytest -s test-modelupdater/test_updateoradd.py
