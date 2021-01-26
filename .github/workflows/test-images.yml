@@ -88,5 +88,4 @@ jobs:
           docker pull haimasree/kipoi-docker:deepmel
           docker pull haimasree/kipoi-docker:kipoi-base-env
           sh ./dockerfiles/dockerfile-generator.sh CleTimer
-          chmod u+x ./dockerfiles/Dockerfile.cletimer 
           python -m pytest -s test-modelupdater/test_updateoradd.py
