@@ -37,21 +37,26 @@ class TestServerCode(object):
             mock_get_list_of_models_from_repo,
         )
 
-        with open(
+        image_name_to_model_file_path = (
             Path(__file__).resolve().parent
             / "../test-containers"
-            / "image-name-to-model.json",
-            "r",
-        ) as infile:
-            image_name_to_model_dict = json.load(infile)
+            / "image-name-to-model.json"
+        )
+        model_group_to_image_name_file_path = (
+            Path(__file__).resolve().parent
+            / "../test-containers"
+            / "model-group-to-image-name.json"
+        )
 
-        with open(
+        shutil.copy(
+            image_name_to_model_file_path,
+            Path(__file__).resolve().parent / "tmp-image-name-to-model.json",
+        )
+        shutil.copy(
+            model_group_to_image_name_file_path,
             Path(__file__).resolve().parent
-            / "../test-containers"
-            / "model-group-to-image-name.json",
-            "r",
-        ) as infile:
-            model_group_to_image_dict = json.load(infile)
+            / "tmp-model-group-to-image-name.json",
+        )
 
         workflow_test_images_file_path = (
             Path(__file__).resolve().parent
@@ -113,23 +118,22 @@ class TestServerCode(object):
             new_model_group_to_image_dict["CleTimer"]
             == "haimasree/kipoi-docker:cletimer"
         )
-
-        with open(
+        shutil.copy(
+            Path(__file__).resolve().parent / "tmp-image-name-to-model.json",
+            image_name_to_model_file_path,
+        )
+        shutil.copy(
             Path(__file__).resolve().parent
-            / "../test-containers"
-            / "model-group-to-image-name.json",
-            "w",
-        ) as fp:
-            json.dump(model_group_to_image_dict, fp, indent=2)
-
-        with open(
+            / "tmp-model-group-to-image-name.json",
+            model_group_to_image_name_file_path,
+        )
+        (
+            Path(__file__).resolve().parent / "tmp-image-name-to-model.json"
+        ).unlink()
+        (
             Path(__file__).resolve().parent
-            / "../test-containers"
-            / "image-name-to-model.json",
-            "w",
-        ) as fp:
-            json.dump(image_name_to_model_dict, fp, indent=2)
-
+            / "tmp-model-group-to-image-name.json"
+        ).unlink()
         with open(workflow_build_and_test_images_file_path, "r") as f:
             data = round_trip_load(f, preserve_quotes=True)
             assert (
