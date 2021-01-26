@@ -85,14 +85,14 @@ def run_docker_image(image_name, model_name):
 
 def update_github_workflow_files(image_name, list_of_models, model_group):
     with open(
-        ".github/workflows/build-and-test-containers.yml",
+        ".github/workflows/build-and-test-images.yml",
         "r",
     ) as f:
         data = round_trip_load(f, preserve_quotes=True)
     data["jobs"]["buildandtest"]["strategy"]["matrix"]["image"].append(
         DoubleQuotedScalarString(image_name.split(":")[1])
     )
-    with open(".github/workflows/build-and-test-containers.yml", "w") as f:
+    with open(".github/workflows/build-and-test-images.yml", "w") as f:
         round_trip_dump(data, f)
 
     with open(
