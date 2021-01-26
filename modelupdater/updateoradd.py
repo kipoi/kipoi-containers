@@ -116,7 +116,8 @@ def add(model_group, kipoi_model_repo, kipoi_container_repo):
     print(f"Adding {model_group}")
 
     dockerfile_generator_path = (
-        Path(__file__).resolve().parent / "dockerfiles/dockerfile-generator.sh"
+        Path(__file__).resolve().parent
+        / "../dockerfiles/dockerfile-generator.sh"
     )
     # Create a new dockerfile
     subprocess.call(
@@ -130,7 +131,7 @@ def add(model_group, kipoi_model_repo, kipoi_container_repo):
     # Build a docker image
     dockerfile_path = (
         Path(__file__).resolve().parent
-        / f"dockerfiles/Dockerfile.{model_group.lower()}"
+        / f"../dockerfiles/Dockerfile.{model_group.lower()}"
     )
     image_name = f"haimasree/kipoi-docker:{model_group.lower()}"
     build_docker_image(
