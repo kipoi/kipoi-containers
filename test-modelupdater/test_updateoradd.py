@@ -133,7 +133,7 @@ class TestServerCode(object):
         with open(workflow_build_and_test_images_file_path, "r") as f:
             data = round_trip_load(f, preserve_quotes=True)
             assert (
-                DoubleQuotedScalarString(self.model_group_to_add)
+                self.model_group_to_add.lower()
                 in data["jobs"]["buildandtest"]["strategy"]["matrix"]["image"]
             )
 
@@ -143,9 +143,10 @@ class TestServerCode(object):
         ) as f:
             data = round_trip_load(f, preserve_quotes=True)
             assert (
-                DoubleQuotedScalarString(self.model_group_to_add)
+                "CleTimer/customBP"
                 in data["jobs"]["test"]["strategy"]["matrix"]["model"]
             )
+
         shutil.copy(
             Path(__file__).resolve().parent / "tmp-test-images.yml",
             workflow_test_images_file_path,
