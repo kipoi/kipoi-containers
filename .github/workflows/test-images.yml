@@ -51,7 +51,7 @@ jobs:
                 "deepTarget",
                 "AttentiveChrome/E003",
                 "BPNet-OSKN",
-                "SeqVec/structure"
+                "SeqVec/embedding"
                 ]
     
     runs-on: ubuntu-latest      
@@ -70,3 +70,23 @@ jobs:
         run: |
           pytest -s test-containers/test_models_from_command_line.py --model=${{ matrix.model }}
           docker system prune -a -f  
+
+  testupdateoradd:
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Test updateoradd
+        run: |
+          docker pull haimasree/kipoi-docker:deepmel
+          docker pull haimasree/kipoi-docker:kipoi-base-env
+          python -m pytest -s test-modelupdater/test_updateoradd.py
