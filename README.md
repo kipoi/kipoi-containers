@@ -77,6 +77,21 @@ The images in [haimasree/kipoi-docker](https://hub.docker.com/repository/docker/
 
 If new models are added to kipoi repository it is prudent to add all the necessary files in this repo and build, test and push a container to kipoi-docker dockerhub repo. For this purpose, I have provided ```model-updater/update.py```. Run it as ```python model-updater/update.py```. A Personal Access Token is required since we will read from and write to github repos using PyGithub. Please add it as an environment variable named ```GITHUB_PAT```. This script will update existing images and rerun the tests. Also, if necessary, add a new dockerfile for model group which has not been containerized yet, build the docker  image, run tests to ensure all corresponding models in the group are compatible with this image, update the json files, update github workflow files, and finally update ```model-updater/kipoi-model-repo-hash```.  If everything goes well, at this point feel free to push the image and create a PR on github.
 
+### Tests
+
+I have provided some unit tests for testing basic features of this framework. For running these tests, first pull the test image
+
+```bash
+docker pull haimasree/kipoi-docker:deepmel
+```
+
+Then, install the requirements and run the tests -
+
+```bash
+pip install -r requirements.txt
+python -m pytest -s test-modelupdater/test_updateoradd.py
+```
+
 ## Models not working
 
 Following models are missing their respective dataloader.pkl files -
