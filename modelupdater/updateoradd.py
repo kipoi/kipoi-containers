@@ -119,7 +119,7 @@ def add(model_group, kipoi_model_repo, kipoi_container_repo):
     # Create a new dockerfile
     subprocess.call(
         [
-            "sh",
+            "bash",
             dockerfile_generator_path,
             f"{model_group}",
         ],

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 newmodelname=$1
 imagename="$(tr [A-Z] [a-z] <<< "$newmodelname")"
