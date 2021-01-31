@@ -1,13 +1,11 @@
 from pathlib import Path
 import pytest
 
-from helper import build_docker_image
+from .helper import build_docker_image
 
 
 class ModelUpdater:
-    def __init__(self, kipoi_model_repo, kipoi_container_repo):
-        self.kipoi_model_repo = kipoi_model_repo
-        self.kipoi_container_repo = kipoi_container_repo
+    def __init__(self):
         self.list_of_models = []
 
     def update(self, model, name_of_docker_image):

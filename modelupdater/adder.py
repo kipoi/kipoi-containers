@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 import subprocess
 
-from helper import build_docker_image, run_docker_image
+from .helper import build_docker_image, run_docker_image
 from ruamel.yaml import round_trip_load, round_trip_dump
 from ruamel.yaml.scalarstring import DoubleQuotedScalarString
 

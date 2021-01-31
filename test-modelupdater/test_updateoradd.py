@@ -4,7 +4,8 @@ from pathlib import Path
 import pytest
 import shutil
 
-from modelupdater.updateoradd import update, add
+from modelupdater.updater import ModelUpdater
+from modelupdater.adder import ModelAdder
 from ruamel.yaml import round_trip_load, round_trip_dump
 from ruamel.yaml.scalarstring import DoubleQuotedScalarString
 
@@ -19,7 +20,7 @@ class TestServerCode(object):
         assert self.image_to_update
         client = docker.from_env()
         original_shortid = client.images.get(self.image_to_update).short_id
-        update(
+        ModelUpdater().update(
             model=self.model_group_to_update,
             name_of_docker_image=self.image_to_update,
         )
@@ -78,11 +79,11 @@ class TestServerCode(object):
 
         assert self.model_group_to_add
 
-        add(
+        ModelAdder(
             model_group=self.model_group_to_add,
             kipoi_model_repo=None,
             kipoi_container_repo=None,
-        )
+        ).add()
 
         # Revert the change
         dockerfile_path = (

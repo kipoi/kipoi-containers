@@ -2,9 +2,9 @@ import os
 import json
 from pathlib import Path
 
-from adder import ModelAdder
+from .adder import ModelAdder
 from github import Github
-from udpater import ModelUpdater
+from .udpater import ModelUpdater
 
 
 class ModelSyncer:
@@ -45,10 +45,7 @@ class ModelSyncer:
 
     def update_or_add_model_container(self, model):
         if model in self.model_group_to_image_dict:
-            model_updater = ModelUpdater(
-                kipoi_model_repo=self.kipoi_model_repo,
-                kipoi_container_repo=self.kipoi_container_repo,
-            )
+            model_updater = ModelUpdater()
             model_updater.update(
                 model=model,
                 name_of_docker_image=self.model_group_to_image_dict[model],
