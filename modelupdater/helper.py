@@ -4,6 +4,16 @@ import docker
 
 
 def build_docker_image(dockerfile_path, name_of_docker_image):
+    """
+    This function builds a docker image
+    Parameters
+    ----------
+    dockerfile_path : str
+        Path to the dockerfile which will be used to build the docker
+        image with no-cache option
+    name_of_docker_image : str
+        Name of the docker image to build
+    """
     client = docker.from_env()
     with open(dockerfile_path, "r") as dockerfile:
         dockerfile_obj = BytesIO(dockerfile.read().encode("utf-8"))
@@ -18,6 +28,18 @@ def build_docker_image(dockerfile_path, name_of_docker_image):
 
 
 def run_docker_image(image_name, model_name):
+    """
+    Runs a container for a given docker image and run
+    kipoi test <model_name> --source=kipoi inside
+    the container, followed by a cleanup
+
+    Parameters
+    ----------
+    image_name : str
+        Name of the docker image
+    model_name : str
+        Name of the model to test
+    """
     client = docker.from_env()
     try:
         container_log = client.containers.run(
