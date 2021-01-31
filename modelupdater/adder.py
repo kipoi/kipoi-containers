@@ -43,14 +43,6 @@ class ModelAdder:
         with open(".github/workflows/test-images.yml", "w") as f:
             round_trip_dump(data, f)
 
-    def get_list_of_models_from_repo(self):
-        contents = self.kipoi_model_repo.get_contents(self.model_group)
-        self.list_of_models = [
-            f"{self.model_group}/{content_file.name}"
-            for content_file in contents
-            if content_file.type == "dir"
-        ]
-
     def update_test_and_json_files(self):
         with open(
             Path.cwd() / "test-containers" / "model-group-to-image-name.json",
@@ -80,6 +72,14 @@ class ModelAdder:
         ) as fp:
             json.dump(image_name_to_model_dict, fp, indent=2)
 
+    def get_list_of_models_from_repo(self):
+        contents = self.kipoi_model_repo.get_contents(self.model_group)
+        return [
+            f"{self.model_group}/{content_file.name}"
+            for content_file in contents
+            if content_file.type == "dir"
+        ]
+
     def add(self):
         dockerfile_generator_path = "dockerfiles/dockerfile-generator.sh"
         # Create a new dockerfile
@@ -99,7 +99,7 @@ class ModelAdder:
         )
 
         # Test the newly created container
-        self.get_list_of_models_from_repo()
+        self.list_of_models = self.get_list_of_models_from_repo()
 
         if self.list_of_models:
             for model_name in self.list_of_models:

@@ -35,7 +35,7 @@ class TestServerCode(object):
 
         monkeypatch.setattr(
             "modelupdater.adder.ModelAdder.get_list_of_models_from_repo",
-            mock_get_list_of_models_from_repo,
+            staticmethod(mock_get_list_of_models_from_repo),
         )
 
         image_name_to_model_file_path = (
