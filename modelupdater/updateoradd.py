@@ -4,7 +4,7 @@ from pathlib import Path
 
 from .adder import ModelAdder
 from github import Github
-from .udpater import ModelUpdater
+from .updater import ModelUpdater
 
 
 class ModelSyncer:

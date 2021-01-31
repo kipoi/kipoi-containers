@@ -34,7 +34,7 @@ class TestServerCode(object):
             return ["CleTimer/customBP", "CleTimer/default"]
 
         monkeypatch.setattr(
-            "modelupdater.updateoradd.get_list_of_models_from_repo",
+            "modelupdater.adder.ModelAdder.get_list_of_models_from_repo",
             mock_get_list_of_models_from_repo,
         )
 
