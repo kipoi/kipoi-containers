@@ -71,10 +71,14 @@ class ModelSyncer:
         """
         if model in self.model_group_to_image_dict:
             model_updater = ModelUpdater()
-            model_updater.update(
-                model=model,
-                name_of_docker_image=self.model_group_to_image_dict[model],
-            )
+            name_of_docker_image = self.model_group_to_image_dict[model]
+            if "shared" not in name_of_docker_image:
+                model_updater.update(
+                    model=model,
+                    name_of_docker_image=name_of_docker_image,
+                )
+            else:
+                print(f"We will not be updating {name_of_docker_image}")
         else:
             model_adder = ModelAdder(
                 model_group=model,
