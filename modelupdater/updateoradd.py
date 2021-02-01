@@ -87,7 +87,7 @@ class ModelSyncer:
     def sync(self):
         """
         Sync this repository with https://github.com/kipoi/models and update the
-        commithash in kipoi-model-repo-hash if everything is fine
+        commit hash in kipoi-model-repo-hash if everything is fine
         """
         if self.source_commit_hash != self.target_commit_hash:
             self.get_list_of_updated_models()

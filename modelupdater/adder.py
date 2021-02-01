@@ -9,6 +9,20 @@ from ruamel.yaml.scalarstring import DoubleQuotedScalarString
 
 class ModelAdder:
     def __init__(self, model_group, kipoi_model_repo, kipoi_container_repo):
+        """
+        This function instantiates ModelAdder class with the model_group to
+        add, kipoi model repo and this repository
+
+        Parameters
+        ----------
+        model_group : str
+            Model group to add
+        kipoi_model_repo : github.Repository.Repository
+            github.Repository.Repository instance of
+            https://github.com/kipoi/models
+        kipoi_container_repo : github.Repository.Repository
+            github.Repository.Repository instance of this repository
+        """
         self.kipoi_model_repo = kipoi_model_repo
         self.kipoi_container_repo = kipoi_container_repo
         self.model_group = model_group
@@ -16,6 +30,9 @@ class ModelAdder:
         self.list_of_models = []
 
     def update_github_workflow_files(self):
+        """
+        Update github actions CI workflow files with the newly added model
+        """
         with open(
             ".github/workflows/build-and-test-images.yml",
             "r",
@@ -44,6 +61,10 @@ class ModelAdder:
             round_trip_dump(data, f)
 
     def update_test_and_json_files(self):
+        """
+        Update image-name-to-model.json and model-group-to-image-name.json
+        with the newly added model and the corresponding docker image
+        """
         with open(
             Path.cwd() / "test-containers" / "model-group-to-image-name.json",
             "r",
@@ -73,6 +94,16 @@ class ModelAdder:
             json.dump(image_name_to_model_dict, fp, indent=2)
 
     def get_list_of_models_from_repo(self):
+
+        """
+        This model returns a list of models listed under a model group
+        at https://github.com/kipoi/models
+
+        Returns
+        -------
+        list
+        List of models under a model group
+        """
         contents = self.kipoi_model_repo.get_contents(self.model_group)
         return [
             f"{self.model_group}/{content_file.name}"
@@ -81,6 +112,15 @@ class ModelAdder:
         ]
 
     def add(self):
+        """
+        This function adds a newly added model group to this repo. The steps are -
+        1. Create the appropriate dockerfile using a generator
+        2. Build the image
+        3. Test the image with all models from this newly added model group
+        4. Update model group to image name map and image name to model name map
+        5. Update github workflow files with this newly added model group
+        """
+
         dockerfile_generator_path = "dockerfiles/dockerfile-generator.sh"
         # Create a new dockerfile
         subprocess.call(

@@ -14,7 +14,10 @@ class ModelUpdater:
     def update(self, model, name_of_docker_image):
         """
         This functions rebuilds the given docker image for the given modelgroup and
-        tests all the models with this new image
+        tests all the models with this new image. The steps are -
+        1. Rebuild the image
+        2. Rerun the tests for this image
+
         Parameters
         ----------
         model : str
