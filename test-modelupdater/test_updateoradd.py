@@ -4,7 +4,8 @@ from pathlib import Path
 import pytest
 import shutil
 
-from modelupdater.updateoradd import update, add
+from modelupdater.updater import ModelUpdater
+from modelupdater.adder import ModelAdder
 from ruamel.yaml import round_trip_load, round_trip_dump
 from ruamel.yaml.scalarstring import DoubleQuotedScalarString
 
@@ -19,7 +20,7 @@ class TestServerCode(object):
         assert self.image_to_update
         client = docker.from_env()
         original_shortid = client.images.get(self.image_to_update).short_id
-        update(
+        ModelUpdater().update(
             model=self.model_group_to_update,
             name_of_docker_image=self.image_to_update,
         )
@@ -33,8 +34,8 @@ class TestServerCode(object):
             return ["CleTimer/customBP", "CleTimer/default"]
 
         monkeypatch.setattr(
-            "modelupdater.updateoradd.get_list_of_models_from_repo",
-            mock_get_list_of_models_from_repo,
+            "modelupdater.adder.ModelAdder.get_list_of_models_from_repo",
+            staticmethod(mock_get_list_of_models_from_repo),
         )
 
         image_name_to_model_file_path = (
@@ -78,11 +79,11 @@ class TestServerCode(object):
 
         assert self.model_group_to_add
 
-        add(
+        ModelAdder(
             model_group=self.model_group_to_add,
             kipoi_model_repo=None,
             kipoi_container_repo=None,
-        )
+        ).add()
 
         # Revert the change
         dockerfile_path = (
