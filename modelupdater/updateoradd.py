@@ -2,9 +2,9 @@ import os
 import json
 from pathlib import Path
 
-from .adder import ModelAdder
+from adder import ModelAdder
 from github import Github
-from .updater import ModelUpdater
+from updater import ModelUpdater
 
 
 class ModelSyncer:
@@ -32,7 +32,7 @@ class ModelSyncer:
             "master"
         ).commit.sha
         with open(
-            "./model-updater/kipoi-model-repo-hash", "r"
+            "./modelupdater/kipoi-model-repo-hash", "r"
         ) as kipoimodelrepohash:
             self.source_commit_hash = kipoimodelrepohash.readline()
         self.list_of_updated_models = []
@@ -56,9 +56,8 @@ class ModelSyncer:
                 [f.filename.split("/")[0] for f in comparison_obj.files]
             )
         )
-        self.list_of_updated_models = self.list_of_updated_models.remove(
-            "shared"
-        )
+        self.list_of_updated_models.remove("shared")
+        self.list_of_updated_models.remove(".circleci")
 
     def update_or_add_model_container(self, model):
         """
@@ -98,7 +97,7 @@ class ModelSyncer:
 
         # If everything has gone well so far update kipoi-model-hash
         with open(
-            "./model-updater/kipoi-model-repo-hash", "w"
+            "./modelupdater/kipoi-model-repo-hash", "w"
         ) as kipoimodelrepohash:
             kipoimodelrepohash.write(self.target_commit_hash)
 
