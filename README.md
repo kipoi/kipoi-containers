@@ -79,7 +79,8 @@ If new models are added to kipoi repository it is prudent to add all the necessa
 
  ```bash
  pip install -r requirements.txt
- python -m  modelupdater.updateoradd```
+ python -m  modelupdater.updateoradd
+ ```
  
  A Personal Access Token is required since we will read from and write to github repos using PyGithub. Please add it as an environment variable named ```GITHUB_PAT```. This script will update existing images and rerun the tests. If a new model group needs to be updated, add a new dockerfile for model group which has not been containerized yet, build the docker  image, run tests to ensure all corresponding models in the group are compatible with this image, update the json files, update github workflow files, and finally update ```modelupdater/kipoi-model-repo-hash```.  If everything goes well, at this point feel free to push the image and create a PR on github.
 
