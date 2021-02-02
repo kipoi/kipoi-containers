@@ -75,7 +75,13 @@ The images in [haimasree/kipoi-docker](https://hub.docker.com/repository/docker/
 
 ## Adding new containers
 
-If new models are added to kipoi repository it is prudent to add all the necessary files in this repo and build, test and push a container to kipoi-docker dockerhub repo. For this purpose, I have provided ```modelupdater/updateoradd.py```. Run it as ```python modelupdater/updateoradd.py```. A Personal Access Token is required since we will read from and write to github repos using PyGithub. Please add it as an environment variable named ```GITHUB_PAT```. This script will update existing images and rerun the tests. If a new model group needs to be updated, add a new dockerfile for model group which has not been containerized yet, build the docker  image, run tests to ensure all corresponding models in the group are compatible with this image, update the json files, update github workflow files, and finally update ```modelupdater/kipoi-model-repo-hash```.  If everything goes well, at this point feel free to push the image and create a PR on github.
+If new models are added to kipoi repository it is prudent to add all the necessary files in this repo and build, test and push a container to kipoi-docker dockerhub repo. For this purpose, I have provided ```modelupdater/updateoradd.py```. Run it as - 
+
+ ```bash
+ pip install -r requirements.txt
+ python -m  modelupdater.updateoradd```
+ 
+ A Personal Access Token is required since we will read from and write to github repos using PyGithub. Please add it as an environment variable named ```GITHUB_PAT```. This script will update existing images and rerun the tests. If a new model group needs to be updated, add a new dockerfile for model group which has not been containerized yet, build the docker  image, run tests to ensure all corresponding models in the group are compatible with this image, update the json files, update github workflow files, and finally update ```modelupdater/kipoi-model-repo-hash```.  If everything goes well, at this point feel free to push the image and create a PR on github.
 
 ### Tests
 
@@ -97,4 +103,3 @@ python -m pytest -s test-modelupdater/test_updateoradd.py
 Following models are missing their respective dataloader.pkl files -
 ```rbp_eclip/U2AF1, rbp_eclip/U2AF2, rbp_eclip/U2AF2, rbp_eclip/UCHL5, rbp_eclip/UPF1, rbp_eclip/XPO5, rbp_eclip/XRN2, rbp_eclip/YBX3, rbp_eclip/YWHAG, rbp_eclip/ZNF622, rbp_eclip/ZRANB2```
 They have been removed from ```test-containers/image-name-to-model.json```.
-

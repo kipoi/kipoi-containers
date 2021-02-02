@@ -2,9 +2,9 @@ import os
 import json
 from pathlib import Path
 
-from adder import ModelAdder
+from .adder import ModelAdder
 from github import Github
-from updater import ModelUpdater
+from .updater import ModelUpdater
 
 
 class ModelSyncer:
