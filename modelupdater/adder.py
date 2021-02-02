@@ -1,8 +1,10 @@
+import csv
 import json
 from pathlib import Path
 import subprocess
 
 from .helper import build_docker_image, run_docker_image
+import pandas as pd
 from ruamel.yaml import round_trip_load, round_trip_dump
 from ruamel.yaml.scalarstring import DoubleQuotedScalarString
 
@@ -105,11 +107,12 @@ class ModelAdder:
         List of models under a model group
         """
         contents = self.kipoi_model_repo.get_contents(self.model_group)
-        return [
-            f"{self.model_group}/{content_file.name}"
-            for content_file in contents
-            if content_file.type == "dir"
-        ]
+        for content_file in contents:
+            if content_file.name == "models.tsv":
+                model_tsv = pd.read_csv(
+                    content_file.download_url, delimiter="\t"
+                )
+                return [f"{self.model_group}/{m}" for m in model_tsv["model"]]
 
     def add(self):
         """
