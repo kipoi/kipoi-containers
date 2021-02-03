@@ -3,6 +3,20 @@ from io import BytesIO
 import docker
 
 
+def cleanup(client):
+    """
+    Cleans up unused docker containers, volumes and networks
+
+    Parameters
+    ----------
+    client : DockerClient
+        A docker client configured from environment variables
+    """
+    client.containers.prune()
+    client.networks.prune()
+    client.volumes.prune()
+
+
 def build_docker_image(dockerfile_path, name_of_docker_image):
     """
     This function builds a docker image
@@ -52,9 +66,7 @@ def run_docker_image(image_name, model_name):
         raise (e)
     except docker.errors.APIError as e:
         raise (e)
-    client.containers.prune()
-    client.networks.prune()
-    client.volumes.prune()
+    cleanup(client=client)
     print(container_log.decode("utf-8"))
 
 
@@ -78,22 +90,14 @@ def run_docker_image_without_exception(image_name, model_name):
             command=f"kipoi test {model_name} --source=kipoi",
         )
     except docker.errors.ImageNotFound:
-        client.containers.prune()
-        client.networks.prune()
-        client.volumes.prune()
+        cleanup(client=client)
         return False
     except docker.errors.ContainerError:
-        client.containers.prune()
-        client.networks.prune()
-        client.volumes.prune()
+        cleanup(client=client)
         return False
     except docker.errors.APIError:
-        client.containers.prune()
-        client.networks.prune()
-        client.volumes.prune()
+        cleanup(client=client)
         return False
-    client.containers.prune()
-    client.networks.prune()
-    client.volumes.prune()
+    cleanup(client=client)
     print(container_log.decode("utf-8"))
     return True
