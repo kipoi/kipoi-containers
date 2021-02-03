@@ -21,7 +21,7 @@ class TestServerCode(object):
         client = docker.from_env()
         original_shortid = client.images.get(self.image_to_update).short_id
         ModelUpdater().update(
-            model=self.model_group_to_update,
+            model_group=self.model_group_to_update,
             name_of_docker_image=self.image_to_update,
         )
         assert (
