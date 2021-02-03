@@ -32,9 +32,18 @@ class ModelUpdater:
             is working with all the models under the group named <model_group>
         """
         print(f"Updating {model_group} and {name_of_docker_image}")
-        dockerfile_path = (
-            Path.cwd() / "dockerfiles" / f"Dockerfile.{model_group.lower()}"
-        )
+        if model_group == "MMSplice/mtsplice":
+            dockerfile_name = "Dockerfile.mmsplice-mtsplice"
+        elif model_group in [
+            "MMSplice/pathogenicity",
+            "MMSplice/splicingEfficiency",
+            "MMSplice/deltaLogitPSI",
+            "MMSplice/modularPredictions",
+        ]:
+            dockerfile_name = "Dockerfile.mmsplice"
+        else:
+            dockerfile_name = f"Dockerfile.{model_group.lower()}"
+        dockerfile_path = Path.cwd() / "dockerfiles" / dockerfile_name
         if dockerfile_path.exists():
             build_docker_image(
                 dockerfile_path=dockerfile_path,
