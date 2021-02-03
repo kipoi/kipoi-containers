@@ -53,7 +53,12 @@ class ModelSyncer:
         )
         self.list_of_updated_model_groups = list(
             dict.fromkeys(
-                [f.filename.split("/")[0] for f in comparison_obj.files]
+                [
+                    f.filename
+                    if "MMSplice" in f.filename
+                    else f.filename.split("/")[0]
+                    for f in comparison_obj.files
+                ]
             )
         )
         self.list_of_updated_model_groups.remove("shared")
