@@ -123,7 +123,7 @@ class ModelAdder:
         This function tests if the new model group is compatible
         with existng shared images -
         "haimasree/kipoi-docker:sharedpy3keras2" and
-        "haimasree/kipoi-docker:sharedpy3keras12",
+        "haimasree/kipoi-docker:sharedpy3keras1.2",
 
         Returns
         -------
@@ -136,7 +136,7 @@ class ModelAdder:
         """
         for image_name in [
             "haimasree/kipoi-docker:sharedpy3keras2",
-            "haimasree/kipoi-docker:sharedpy3keras12",
+            "haimasree/kipoi-docker:sharedpy3keras1.2",
         ]:
             if self.list_of_models:
                 for model_name in self.list_of_models:
@@ -159,7 +159,7 @@ class ModelAdder:
         This function adds a newly added model group to this repo. The steps are -
         1. Test the model group with two available docker images for shared
            environments - haimasree/kipoi-docker:sharedpy3keras2 and
-           haimasree/kipoi-docker:sharedpy3keras12. If the tests pass go to step
+           haimasree/kipoi-docker:sharedpy3keras1.2. If the tests pass go to step
            5. Otherwise folow step 2-4
         2. Create the appropriate dockerfile using a generator
         3. Build the image
