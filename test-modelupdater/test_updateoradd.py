@@ -79,20 +79,22 @@ class TestServerCode(object):
 
         assert self.model_group_to_add
 
-        ModelAdder(
+        model_adder = ModelAdder(
             model_group=self.model_group_to_add,
             kipoi_model_repo=None,
             kipoi_container_repo=None,
-        ).add()
+        )
+        model_adder.add()
 
         # Revert the change
         dockerfile_path = (
             Path(__file__).resolve().parent
             / f"../dockerfiles/Dockerfile.{self.model_group_to_add.lower()}"
         )
-        assert dockerfile_path.exists()
-        dockerfile_path.unlink()
-
+        if dockerfile_path.exists():
+            dockerfile_path.unlink()
+        else:
+            assert "sharedpy3keras" in model_adder.image_name
         with open(
             Path(__file__).resolve().parent
             / "../test-containers"

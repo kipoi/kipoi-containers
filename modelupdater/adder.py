@@ -44,9 +44,14 @@ class ModelAdder:
             "r",
         ) as f:
             data = round_trip_load(f, preserve_quotes=True)
-        data["jobs"]["buildandtest"]["strategy"]["matrix"]["image"].append(
-            DoubleQuotedScalarString(self.image_name.split(":")[1])
-        )
+        if "sharedpy3keras2" in self.image_name:
+            data["jobs"]["buildandtestsharedpy3keras2"]["strategy"]["matrix"][
+                "modelgroup"
+            ].append(DoubleQuotedScalarString(self.model_group))
+        else:
+            data["jobs"]["buildandtest"]["strategy"]["matrix"]["image"].append(
+                DoubleQuotedScalarString(self.image_name.split(":")[1])
+            )
         with open(".github/workflows/build-and-test-images.yml", "w") as f:
             round_trip_dump(data, f)
 

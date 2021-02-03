@@ -2051,7 +2051,12 @@
     "rbp_eclip/TIA1",
     "rbp_eclip/TNRC6A",
     "rbp_eclip/TRA2A",
-    "rbp_eclip/TROVE2"
+    "rbp_eclip/TROVE2",
+    "Xpresso/human_GM12878",
+    "Xpresso/human_median",
+    "Xpresso/human_K562",
+    "Xpresso/mouse_ESCs",
+    "Xpresso/mouse_median"
   ],
   "haimasree/kipoi-docker:mpra-dragonn": [
     "MPRA-DragoNN/DeepFactorizedModel",
@@ -2145,12 +2150,5 @@
   "haimasree/kipoi-docker:seqvec": [
     "SeqVec/structure",
     "SeqVec/embedding"
-  ],
-  "haimasree/kipoi-docker:xpresso": [
-    "Xpresso/human_GM12878",
-    "Xpresso/human_median",
-    "Xpresso/human_K562",
-    "Xpresso/mouse_ESCs",
-    "Xpresso/mouse_median"
   ]
 }
