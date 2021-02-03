@@ -9,9 +9,9 @@ class ModelUpdater:
         """
         This function instantiate the ModelUpdater class
         """
-        self.list_of_models = []
+        pass
 
-    def update(self, model, name_of_docker_image):
+    def update(self, model_group, name_of_docker_image):
         """
         This functions rebuilds the given docker image for the given modelgroup and
         tests all the models with this new image. The steps are -
@@ -20,7 +20,7 @@ class ModelUpdater:
 
         Parameters
         ----------
-        model : str
+        model_group : str
             Model group which has been updated in the kipoi model repo
         name_of_docker_image : str
             Corresponding name of the docker image
@@ -29,11 +29,11 @@ class ModelUpdater:
         ------
         ValueError
             exitcode from the pytest instance that ran to ensure the new image
-            is working with all the models under the group named <model>
+            is working with all the models under the group named <model_group>
         """
-        print(f"Updating {model} and {name_of_docker_image}")
+        print(f"Updating {model_group} and {name_of_docker_image}")
         dockerfile_path = (
-            Path.cwd() / "dockerfiles" / f"Dockerfile.{model.lower()}"
+            Path.cwd() / "dockerfiles" / f"Dockerfile.{model_group.lower()}"
         )
         if dockerfile_path.exists():
             build_docker_image(
@@ -49,7 +49,7 @@ class ModelUpdater:
             )
             if exitcode != 0:
                 raise ValueError(
-                    f"Updated docker image {name_of_docker_image} for {model} did not pass relevant tests"
+                    f"Updated docker image {name_of_docker_image} for {model_group} did not pass relevant tests"
                 )
         else:
-            print(f"{model} needs to be containerized first")
+            print(f"{model_group} needs to be containerized first")
