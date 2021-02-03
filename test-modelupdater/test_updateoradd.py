@@ -33,11 +33,17 @@ class TestServerCode(object):
         def mock_get_list_of_models_from_repo(*args, **kwargs):
             return ["CleTimer/customBP", "CleTimer/default"]
 
+        def mock_is_compatible_with_existing_image(*args, **kwargs):
+            return False
+
         monkeypatch.setattr(
             "modelupdater.adder.ModelAdder.get_list_of_models_from_repo",
             staticmethod(mock_get_list_of_models_from_repo),
         )
-
+        monkeypatch.setattr(
+            "modelupdater.adder.ModelAdder.is_compatible_with_existing_image",
+            staticmethod(mock_is_compatible_with_existing_image),
+        )
         image_name_to_model_file_path = (
             Path(__file__).resolve().parent
             / "../test-containers"
@@ -91,10 +97,8 @@ class TestServerCode(object):
             Path(__file__).resolve().parent
             / f"../dockerfiles/Dockerfile.{self.model_group_to_add.lower()}"
         )
-        if dockerfile_path.exists():
-            dockerfile_path.unlink()
-        else:
-            assert "sharedpy3keras" in model_adder.image_name
+        assert dockerfile_path.exists()
+        dockerfile_path.unlink()
         with open(
             Path(__file__).resolve().parent
             / "../test-containers"
