@@ -56,3 +56,44 @@ def run_docker_image(image_name, model_name):
     client.networks.prune()
     client.volumes.prune()
     print(container_log.decode("utf-8"))
+
+
+def run_docker_image_without_exception(image_name, model_name):
+    """
+    Runs a container for a given docker image and run
+    kipoi test <model_name> --source=kipoi inside
+    the container, followed by a cleanup, without raising an exception
+
+    Parameters
+    ----------
+    image_name : str
+        Name of the docker image
+    model_name : str
+        Name of the model to test
+    """
+    client = docker.from_env()
+    try:
+        container_log = client.containers.run(
+            image=image_name,
+            command=f"kipoi test {model_name} --source=kipoi",
+        )
+    except docker.errors.ImageNotFound:
+        client.containers.prune()
+        client.networks.prune()
+        client.volumes.prune()
+        return False
+    except docker.errors.ContainerError:
+        client.containers.prune()
+        client.networks.prune()
+        client.volumes.prune()
+        return False
+    except docker.errors.APIError:
+        client.containers.prune()
+        client.networks.prune()
+        client.volumes.prune()
+        return False
+    client.containers.prune()
+    client.networks.prune()
+    client.volumes.prune()
+    print(container_log.decode("utf-8"))
+    return True
