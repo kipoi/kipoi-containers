@@ -119,6 +119,21 @@ class ModelAdder:
                 return [f"{self.model_group}/{m}" for m in model_tsv["model"]]
 
     def is_compatible_with_existing_image(self):
+        """
+        This function tests if the new model group is compatible
+        with existng shared images -
+        "haimasree/kipoi-docker:sharedpy3keras2" and
+        "haimasree/kipoi-docker:sharedpy3keras12",
+
+        Returns
+        -------
+        bool
+            If the new model group is found to be compatible with
+            one of the above mentioned shared image,  it updates
+            class variable image_name to the compatible image name
+            and returns True. It will return False otherwise.
+
+        """
         for image_name in [
             "haimasree/kipoi-docker:sharedpy3keras2",
             "haimasree/kipoi-docker:sharedpy3keras12",
