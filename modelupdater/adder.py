@@ -3,7 +3,11 @@ import json
 from pathlib import Path
 import subprocess
 
-from .helper import build_docker_image, run_docker_image
+from .helper import (
+    build_docker_image,
+    run_docker_image,
+    run_docker_image_without_exception,
+)
 import pandas as pd
 from ruamel.yaml import round_trip_load, round_trip_dump
 from ruamel.yaml.scalarstring import DoubleQuotedScalarString
@@ -40,9 +44,14 @@ class ModelAdder:
             "r",
         ) as f:
             data = round_trip_load(f, preserve_quotes=True)
-        data["jobs"]["buildandtest"]["strategy"]["matrix"]["image"].append(
-            DoubleQuotedScalarString(self.image_name.split(":")[1])
-        )
+        if "sharedpy3keras2" in self.image_name:
+            data["jobs"]["buildandtestsharedpy3keras2"]["strategy"]["matrix"][
+                "modelgroup"
+            ].append(DoubleQuotedScalarString(self.model_group))
+        else:
+            data["jobs"]["buildandtest"]["strategy"]["matrix"]["image"].append(
+                DoubleQuotedScalarString(self.image_name.split(":")[1])
+            )
         with open(".github/workflows/build-and-test-images.yml", "w") as f:
             round_trip_dump(data, f)
 
@@ -114,46 +123,91 @@ class ModelAdder:
                 )
                 return [f"{self.model_group}/{m}" for m in model_tsv["model"]]
 
+    def is_compatible_with_existing_image(self):
+        """
+        This function tests if the new model group is compatible
+        with existng shared images -
+        "haimasree/kipoi-docker:sharedpy3keras2" and
+        "haimasree/kipoi-docker:sharedpy3keras1.2",
+
+        Returns
+        -------
+        bool
+            If the new model group is found to be compatible with
+            one of the above mentioned shared image,  it updates
+            class variable image_name to the compatible image name
+            and returns True. It will return False otherwise.
+
+        """
+        for image_name in [
+            "haimasree/kipoi-docker:sharedpy3keras2",
+            "haimasree/kipoi-docker:sharedpy3keras1.2",
+        ]:
+            if self.list_of_models:
+                for model_name in self.list_of_models:
+                    # Run the newly created container
+                    if run_docker_image_without_exception(
+                        image_name=image_name, model_name=model_name
+                    ):
+                        self.image_name = image_name
+                        return True
+            else:
+                if run_docker_image_without_exception(
+                    image_name=image_name, model_name=self.model_group
+                ):
+                    self.image_name = image_name
+                    return True
+        return False
+
     def add(self):
         """
         This function adds a newly added model group to this repo. The steps are -
-        1. Create the appropriate dockerfile using a generator
-        2. Build the image
-        3. Test the image with all models from this newly added model group
-        4. Update model group to image name map and image name to model name map
-        5. Update github workflow files with this newly added model group
+        1. Test the model group with two available docker images for shared
+           environments - haimasree/kipoi-docker:sharedpy3keras2 and
+           haimasree/kipoi-docker:sharedpy3keras1.2. If the tests pass go to step
+           5. Otherwise folow step 2-4
+        2. Create the appropriate dockerfile using a generator
+        3. Build the image
+        4. Test the image with all models from this newly added model group
+        5. Update model group to image name map and image name to model name map
+        6. Update github workflow files with this newly added model group
         """
-
-        dockerfile_generator_path = "dockerfiles/dockerfile-generator.sh"
-        # Create a new dockerfile
-        subprocess.call(
-            [
-                "bash",
-                dockerfile_generator_path,
-                f"{self.model_group}",
-            ],
-        )
-
-        # Build a docker image
-        dockerfile_path = f"dockerfiles/Dockerfile.{self.model_group.lower()}"
-        build_docker_image(
-            dockerfile_path=dockerfile_path,
-            name_of_docker_image=self.image_name,
-        )
-
-        # Test the newly created container
         self.list_of_models = self.get_list_of_models_from_repo()
-
-        if self.list_of_models:
-            for model_name in self.list_of_models:
-                # Run the newly created container
-                run_docker_image(
-                    image_name=self.image_name, model_name=model_name
-                )
+        if self.is_compatible_with_existing_image():
+            self.update_test_and_json_files()
+            self.update_github_workflow_files()
         else:
-            run_docker_image(
-                image_name=self.image_name, model_name=self.model_group
+            dockerfile_generator_path = "dockerfiles/dockerfile-generator.sh"
+            # Create a new dockerfile
+            subprocess.call(
+                [
+                    "bash",
+                    dockerfile_generator_path,
+                    f"{self.model_group}",
+                ],
             )
 
-        self.update_test_and_json_files()
-        self.update_github_workflow_files()
+            # Build a docker image
+            dockerfile_path = (
+                f"dockerfiles/Dockerfile.{self.model_group.lower()}"
+            )
+            build_docker_image(
+                dockerfile_path=dockerfile_path,
+                name_of_docker_image=self.image_name,
+            )
+
+            # Test the newly created container
+
+            if self.list_of_models:
+                for model_name in self.list_of_models:
+                    # Run the newly created container
+                    run_docker_image(
+                        image_name=self.image_name, model_name=model_name
+                    )
+            else:
+                run_docker_image(
+                    image_name=self.image_name, model_name=self.model_group
+                )
+
+            self.update_test_and_json_files()
+            self.update_github_workflow_files()

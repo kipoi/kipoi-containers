@@ -33,11 +33,17 @@ class TestServerCode(object):
         def mock_get_list_of_models_from_repo(*args, **kwargs):
             return ["CleTimer/customBP", "CleTimer/default"]
 
+        def mock_is_compatible_with_existing_image(*args, **kwargs):
+            return False
+
         monkeypatch.setattr(
             "modelupdater.adder.ModelAdder.get_list_of_models_from_repo",
             staticmethod(mock_get_list_of_models_from_repo),
         )
-
+        monkeypatch.setattr(
+            "modelupdater.adder.ModelAdder.is_compatible_with_existing_image",
+            staticmethod(mock_is_compatible_with_existing_image),
+        )
         image_name_to_model_file_path = (
             Path(__file__).resolve().parent
             / "../test-containers"
@@ -79,11 +85,12 @@ class TestServerCode(object):
 
         assert self.model_group_to_add
 
-        ModelAdder(
+        model_adder = ModelAdder(
             model_group=self.model_group_to_add,
             kipoi_model_repo=None,
             kipoi_container_repo=None,
-        ).add()
+        )
+        model_adder.add()
 
         # Revert the change
         dockerfile_path = (
@@ -92,7 +99,6 @@ class TestServerCode(object):
         )
         assert dockerfile_path.exists()
         dockerfile_path.unlink()
-
         with open(
             Path(__file__).resolve().parent
             / "../test-containers"

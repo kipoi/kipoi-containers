@@ -18,7 +18,7 @@ jobs:
       matrix:
         image: ["sharedpy3keras1.2", "mpra-dragonn", "extended_coda", "mmsplice",
           "mmsplice-mtsplice", "deepmel", "framepool", "kipoisplice", "deeptarget",
-          "attentivechrome", "bpnet-oskn", "seqvec", "xpresso"]
+          "attentivechrome", "bpnet-oskn", "seqvec"]
     runs-on: ubuntu-latest
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -47,7 +47,7 @@ jobs:
       fail-fast: false
       matrix:
         modelgroup: ["Basenji,Basset,HAL,DeepSEA,Optimus_5Prime,labranchor,CleTimer,SiSp,FactorNet,MaxEntScan,pwm_HOCOMOCO",
-          "DeepBind,lsgkm-SVM", "rbp_eclip"]
+          "DeepBind,lsgkm-SVM", "rbp_eclip", "Xpresso"]
     runs-on: ubuntu-latest
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:

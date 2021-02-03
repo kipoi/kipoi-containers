@@ -30,5 +30,5 @@
   "AttentiveChrome": "haimasree/kipoi-docker:attentivechrome",
   "BPNet-OSKN": "haimasree/kipoi-docker:bpnet-oskn",
   "SeqVec": "haimasree/kipoi-docker:seqvec",
-  "Xpresso": "haimasree/kipoi-docker:xpresso"
+  "Xpresso": "haimasree/kipoi-docker:sharedpy3keras2"
 }
