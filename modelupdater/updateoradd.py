@@ -35,14 +35,14 @@ class ModelSyncer:
             "./modelupdater/kipoi-model-repo-hash", "r"
         ) as kipoimodelrepohash:
             self.source_commit_hash = kipoimodelrepohash.readline()
-        self.list_of_updated_models = []
+        self.list_of_updated_model_groups = []
         with open(
             Path.cwd() / "test-containers" / "model-group-to-image-name.json",
             "r",
         ) as infile:
             self.model_group_to_image_dict = json.load(infile)
 
-    def get_list_of_updated_models(self):
+    def get_list_of_updated_model_groups(self):
         """
         Figures out which model groups have been updated or added between
         the commit hash stored in ./kipoi-model-repo-hash and current
@@ -51,37 +51,42 @@ class ModelSyncer:
         comparison_obj = self.kipoi_model_repo.compare(
             base=self.source_commit_hash, head=self.target_commit_hash
         )
-        self.list_of_updated_models = list(
+        self.list_of_updated_model_groups = list(
             dict.fromkeys(
-                [f.filename.split("/")[0] for f in comparison_obj.files]
+                [
+                    f.filename
+                    if "MMSplice" in f.filename
+                    else f.filename.split("/")[0]
+                    for f in comparison_obj.files
+                ]
             )
         )
-        self.list_of_updated_models.remove("shared")
-        self.list_of_updated_models.remove(".circleci")
+        self.list_of_updated_model_groups.remove("shared")
+        self.list_of_updated_model_groups.remove(".circleci")
 
-    def update_or_add_model_container(self, model):
+    def update_or_add_model_container(self, model_group):
         """
         Calls appropariate functions based on whether a model group has
         been updated or added.
 
         Parameters
         ----------
-        model : str
+        model_group : str
             Model group to update or add
         """
-        if model in self.model_group_to_image_dict:
+        if model_group in self.model_group_to_image_dict:
             model_updater = ModelUpdater()
-            name_of_docker_image = self.model_group_to_image_dict[model]
+            name_of_docker_image = self.model_group_to_image_dict[model_group]
             if "shared" not in name_of_docker_image:
                 model_updater.update(
-                    model=model,
+                    model_group=model_group,
                     name_of_docker_image=name_of_docker_image,
                 )
             else:
                 print(f"We will not be updating {name_of_docker_image}")
         else:
             model_adder = ModelAdder(
-                model_group=model,
+                model_group=model_group,
                 kipoi_model_repo=self.kipoi_model_repo,
                 kipoi_container_repo=self.kipoi_container_repo,
             )
@@ -93,9 +98,9 @@ class ModelSyncer:
         commit hash in kipoi-model-repo-hash if everything is fine
         """
         if self.source_commit_hash != self.target_commit_hash:
-            self.get_list_of_updated_models()
-            for model in self.list_of_updated_models:
-                self.update_or_add_model_container(model=model)
+            self.get_list_of_updated_model_groups()
+            for model_group in self.list_of_updated_model_groups:
+                self.update_or_add_model_container(model_group=model_group)
         else:
             print("No need to update the repo")
 
