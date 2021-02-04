@@ -10,14 +10,14 @@ from ruamel.yaml import round_trip_load, round_trip_dump
 from ruamel.yaml.scalarstring import DoubleQuotedScalarString
 
 
-model_group_to_update = "DeepMEL"
-image_to_update = "haimasree/kipoi-docker:deepmel"
-model_group_to_add = "CleTimer"
-
-
-def test_update():
-    assert model_group_to_update
-    assert image_to_update
+@pytest.mark.parametrize(
+    "model_group_to_update,image_to_update",
+    [
+        ("MMSplice/deltaLogitPSI", "haimasree/kipoi-docker:mmsplice"),
+        ("DeepMEL", "haimasree/kipoi-docker:deepmel"),
+    ],
+)
+def test_update(model_group_to_update, image_to_update):
     client = docker.from_env()
     original_shortid = client.images.get(image_to_update).short_id
     ModelUpdater().update(
@@ -28,6 +28,8 @@ def test_update():
 
 
 def test_add(monkeypatch):
+    model_group_to_add = "CleTimer"
+
     def mock_get_list_of_models_from_repo(*args, **kwargs):
         return ["CleTimer/customBP", "CleTimer/default"]
 
