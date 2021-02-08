@@ -34,6 +34,28 @@ To run your custom kipoi cli calls directly,
 docker run haimasree/kipoi-docker:kipoisplice kipoi test KipoiSplice/4 --source=kipoi
 ```
 
+## Use datasets from local filesystem
+
+We will make use of the [-v option of docker cli](https://docs.docker.com/storage/volumes/#choose-the--v-or---mount-flag). 
+
+Example: 
+
+```bash
+docker run -v <absolute path to your data directory>:/app/ haimasree/kipoi-docker:sharedpy3keras2 kipoi predict DeepBind/Homo_sapiens/TF/D00328.018_ChIP-seq_CTCF \
+   --dataloader_args='{"intervals_file": "/app/input/enhancer-regions.hg19.chr22.bed.gz",
+                       "fasta_file": "/app/input/hg19.chr22.fa"}' \
+  -o /app/output/preds.tsv
+```
+ The above example assumes the three following paths/files exist locally
+ - ```<absolute path to your data directory>/input/enhancer-regions.hg19.chr22.bed.gz```
+ - ```<absolute path to your data directory>/input/hg19.chr22.fa```
+ - ```<absolute path to your data directory>/output```
+
+If everything goes well, we will find the predictions stored in ```<absolute path to your data directory>/output/preds.csv```.
+
+Note: The docker images in this [repo](https://hub.docker.com/repository/docker/haimasree/kipoi-docker) has a folder named ```/app/```. 
+So, the above template will work for all the images.
+
 ## Testing the containers
 
 ### Manual and CI
