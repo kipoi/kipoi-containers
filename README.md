@@ -1,4 +1,4 @@
-# kipoi-docker
+# kipoi-containers
 This is an attempt to reduce  and eventully eliminate complexities related to creating and invoking model specific conda environments. The docker images are hosted 
 [here](https://hub.docker.com/repository/docker/haimasree/kipoi-docker).
 
