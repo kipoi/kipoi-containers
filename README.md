@@ -41,11 +41,9 @@ We will make use of the [-v option of docker cli](https://docs.docker.com/storag
 Example: 
 
 ```bash
-docker run -v <absolute path to your data directory>:/app/ haimasree/kipoi-docker:sharedpy3keras2 \
-kipoi predict DeepBind/Homo_sapiens/TF/D00328.018_ChIP-seq_CTCF \
-   --dataloader_args='{"intervals_file": "/app/input/enhancer-regions.hg19.chr22.bed.gz",
-                       "fasta_file": "/app/input/hg19.chr22.fa"}' \
-  -o /app/output/preds.tsv
+mkdir -p $PWD/kipoi-example 
+docker run -v $PWD/kipoi-example:/app/ haimasree/kipoi-docker:sharedpy3keras2 \
+kipoi get-example Basset -o /app/example 
 ```
  The above example assumes the three following paths/files exist locally
  - ```<absolute path to your data directory>/input/enhancer-regions.hg19.chr22.bed.gz```
