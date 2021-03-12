@@ -8,5 +8,3 @@ RUN echo "source activate kipoi-DeepMEL" > ~/.bashrc
 ENV PATH /opt/conda/envs/kipoi-DeepMEL/bin:$PATH
 
 SHELL ["conda", "run", "-n", "kipoi-DeepMEL", "/bin/bash", "-c"]
-
-RUN pip install h5py==2.10.0
