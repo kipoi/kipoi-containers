@@ -2075,7 +2075,9 @@
     "MMSplice/mtsplice"
   ],
   "haimasree/kipoi-docker:deepmel": [
-    "DeepMEL"
+    "DeepMEL/DeepMEL",
+    "DeepMEL/DeepMEL2",
+    "DeepMEL/DeepMEL2_GABPA"
   ],
   "haimasree/kipoi-docker:framepool": [
     "Framepool"

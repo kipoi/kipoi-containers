@@ -61,8 +61,10 @@ class ModelSyncer:
                 ]
             )
         )
-        self.list_of_updated_model_groups.remove("shared")
-        self.list_of_updated_model_groups.remove(".circleci")
+        if "shared" in self.list_of_updated_model_groups:
+            self.list_of_updated_model_groups.remove("shared")
+        if ".circleci" in self.list_of_updated_model_groups:
+            self.list_of_updated_model_groups.remove(".circleci")
 
     def update_or_add_model_container(self, model_group):
         """
