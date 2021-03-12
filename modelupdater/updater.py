@@ -42,7 +42,7 @@ class ModelUpdater:
         ]:
             dockerfile_name = "Dockerfile.mmsplice"
         else:
-            dockerfile_name = f"Dockerfile.{model_group.lower()}"
+            dockerfile_name = f"Dockerfile.{model_group.split('/')[0].lower()}"
         dockerfile_path = Path.cwd() / "dockerfiles" / dockerfile_name
         if dockerfile_path.exists():
             build_docker_image(
@@ -61,4 +61,4 @@ class ModelUpdater:
                     f"Updated docker image {name_of_docker_image} for {model_group} did not pass relevant tests"
                 )
         else:
-            print(f"{model_group} needs to be containerized first")
+            raise ValueError(f"{model_group} needs to be containerized first")
