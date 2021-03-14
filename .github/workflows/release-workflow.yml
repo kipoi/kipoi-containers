@@ -41,55 +41,55 @@ jobs:
 
     buildandtestsharedpy3keras2:
     # The type of runner that the job will run on
-    strategy:
-      fail-fast: true
-      matrix:
-        modelgroup: ["Basenji,Basset,HAL,DeepSEA,Optimus_5Prime,labranchor,CleTimer,SiSp,FactorNet,MaxEntScan,pwm_HOCOMOCO",
-          "DeepBind,lsgkm-SVM", "rbp_eclip", "Xpresso"]
-    runs-on: ubuntu-latest
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Build and test sharedpy3keras2 with ${{ matrix.modelgroup }}
-      run: |
-        docker build -f dockerfiles/Dockerfile.kipoi-base-env -t haimasree/kipoi-docker:kipoi-base-env . 
-        docker build -f dockerfiles/Dockerfile.sharedpy3keras2 -t haimasree/kipoi-docker:sharedpy3keras2 . 
-        pytest -s test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:sharedpy3keras2 --modelgroup=${{ matrix.modelgroup }}
+      strategy:
+        fail-fast: true
+        matrix:
+          modelgroup: ["Basenji,Basset,HAL,DeepSEA,Optimus_5Prime,labranchor,CleTimer,SiSp,FactorNet,MaxEntScan,pwm_HOCOMOCO",
+            "DeepBind,lsgkm-SVM", "rbp_eclip", "Xpresso"]
+      runs-on: ubuntu-latest
+      # Steps represent a sequence of tasks that will be executed as part of the job
+      steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Build and test sharedpy3keras2 with ${{ matrix.modelgroup }}
+        run: |
+          docker build -f dockerfiles/Dockerfile.kipoi-base-env -t haimasree/kipoi-docker:kipoi-base-env . 
+          docker build -f dockerfiles/Dockerfile.sharedpy3keras2 -t haimasree/kipoi-docker:sharedpy3keras2 . 
+          pytest -s test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:sharedpy3keras2 --modelgroup=${{ matrix.modelgroup }}
 
 
     buildandpushkipoi-base-envandsharedpy3keras2:
-    needs: [buildandtestsharedpy3keras2, buildtestandpush]
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Build sharedpy3keras2 and kipoi-base-env
-      run: |
-        docker build -f dockerfiles/Dockerfile.kipoi-base-env -t haimasree/kipoi-docker:kipoi-base-env . 
-        docker build -f dockerfiles/Dockerfile.sharedpy3keras2 -t haimasree/kipoi-docker:sharedpy3keras2 . 
-    - name: Push kipoi-base-env and sharedpy3keras2
-      if: ${{ success() }}
-      run: |
-        docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
-        docker push haimasree/kipoi-docker:kipoi-base-env
-        docker push haimasree/kipoi-docker:sharedpy3keras2
-        docker system prune -a -f
+      needs: [buildandtestsharedpy3keras2, buildtestandpush]
+      # The type of runner that the job will run on
+      runs-on: ubuntu-latest
+      # Steps represent a sequence of tasks that will be executed as part of the job
+      steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Build sharedpy3keras2 and kipoi-base-env
+        run: |
+          docker build -f dockerfiles/Dockerfile.kipoi-base-env -t haimasree/kipoi-docker:kipoi-base-env . 
+          docker build -f dockerfiles/Dockerfile.sharedpy3keras2 -t haimasree/kipoi-docker:sharedpy3keras2 . 
+      - name: Push kipoi-base-env and sharedpy3keras2
+        if: ${{ success() }}
+        run: |
+          docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
+          docker push haimasree/kipoi-docker:kipoi-base-env
+          docker push haimasree/kipoi-docker:sharedpy3keras2
+          docker system prune -a -f
