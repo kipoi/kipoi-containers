@@ -3,15 +3,10 @@ name: Build, test and push images on demand
 # Controls when the action will run. 
 on:
   workflow_dispatch:
-    inputs:
-      release:
-        description: 'Release to docker hub repo haimasree/kipoi-docker'     
-        required: false
-        default: 'no'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  buildandtest:
+  buildtestandpush:
     # The type of runner that the job will run on
     strategy:
       fail-fast: false
@@ -30,14 +25,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Build, test and push ${{ matrix.image }}
+    - name: Build and test ${{ matrix.image }}
       run: |
-        echo "Hello release ${{ github.event.inputs.release }}"
         docker build -f dockerfiles/Dockerfile.kipoi-base-env -t haimasree/kipoi-docker:kipoi-base-env . 
         docker build -f dockerfiles/Dockerfile.${{ matrix.image }} -t haimasree/kipoi-docker:${{ matrix.image }} . 
         pytest -s test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:${{ matrix.image }} 
-        if ${{ github.event.inputs.release }} == "yes"; then
-          docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
-          docker push haimasree/kipoi-docker:${{ matrix.image }} 
-        fi
+    - name: Push ${{ matrix.image }}
+        docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
+        docker push haimasree/kipoi-docker:${{ matrix.image }} 
         docker system prune -a -f
