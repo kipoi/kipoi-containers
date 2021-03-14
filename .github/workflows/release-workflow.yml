@@ -45,7 +45,7 @@ jobs:
       fail-fast: true
       matrix:
         modelgroup: ["Basenji,Basset,HAL,DeepSEA,Optimus_5Prime,labranchor,CleTimer,SiSp,FactorNet,MaxEntScan,pwm_HOCOMOCO",
-          "DeepBind,lsgkm-SVM", "rbp_eclip", "Xpresso"]
+          "DeepBind", "lsgkm-SVM", "rbp_eclip", "Xpresso"]
     runs-on: ubuntu-latest
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
