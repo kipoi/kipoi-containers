@@ -31,7 +31,7 @@ jobs:
         docker build -f dockerfiles/Dockerfile.${{ matrix.image }} -t haimasree/kipoi-docker:${{ matrix.image }} . 
         pytest -s test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:${{ matrix.image }} 
     - name: Push ${{ matrix.image }}
-      if: ${{ success() }}
+      if: ${{ failure() }}
       run: |
         docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
         docker push haimasree/kipoi-docker:${{ matrix.image }} 
