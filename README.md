@@ -44,13 +44,13 @@ Example:
 mkdir -p $PWD/kipoi-example 
 docker run -v $PWD/kipoi-example:/app/ haimasree/kipoi-docker:sharedpy3keras2 \
 kipoi get-example Basset -o /app/example 
+docker run -v $PWD/kipoi-example:/app/ haimasree/kipoi-docker:sharedpy3keras2 \
+kipoi predict Basenji \
+--dataloader_args='{'intervals_file': '/app/example/intervals_file', 'fasta_file': '/app/example/fasta_file'}' \
+-o '/app/Basenji.example_pred.tsv' 
 ```
- The above example assumes the three following paths/files exist locally
- - ```<absolute path to your data directory>/input/enhancer-regions.hg19.chr22.bed.gz```
- - ```<absolute path to your data directory>/input/hg19.chr22.fa```
- - ```<absolute path to your data directory>/output```
 
-If everything goes well, we will find the predictions stored in ```<absolute path to your data directory>/output/preds.csv```.
+If everything goes well, we will find the predictions stored in ```$PWD/kipoi-example/Basenji.example_pred.tsv```.
 
 Note: The docker images in this [repo](https://hub.docker.com/repository/docker/haimasree/kipoi-docker) has a folder named ```/app/```. 
 So, the above template will work for all the images.
@@ -82,7 +82,8 @@ This workflow gets triggered with every commit to every branch and each pull req
 For the corresponding CI (github actions) version, look [here](https://github.com/haimasree/kipoi-containers/blob/main/.github/workflows/build-and-test-images.yml).
 This workflow gets triggered on the 1st of every month. It can also be trigerred manually.
   
-  
+```.github/actions/release-workflow.yml``` can be manually triggered if all the docker images need to be updated in dockerhub. One reason can be Kipoi package update on pypi. Yyour dockerhub username and access token must be saved as github encrypoted secrets named DOCKERUSERNAME and DOCKERPASSWORD respectively. For a quick howto look [here](https://docs.github.com/en/actions/reference/encrypted-secrets) 
+
 ## Mapping between model and docker images
 
 To know which model group/model is represented by which docker image pleae take a look at https://github.com/haimasree/kipoi-containers/blob/main/test-containers/model-group-to-image-name.json.
@@ -104,6 +105,7 @@ If new models are added to kipoi repository it is prudent to add all the necessa
  ```
  
  A Personal Access Token is required since we will read from and write to github repos using PyGithub. Please add it as an environment variable named ```GITHUB_PAT```. This script will update existing images and rerun the tests. If a new model group needs to be updated, add a new dockerfile for model group which has not been containerized yet, build the docker  image, run tests to ensure all corresponding models in the group are compatible with this image, update the json files, update github workflow files, and finally update ```modelupdater/kipoi-model-repo-hash```.  If everything goes well, at this point feel free to push the image and create a PR on github.
+
 
 ### Tests
 
