@@ -134,7 +134,7 @@ dependencies:
     - gffutils==0.10.1
     - idna==2.10
     - jinja2-time==0.2.0
-    - kipoi==0.6.29
+    - kipoi==0.6.31
     - kipoi-conda==0.2.2
     - kipoi-utils==0.3.8
     - kipoiseq==0.5.2
