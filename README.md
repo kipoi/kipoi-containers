@@ -82,7 +82,7 @@ This workflow gets triggered with every commit to every branch and each pull req
 For the corresponding CI (github actions) version, look [here](https://github.com/haimasree/kipoi-containers/blob/main/.github/workflows/build-and-test-images.yml).
 This workflow gets triggered on the 1st of every month. It can also be trigerred manually.
   
-```.github/actions/release-workflow.yml``` can be manually triggered if all the docker images need to be updated in dockerhub. One reason can be Kipoi package update on pypi. Yyour dockerhub username and access token must be saved as github encrypoted secrets named DOCKERUSERNAME and DOCKERPASSWORD respectively. For a quick howto look [here](https://docs.github.com/en/actions/reference/encrypted-secrets) 
+```.github/workflows/release-workflow.yml``` can be manually triggered if all the docker images need to be updated in dockerhub. One reason can be Kipoi package update on pypi. Your dockerhub username and access token must be saved as github encrypoted secrets named DOCKERUSERNAME and DOCKERPASSWORD respectively. For a quick howto look [here](https://docs.github.com/en/actions/reference/encrypted-secrets) 
 
 ## Mapping between model and docker images
 
