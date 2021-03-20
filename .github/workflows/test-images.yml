@@ -76,5 +76,4 @@ jobs:
     - name: Test updateoradd
       run: |-
         docker pull haimasree/kipoi-docker:mmsplice
-        docker pull haimasree/kipoi-docker:kipoi-base-env
         python -m pytest -s test-modelupdater/test_updateoradd.py
