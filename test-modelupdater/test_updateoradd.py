@@ -24,7 +24,7 @@ def test_update(model_group_to_update, image_to_update):
         name_of_docker_image=image_to_update,
     )
     assert client.images.get(image_to_update).short_id != original_shortid
-    client.images.prune(filters={"dangling": False})
+
 
 def test_add(monkeypatch):
     model_group_to_add = "CleTimer"
