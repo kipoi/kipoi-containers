@@ -24,11 +24,9 @@ def test_update(model_group_to_update, image_to_update):
         name_of_docker_image=image_to_update,
     )
     assert client.images.get(image_to_update).short_id != original_shortid
-
+    client.images.prune(filters={"dangling": False})
 
 def test_add(monkeypatch):
-    client = docker.from_env()
-    client.images.prune(filters={"dangling": False})
     model_group_to_add = "CleTimer"
 
     def mock_get_list_of_models_from_repo(*args, **kwargs):
