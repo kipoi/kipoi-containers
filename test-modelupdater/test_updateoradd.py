@@ -14,7 +14,6 @@ from ruamel.yaml.scalarstring import DoubleQuotedScalarString
     "model_group_to_update,image_to_update",
     [
         ("MMSplice/deltaLogitPSI", "haimasree/kipoi-docker:mmsplice"),
-        ("DeepMEL/DeepMEL", "haimasree/kipoi-docker:deepmel"),
     ],
 )
 def test_update(model_group_to_update, image_to_update):
