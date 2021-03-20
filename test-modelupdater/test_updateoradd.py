@@ -28,6 +28,8 @@ def test_update(model_group_to_update, image_to_update):
 
 
 def test_add(monkeypatch):
+    client = docker.from_env()
+    client.images.prune(filters={"dangling": False})
     model_group_to_add = "CleTimer"
 
     def mock_get_list_of_models_from_repo(*args, **kwargs):
