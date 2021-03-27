@@ -1,4 +1,4 @@
-name: Build and test images once a month
+name:  Sync with https://github.com/kipoi/models
 
 # Controls when the action will run. 
 on:
@@ -16,6 +16,8 @@ jobs:
     strategy:
       fail-fast: false
     runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - uses: actions/checkout@v2
