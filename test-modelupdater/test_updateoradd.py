@@ -161,6 +161,4 @@ def test_add(monkeypatch):
     )
 
     (Path(__file__).resolve().parent / "tmp-test-images.yml").unlink()
-    (
-        Path(__file__).resolve().parent / "tmp-sync-with-model-repo.yml"
-    ).unlink()
+    (Path(__file__).resolve().parent / "tmp-sync-with-model-repo.yml").unlink()
