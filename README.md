@@ -79,7 +79,7 @@ This workflow gets triggered with every commit to every branch and each pull req
   - ```pytest test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:sharedpy3keras2```
   - ```pytest test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:sharedpy3keras2 --modelgroup=HAL```
   
-For the corresponding CI (github actions) version, look [here](https://github.com/haimasree/kipoi-containers/blob/main/.github/workflows/build-and-test-images.yml).
+For the corresponding CI (github actions) version, look [here](https://github.com/haimasree/kipoi-containers/blob/main/.github/workflows/sync-with-model-repo.yml).
 This workflow gets triggered on the 1st of every month. It can also be trigerred manually.
   
 ```.github/workflows/release-workflow.yml``` can be manually triggered if all the docker images need to be updated in dockerhub. One reason can be Kipoi package update on pypi. Your dockerhub username and access token must be saved as github encrypoted secrets named DOCKERUSERNAME and DOCKERPASSWORD respectively. For a quick howto look [here](https://docs.github.com/en/actions/reference/encrypted-secrets) 

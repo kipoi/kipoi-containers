@@ -40,7 +40,7 @@ class ModelAdder:
         Update github actions CI workflow files with the newly added model
         """
         with open(
-            ".github/workflows/build-and-test-images.yml",
+            ".github/workflows/sync-with-model-repo.yml",
             "r",
         ) as f:
             data = round_trip_load(f, preserve_quotes=True)
@@ -52,7 +52,7 @@ class ModelAdder:
             data["jobs"]["buildandtest"]["strategy"]["matrix"]["image"].append(
                 DoubleQuotedScalarString(self.image_name.split(":")[1])
             )
-        with open(".github/workflows/build-and-test-images.yml", "w") as f:
+        with open(".github/workflows/sync-with-model-repo.yml", "w") as f:
             round_trip_dump(data, f)
 
         with open(
