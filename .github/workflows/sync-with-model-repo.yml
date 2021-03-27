@@ -1,5 +1,4 @@
-name: Build and test images once a month
-
+name: Sync with https://github.com/kipoi/models
 # Controls when the action will run. 
 on:
   schedule:
