@@ -18,6 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUBPAT }}
+      DOCKER_USERNAME: ${{ secrets.DOCKERUSERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKERPASSWORD }}
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - uses: actions/checkout@v2
