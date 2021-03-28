@@ -7,6 +7,7 @@ from .helper import (
     build_docker_image,
     run_docker_image,
     run_docker_image_without_exception,
+    push_docker_image,
 )
 import pandas as pd
 from ruamel.yaml import round_trip_load, round_trip_dump
@@ -208,6 +209,9 @@ class ModelAdder:
                 run_docker_image(
                     image_name=self.image_name, model_name=self.model_group
                 )
+
+            # Push the container
+            push_docker_image(name_of_docker_image=self.model_group)
 
             self.update_test_and_json_files()
             self.update_github_workflow_files()
