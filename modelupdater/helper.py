@@ -118,14 +118,10 @@ def push_docker_image(tag):
         "password": os.environ["DOCKER_PASSWORD"],
     }
     try:
-        for line in client.images.push(
-            "haimasree/kipoi-docker",
+        client.images.push(
+            repository="haimasree/kipoi-docker",
             tag=tag,
             auth_config=auth_config,
-            stream=True,
-            decode=True,
-        ):
-            print(line)
+        )
     except docker.errors.APIError as e:
         raise (e)
-    cleanup(client=client)

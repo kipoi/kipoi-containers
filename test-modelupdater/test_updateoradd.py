@@ -16,7 +16,15 @@ from ruamel.yaml.scalarstring import DoubleQuotedScalarString
         ("MMSplice/deltaLogitPSI", "haimasree/kipoi-docker:mmsplice"),
     ],
 )
-def test_update(model_group_to_update, image_to_update):
+def test_update(model_group_to_update, image_to_update, monkeypatch):
+    def mock_push_docker_image(*args, **kwargs):
+        return True
+
+    monkeypatch.setattr(
+        "modelupdater.helper.push_docker_image",
+        staticmethod(mock_push_docker_image),
+    )
+
     client = docker.from_env()
     original_shortid = client.images.get(image_to_update).short_id
     ModelUpdater().update(
@@ -35,6 +43,9 @@ def test_add(monkeypatch):
     def mock_is_compatible_with_existing_image(*args, **kwargs):
         return False
 
+    def mock_push_docker_image(*args, **kwargs):
+        return True
+
     monkeypatch.setattr(
         "modelupdater.adder.ModelAdder.get_list_of_models_from_repo",
         staticmethod(mock_get_list_of_models_from_repo),
@@ -43,6 +54,11 @@ def test_add(monkeypatch):
         "modelupdater.adder.ModelAdder.is_compatible_with_existing_image",
         staticmethod(mock_is_compatible_with_existing_image),
     )
+    monkeypatch.setattr(
+        "modelupdater.helper.push_docker_image",
+        staticmethod(mock_push_docker_image),
+    )
+
     image_name_to_model_file_path = (
         Path(__file__).resolve().parent
         / "../test-containers"
