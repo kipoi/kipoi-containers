@@ -22,7 +22,7 @@ def test_update(model_group_to_update, image_to_update, monkeypatch):
 
     monkeypatch.setattr(
         "modelupdater.updater.push_docker_image",
-        staticmethod(mock_push_docker_image),
+        mock_push_docker_image,
     )
 
     client = docker.from_env()
@@ -56,7 +56,7 @@ def test_add(monkeypatch):
     )
     monkeypatch.setattr(
         "modelupdater.adder.push_docker_image",
-        staticmethod(mock_push_docker_image),
+        mock_push_docker_image,
     )
 
     image_name_to_model_file_path = (
