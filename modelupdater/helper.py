@@ -1,4 +1,5 @@
 from io import BytesIO
+import os
 
 import docker
 
@@ -101,3 +102,26 @@ def run_docker_image_without_exception(image_name, model_name):
     cleanup(client=client)
     print(container_log.decode("utf-8"))
     return True
+
+
+def push_docker_image(tag):
+    """
+    This function pushes a docker image to haimasree/kipoi-docker
+    Parameters
+    ----------
+    tag : str
+       Tag of the docker image to push
+    """
+    client = docker.from_env()
+    auth_config = {
+        "username": os.environ["DOCKER_USERNAME"],
+        "password": os.environ["DOCKER_PASSWORD"],
+    }
+    try:
+        client.images.push(
+            repository="haimasree/kipoi-docker",
+            tag=tag,
+            auth_config=auth_config,
+        )
+    except docker.errors.APIError as e:
+        raise (e)

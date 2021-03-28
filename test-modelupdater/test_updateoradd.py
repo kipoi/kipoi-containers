@@ -16,7 +16,15 @@ from ruamel.yaml.scalarstring import DoubleQuotedScalarString
         ("MMSplice/deltaLogitPSI", "haimasree/kipoi-docker:mmsplice"),
     ],
 )
-def test_update(model_group_to_update, image_to_update):
+def test_update(model_group_to_update, image_to_update, monkeypatch):
+    def mock_push_docker_image(*args, **kwargs):
+        return True
+
+    monkeypatch.setattr(
+        "modelupdater.updater.push_docker_image",
+        mock_push_docker_image,
+    )
+
     client = docker.from_env()
     original_shortid = client.images.get(image_to_update).short_id
     ModelUpdater().update(
@@ -35,6 +43,9 @@ def test_add(monkeypatch):
     def mock_is_compatible_with_existing_image(*args, **kwargs):
         return False
 
+    def mock_push_docker_image(*args, **kwargs):
+        return True
+
     monkeypatch.setattr(
         "modelupdater.adder.ModelAdder.get_list_of_models_from_repo",
         staticmethod(mock_get_list_of_models_from_repo),
@@ -43,6 +54,11 @@ def test_add(monkeypatch):
         "modelupdater.adder.ModelAdder.is_compatible_with_existing_image",
         staticmethod(mock_is_compatible_with_existing_image),
     )
+    monkeypatch.setattr(
+        "modelupdater.adder.push_docker_image",
+        mock_push_docker_image,
+    )
+
     image_name_to_model_file_path = (
         Path(__file__).resolve().parent
         / "../test-containers"
@@ -67,18 +83,10 @@ def test_add(monkeypatch):
         Path(__file__).resolve().parent
         / "../.github/workflows/test-images.yml"
     )
-    workflow_build_and_test_images_file_path = (
-        Path(__file__).resolve().parent
-        / "../.github/workflows/sync-with-model-repo.yml"
-    )
 
     shutil.copy(
         workflow_test_images_file_path,
         Path(__file__).resolve().parent / "tmp-test-images.yml",
-    )
-    shutil.copy(
-        workflow_build_and_test_images_file_path,
-        Path(__file__).resolve().parent / "tmp-sync-with-model-repo.yml",
     )
 
     assert model_group_to_add
@@ -134,12 +142,6 @@ def test_add(monkeypatch):
     (
         Path(__file__).resolve().parent / "tmp-model-group-to-image-name.json"
     ).unlink()
-    with open(workflow_build_and_test_images_file_path, "r") as f:
-        data = round_trip_load(f, preserve_quotes=True)
-        assert (
-            model_group_to_add.lower()
-            in data["jobs"]["buildandtest"]["strategy"]["matrix"]["image"]
-        )
 
     with open(
         workflow_test_images_file_path,
@@ -155,10 +157,5 @@ def test_add(monkeypatch):
         Path(__file__).resolve().parent / "tmp-test-images.yml",
         workflow_test_images_file_path,
     )
-    shutil.copy(
-        Path(__file__).resolve().parent / "tmp-sync-with-model-repo.yml",
-        workflow_build_and_test_images_file_path,
-    )
 
     (Path(__file__).resolve().parent / "tmp-test-images.yml").unlink()
-    (Path(__file__).resolve().parent / "tmp-sync-with-model-repo.yml").unlink()

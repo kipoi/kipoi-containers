@@ -57,7 +57,7 @@ jobs:
     - name: Test with pytest
       run: |
         pytest -s test-containers/test_models_from_command_line.py --model=${{ matrix.model }}
-        docker system prune -a -f  
+        docker system prune -a -f
 
   testupdateoradd:
 

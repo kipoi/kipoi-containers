@@ -1,7 +1,7 @@
 from pathlib import Path
 import pytest
 
-from .helper import build_docker_image
+from .helper import build_docker_image, push_docker_image
 
 
 class ModelUpdater:
@@ -60,5 +60,7 @@ class ModelUpdater:
                 raise ValueError(
                     f"Updated docker image {name_of_docker_image} for {model_group} did not pass relevant tests"
                 )
+            else:
+                push_docker_image(tag=name_of_docker_image.split(":")[1])
         else:
             raise ValueError(f"{model_group} needs to be containerized first")

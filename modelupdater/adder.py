@@ -7,6 +7,7 @@ from .helper import (
     build_docker_image,
     run_docker_image,
     run_docker_image_without_exception,
+    push_docker_image,
 )
 import pandas as pd
 from ruamel.yaml import round_trip_load, round_trip_dump
@@ -39,22 +40,6 @@ class ModelAdder:
         """
         Update github actions CI workflow files with the newly added model
         """
-        with open(
-            ".github/workflows/sync-with-model-repo.yml",
-            "r",
-        ) as f:
-            data = round_trip_load(f, preserve_quotes=True)
-        if "sharedpy3keras2" in self.image_name:
-            data["jobs"]["buildandtestsharedpy3keras2"]["strategy"]["matrix"][
-                "modelgroup"
-            ].append(DoubleQuotedScalarString(self.model_group))
-        else:
-            data["jobs"]["buildandtest"]["strategy"]["matrix"]["image"].append(
-                DoubleQuotedScalarString(self.image_name.split(":")[1])
-            )
-        with open(".github/workflows/sync-with-model-repo.yml", "w") as f:
-            round_trip_dump(data, f)
-
         with open(
             ".github/workflows/test-images.yml",
             "r",
@@ -208,6 +193,9 @@ class ModelAdder:
                 run_docker_image(
                     image_name=self.image_name, model_name=self.model_group
                 )
+
+            # Push the container
+            push_docker_image(tag=self.image_name.split(":")[1])
 
             self.update_test_and_json_files()
             self.update_github_workflow_files()

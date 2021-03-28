@@ -79,8 +79,8 @@ This workflow gets triggered with every commit to every branch and each pull req
   - ```pytest test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:sharedpy3keras2```
   - ```pytest test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:sharedpy3keras2 --modelgroup=HAL```
   
-For the corresponding CI (github actions) version, look [here](https://github.com/haimasree/kipoi-containers/blob/main/.github/workflows/sync-with-model-repo.yml).
-This workflow gets triggered on the 1st of every month. It can also be trigerred manually.
+[This workflow](https://github.com/haimasree/kipoi-containers/blob/main/.github/workflows/sync-with-model-repo.yml) keep this repo in sync with [kipoi model repo](https://github.com/kipoi/models). 
+This workflow gets triggered on the 1st of every month and can also be trigerred manually.
   
 ```.github/workflows/release-workflow.yml``` can be manually triggered if all the docker images need to be updated in dockerhub. One reason can be Kipoi package update on pypi. Your dockerhub username and access token must be saved as github encrypoted secrets named DOCKERUSERNAME and DOCKERPASSWORD respectively. For a quick howto look [here](https://docs.github.com/en/actions/reference/encrypted-secrets) 
 
@@ -104,7 +104,7 @@ If new models are added to kipoi repository it is prudent to add all the necessa
  python -m  modelupdater.updateoradd
  ```
  
- A Personal Access Token is required since we will read from and write to github repos using PyGithub. Please add it as an environment variable named ```GITHUB_PAT```. This script will update existing images and rerun the tests. If a new model group needs to be updated, add a new dockerfile for model group which has not been containerized yet, build the docker  image, run tests to ensure all corresponding models in the group are compatible with this image, update the json files, update github workflow files, and finally update ```modelupdater/kipoi-model-repo-hash```.  If everything goes well, at this point feel free to push the image and create a PR on github.
+ A Personal Access Token is required since we will read from and write to github repos using PyGithub. Please add it as an environment variable named ```GITHUB_PAT```. Docker username and access token is also required for pushing the container to [the docker hub](https://index.docker.io/v1/haimasree/kipoi-docker/). Please add them as environment variables named ```DOCKER_USERNAME``` and ```DOCKER_PASSWORD```. This script will update existing images and rerun the tests. If a new model group needs to be updated, add a new dockerfile for model group which has not been containerized yet, build the docker  image, run tests to ensure all corresponding models in the group are compatible with this image, update the json files, update github workflow files, and finally update ```modelupdater/kipoi-model-repo-hash```.  If everything goes well, at this point feel free to push the image and create a PR on github.
 
 
 ### Tests
