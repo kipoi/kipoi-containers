@@ -69,7 +69,7 @@ def test_add(monkeypatch):
     )
     workflow_build_and_test_images_file_path = (
         Path(__file__).resolve().parent
-        / "../.github/workflows/build-and-test-images.yml"
+        / "../.github/workflows/sync-with-model-repo.yml"
     )
 
     shutil.copy(
@@ -78,7 +78,7 @@ def test_add(monkeypatch):
     )
     shutil.copy(
         workflow_build_and_test_images_file_path,
-        Path(__file__).resolve().parent / "tmp-build-and-test-images.yml",
+        Path(__file__).resolve().parent / "tmp-sync-with-model-repo.yml",
     )
 
     assert model_group_to_add
@@ -156,11 +156,9 @@ def test_add(monkeypatch):
         workflow_test_images_file_path,
     )
     shutil.copy(
-        Path(__file__).resolve().parent / "tmp-build-and-test-images.yml",
+        Path(__file__).resolve().parent / "tmp-sync-with-model-repo.yml",
         workflow_build_and_test_images_file_path,
     )
 
     (Path(__file__).resolve().parent / "tmp-test-images.yml").unlink()
-    (
-        Path(__file__).resolve().parent / "tmp-build-and-test-images.yml"
-    ).unlink()
+    (Path(__file__).resolve().parent / "tmp-sync-with-model-repo.yml").unlink()
