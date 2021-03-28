@@ -21,7 +21,7 @@ def test_update(model_group_to_update, image_to_update, monkeypatch):
         return True
 
     monkeypatch.setattr(
-        "modelupdater.updater.helper.push_docker_image",
+        "modelupdater.updater.push_docker_image",
         staticmethod(mock_push_docker_image),
     )
 
@@ -55,7 +55,7 @@ def test_add(monkeypatch):
         staticmethod(mock_is_compatible_with_existing_image),
     )
     monkeypatch.setattr(
-        "modelupdater.adder.helper.push_docker_image",
+        "modelupdater.adder.push_docker_image",
         staticmethod(mock_push_docker_image),
     )
 
