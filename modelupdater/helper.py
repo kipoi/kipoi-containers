@@ -104,13 +104,13 @@ def run_docker_image_without_exception(image_name, model_name):
     return True
 
 
-def push_docker_image(name_of_docker_image):
+def push_docker_image(tag):
     """
     This function pushes a docker image to haimasree/kipoi-docker
     Parameters
     ----------
-    name_of_docker_image : str
-        Name of the docker image to push
+    tag : str
+       Tag of the docker image to push
     """
     client = docker.from_env()
     auth_config = {
@@ -120,7 +120,7 @@ def push_docker_image(name_of_docker_image):
     try:
         for line in client.images.push(
             "haimasree/kipoi-docker",
-            tag=name_of_docker_image,
+            tag=tag,
             auth_config=auth_config,
             stream=True,
             decode=True,
