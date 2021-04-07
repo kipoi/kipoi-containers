@@ -1,8 +1,8 @@
 FROM haimasree/kipoi-docker:kipoi-base-env
 
-COPY ./envfiles/mmsplicemtsplice.yml ./app
+SHELL ["conda", "run", "-n", "kipoi-env", "/bin/bash", "-c"]
 
-RUN conda env create -n kipoi-MMSplice__mtsplice -f ./app/mmsplicemtsplice.yml
+RUN kipoi env create MMSplice/mtsplice --verbose
 
 RUN echo "source activate kipoi-MMSplice__mtsplice" > ~/.bashrc
 ENV PATH /opt/conda/envs/kipoi-MMSplice__mtsplice/bin:$PATH
