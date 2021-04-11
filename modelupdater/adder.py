@@ -196,7 +196,7 @@ class ModelAdder:
                 )
 
             # Push the container
-            # push_docker_image(tag=self.image_name.split(":")[1])
+            push_docker_image(tag=self.image_name.split(":")[1])
             cleanup(images=True)
 
             self.update_test_and_json_files()
