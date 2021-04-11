@@ -61,7 +61,6 @@ class ModelUpdater:
                     f"Updated docker image {name_of_docker_image} for {model_group} did not pass relevant tests"
                 )
             else:
-                pass
-                # push_docker_image(tag=name_of_docker_image.split(":")[1])
+                push_docker_image(tag=name_of_docker_image.split(":")[1])
         else:
             raise ValueError(f"{model_group} needs to be containerized first")
