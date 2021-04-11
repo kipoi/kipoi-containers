@@ -65,6 +65,28 @@ class ModelSyncer:
             self.list_of_updated_model_groups.remove("shared")
         if ".circleci" in self.list_of_updated_model_groups:
             self.list_of_updated_model_groups.remove(".circleci")
+        # TODO: Fix the special case handling for MMSplice
+        if "MMSplice/deltaLogitPSI" in self.list_of_updated_model_groups:
+            if (
+                "MMSplice/modularPredictions"
+                in self.list_of_updated_model_groups
+            ):
+                self.list_of_updated_model_groups.remove(
+                    "MMSplice/modularPredictions"
+                )
+            if "MMSplice/pathogenicity" in self.list_of_updated_model_groups:
+                self.list_of_updated_model_groups.remove(
+                    "MMSplice/pathogenicity"
+                )
+            if (
+                "MMSplice/splicingEfficiency"
+                in self.list_of_updated_model_groups
+            ):
+                self.list_of_updated_model_groups.remove(
+                    "MMSplice/splicingEfficiency"
+                )
+
+        print(self.list_of_updated_model_groups)
 
     def update_or_add_model_container(self, model_group):
         """
