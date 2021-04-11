@@ -54,7 +54,7 @@ class ModelSyncer:
         self.list_of_updated_model_groups = list(
             dict.fromkeys(
                 [
-                    f.filename
+                    f"{f.filename.split('/')[0]}/{f.filename.split('/')[1]}"
                     if "MMSplice" in f.filename
                     else f.filename.split("/")[0]
                     for f in comparison_obj.files

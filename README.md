@@ -122,9 +122,3 @@ Then, install the requirements and run the tests -
 pip install -r requirements.txt
 python -m pytest -s test-modelupdater/test_updateoradd.py
 ```
-
-## Models not working
-
-Following models are missing their respective dataloader.pkl files -
-```rbp_eclip/U2AF1, rbp_eclip/U2AF2, rbp_eclip/U2AF2, rbp_eclip/UCHL5, rbp_eclip/UPF1, rbp_eclip/XPO5, rbp_eclip/XRN2, rbp_eclip/YBX3, rbp_eclip/YWHAG, rbp_eclip/ZNF622, rbp_eclip/ZRANB2```
-They have been removed from ```test-containers/image-name-to-model.json```.
