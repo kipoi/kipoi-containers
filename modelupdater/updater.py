@@ -1,7 +1,7 @@
 from pathlib import Path
 import pytest
 
-from .helper import build_docker_image, push_docker_image
+from .helper import build_docker_image, cleanup, push_docker_image
 
 
 class ModelUpdater:
@@ -62,5 +62,6 @@ class ModelUpdater:
                 )
             else:
                 push_docker_image(tag=name_of_docker_image.split(":")[1])
+                cleanup(images=True)
         else:
             raise ValueError(f"{model_group} needs to be containerized first")

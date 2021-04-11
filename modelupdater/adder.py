@@ -5,6 +5,7 @@ import subprocess
 
 from .helper import (
     build_docker_image,
+    cleanup,
     run_docker_image,
     run_docker_image_without_exception,
     push_docker_image,
@@ -196,6 +197,7 @@ class ModelAdder:
 
             # Push the container
             push_docker_image(tag=self.image_name.split(":")[1])
+            cleanup(images=True)
 
             self.update_test_and_json_files()
             self.update_github_workflow_files()

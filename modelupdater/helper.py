@@ -4,18 +4,16 @@ import os
 import docker
 
 
-def cleanup(client):
+def cleanup(images=False):
     """
     Cleans up unused docker containers, volumes and networks
-
-    Parameters
-    ----------
-    client : DockerClient
-        A docker client configured from environment variables
     """
+    client = docker.from_env()
     client.containers.prune()
     client.networks.prune()
     client.volumes.prune()
+    if images:
+        client.images.prune(filters={"dangling": True})
 
 
 def build_docker_image(dockerfile_path, name_of_docker_image):
@@ -67,7 +65,7 @@ def run_docker_image(image_name, model_name):
         raise (e)
     except docker.errors.APIError as e:
         raise (e)
-    cleanup(client=client)
+    cleanup()
     print(container_log.decode("utf-8"))
 
 
@@ -91,15 +89,15 @@ def run_docker_image_without_exception(image_name, model_name):
             command=f"kipoi test {model_name} --source=kipoi",
         )
     except docker.errors.ImageNotFound:
-        cleanup(client=client)
+        cleanup()
         return False
     except docker.errors.ContainerError:
-        cleanup(client=client)
+        cleanup()
         return False
     except docker.errors.APIError:
-        cleanup(client=client)
+        cleanup()
         return False
-    cleanup(client=client)
+    cleanup()
     print(container_log.decode("utf-8"))
     return True
 
