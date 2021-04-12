@@ -37,9 +37,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        model: ["Basenji,Basset,HAL",
-        "DeepSEA/variantEffects,Optimus_5Prime,labranchor",
-        "CleTimer/customBP,SiSp,FactorNet/FOXA2/onePeak_Unique35_DGF,MaxEntScan/5prime",
+        model: ["Basenji,Basset,HAL", "DeepSEA/variantEffects,Optimus_5Prime,labranchor", "CleTimer/customBP,SiSp,FactorNet/FOXA2/onePeak_Unique35_DGF,MaxEntScan/5prime",
         "pwm_HOCOMOCO/human/AHR,DeepBind/Arabidopsis_thaliana/RBP/D00283.001_RNAcompete_At_0284,lsgkm-SVM/Chip/OpenChrom/Cmyc/K562,
         "rbp_eclip/AARS",
           ]
