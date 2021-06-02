@@ -14,6 +14,7 @@ def pytest_addoption(parser):
 
 
 def pytest_generate_tests(metafunc):
+
     with open(
         Path.cwd() / "test-containers" / "model-group-to-image-name.json", "r"
     ) as infile:
