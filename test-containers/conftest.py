@@ -3,7 +3,7 @@ import json
 
 
 def pytest_addoption(parser):
-    """ attaches optional cmd-line args to the pytest machinery """
+    """attaches optional cmd-line args to the pytest machinery"""
     parser.addoption(
         "--model", action="append", default=[], help="Model name(s)"
     )
@@ -14,7 +14,6 @@ def pytest_addoption(parser):
 
 
 def pytest_generate_tests(metafunc):
-
     with open(
         Path.cwd() / "test-containers" / "model-group-to-image-name.json", "r"
     ) as infile:
