@@ -9,7 +9,12 @@ on:
     branches: ['**']
   pull_request:
     branches: [main]
-
+    
+on:
+  schedule:
+  # Triggers the workflow 9:00 PM every sunday
+  - cron: "0 21 * * 0"
+    
 jobs:
   build:
 
