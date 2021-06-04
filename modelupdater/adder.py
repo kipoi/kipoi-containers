@@ -80,11 +80,21 @@ class ModelAdder:
             Path.cwd() / "test-containers" / "image-name-to-model.json", "r"
         ) as infile:
             image_name_to_model_dict = json.load(infile)
-        image_name_to_model_dict.update(
-            {self.image_name: self.list_of_models}
-            if self.list_of_models
-            else {self.image_name: [self.model_group]}
-        )
+        if self.image_name in image_name_to_model_dict:
+            if self.list_of_models:
+                image_name_to_model_dict[self.image_name].extend(
+                    self.list_of_models
+                )
+            else:
+                image_name_to_model_dict[self.image_name].append(
+                    self.model_group
+                )
+        else:
+            image_name_to_model_dict.update(
+                {self.image_name: self.list_of_models}
+                if self.list_of_models
+                else {self.image_name: [self.model_group]}
+            )
         with open(
             Path.cwd() / "test-containers" / "image-name-to-model.json", "w"
         ) as fp:
