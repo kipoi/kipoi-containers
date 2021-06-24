@@ -23,6 +23,7 @@ dependencies:
   - cloudpickle=1.6.0
   - contextvars=2.4
   - curl=7.71.1
+  - cython=0.29.23
   - cytoolz=0.11.0
   - dask=2.30.0
   - dask-core=2.30.0

@@ -23,6 +23,7 @@ dependencies:
   - contextvars=2.4
   - cudatoolkit=10.0.130
   - cudnn=7.6.5.32
+  - cython=0.29.23
   - cytoolz=0.11.0
   - cyvcf2=0.30.6
   - dask=2021.3.0
