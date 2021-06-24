@@ -134,10 +134,6 @@ dependencies:
     - gffutils==0.10.1
     - idna==2.10
     - jinja2-time==0.2.0
-    - kipoi==0.6.31
-    - kipoi-conda==0.2.2
-    - kipoi-utils==0.3.8
-    - kipoiseq==0.5.2
     - packaging==20.7
     - poyo==0.5.0
     - python-slugify==4.0.1
@@ -148,4 +144,8 @@ dependencies:
     - tinydb==4.3.0
     - tqdm==4.54.0
     - urllib3==1.26.4
+    - kipoi
+    - kipoi-conda
+    - kipoi-utils
+    - kipoiseq
 prefix: /opt/conda/envs/kipoi-shared__envs__kipoi-py3-keras1.2

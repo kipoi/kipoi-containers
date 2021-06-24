@@ -143,10 +143,6 @@ dependencies:
     - iniconfig==1.1.1
     - jinja2-time==0.2.0
     - keras==2.1.6
-    - kipoi==0.6.31
-    - kipoi-conda==0.2.2
-    - kipoi-utils==0.3.8
-    - kipoiseq==0.5.2
     - markdown==3.3.4
     - nodeenv==1.5.0
     - pluggy==0.13.1
@@ -171,4 +167,8 @@ dependencies:
     - websocket-client==0.58.0
     - werkzeug==1.0.1
     - zipp==3.4.1  
+    - kipoi
+    - kipoi-conda
+    - kipoi-utils
+    - kipoiseq
 prefix: /opt/conda/envs/kipoi-env
