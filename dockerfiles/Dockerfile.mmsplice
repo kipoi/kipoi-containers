@@ -8,5 +8,3 @@ RUN echo "source activate kipoi-MMSplice__deltaLogitPSI" > ~/.bashrc
 ENV PATH /opt/conda/envs/kipoi-MMSplice__deltaLogitPSI/bin:$PATH
 
 SHELL ["conda", "run", "-n", "kipoi-MMSplice__deltaLogitPSI", "/bin/bash", "-c"]
-
-RUN pip install h5py==2.10.0
