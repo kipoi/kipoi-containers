@@ -2182,5 +2182,8 @@
   "haimasree/kipoi-docker:seqvec": [
     "SeqVec/structure",
     "SeqVec/embedding"
+  ],
+  "haimasree/kipoi-docker:deepflybrain": [
+    "DeepFlyBrain"
   ]
 }
