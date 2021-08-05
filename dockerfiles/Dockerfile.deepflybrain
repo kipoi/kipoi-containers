@@ -1,0 +1,10 @@
+FROM haimasree/kipoi-docker:kipoi-base-env
+
+SHELL ["conda", "run", "-n", "kipoi-env", "/bin/bash", "-c"]
+
+RUN kipoi env create DeepFlyBrain --verbose
+
+RUN echo "source activate kipoi-DeepFlyBrain" > ~/.bashrc
+ENV PATH /opt/conda/envs/kipoi-DeepFlyBrain/bin:$PATH
+
+SHELL ["conda", "run", "-n", "kipoi-DeepFlyBrain", "/bin/bash", "-c"]

@@ -45,7 +45,8 @@ jobs:
           "CpGenie/A549_ENCSR000DDI,Divergent421,DeepCpG_DNA/Hou2016_HepG2_dna", "MPRA-DragoNN/DeepFactorizedModel",
           "extended_coda", "MMSplice/deltaLogitPSI", "MMSplice/mtsplice", "DeepMEL/DeepMEL",
           "Framepool", "KipoiSplice/4", "deepTarget", "AttentiveChrome/E003", "BPNet-OSKN",
-          "SeqVec/embedding", "Xpresso/human_GM12878", "epidermal_basset/encode-roadmap.basset.clf.testfold-0"]
+          "SeqVec/embedding", "Xpresso/human_GM12878", "epidermal_basset/encode-roadmap.basset.clf.testfold-0",
+          "DeepFlyBrain"]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
