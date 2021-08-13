@@ -57,6 +57,23 @@ class ModelAdder:
         with open(".github/workflows/test-images.yml", "w") as f:
             round_trip_dump(data, f)
 
+        with open(
+            ".github/workflows/release-workflow.yml",
+            "r",
+        ) as f:
+            data = round_trip_load(f, preserve_quotes=True)
+        if "sharedpy3keras2" in self.image_name:
+            data["jobs"]["buildandtestsharedpy3keras2"]["strategy"]["matrix"][
+                "modelgroup"
+            ].append(DoubleQuotedScalarString(self.model_group))
+        else:
+            data["jobs"]["buildtestandpush"]["strategy"]["matrix"][
+                "image"
+            ].append(DoubleQuotedScalarString(self.image_name.split(":")[1]))
+
+        with open(".github/workflows/release-workflow.yml", "w") as f:
+            round_trip_dump(data, f)
+
     def update_test_and_json_files(self):
         """
         Update image-name-to-model.json and model-group-to-image-name.json
