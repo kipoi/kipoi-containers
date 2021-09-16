@@ -1,0 +1,10 @@
+FROM haimasree/kipoi-docker:kipoi-base-env
+
+SHELL ["conda", "run", "-n", "kipoi-env", "/bin/bash", "-c"]
+
+RUN kipoi env create APARENT/veff --verbose
+
+RUN echo "source activate kipoi-APARENT__veff" > ~/.bashrc
+ENV PATH /opt/conda/envs/kipoi-APARENT__veff/bin:$PATH
+
+SHELL ["conda", "run", "-n", "kipoi-APARENT__veff", "/bin/bash", "-c"]

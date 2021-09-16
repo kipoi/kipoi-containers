@@ -13,7 +13,8 @@ jobs:
       matrix:
         image: ["sharedpy3keras1.2", "mpra-dragonn", "extended_coda", "mmsplice",
         "mmsplice-mtsplice", "deepmel", "framepool", "kipoisplice", "deeptarget",
-        "attentivechrome", "bpnet-oskn", "seqvec", "deepflybrain", "aparent-site_probabilities"]
+        "attentivechrome", "bpnet-oskn", "seqvec", "deepflybrain", "aparent-site_probabilities", 
+        "aparent-veff"]
     runs-on: ubuntu-latest
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
