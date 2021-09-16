@@ -1,9 +1,13 @@
 name: kipoi-env
 channels:
+  - conda-forge
+  - bioconda
   - defaults
 dependencies:
-  - python=3.6
+  - python
   - pip
+  - pkgconfig
+  - conda-forge::hdf5=1.10.6
   - pip:
     - kipoi
     

@@ -1,7 +1,8 @@
-FROM continuumio/miniconda3:4.8.2
+FROM continuumio/miniconda3:latest
 
-RUN apt-get update && \
-    apt-get install -y build-essential libz-dev libcurl3-dev
+RUN apt-get update && apt-get install -y build-essential libz-dev libcurl3-dev libarchive-dev gcc
+
+RUN conda install --yes -c conda-forge hdf5=1.10.6 pkgconfig
 
 RUN mkdir -p /app
 
