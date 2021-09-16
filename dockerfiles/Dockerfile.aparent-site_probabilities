@@ -1,0 +1,10 @@
+FROM haimasree/kipoi-docker:kipoi-base-env
+
+SHELL ["conda", "run", "-n", "kipoi-env", "/bin/bash", "-c"]
+
+RUN kipoi env create APARENT/site_probabilities --verbose
+
+RUN echo "source activate kipoi-APARENT__site_probabilities" > ~/.bashrc
+ENV PATH /opt/conda/envs/kipoi-APARENT__site_probabilities/bin:$PATH
+
+SHELL ["conda", "run", "-n", "kipoi-APARENT__site_probabilities", "/bin/bash", "-c"]

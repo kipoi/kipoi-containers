@@ -2185,5 +2185,11 @@
   ],
   "haimasree/kipoi-docker:deepflybrain": [
     "DeepFlyBrain"
+  ],
+  "haimasree/kipoi-docker:aparent-site_probabilities": [
+    "APARENT/site_probabilities"
+  ],
+  "haimasree/kipoi-docker:aparent-veff": [
+    "APARENT/veff"
   ]
 }

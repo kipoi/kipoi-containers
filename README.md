@@ -6,7 +6,7 @@ This is an attempt to reduce  and eventully eliminate complexities related to cr
 
 First, we need to build the base image which activates a conda environment made with python 3.6 with kipoi installed in it.
 ```
-docker build -f dockerfiles/Dockerfile.base -t haimasree/kipoi-docker:kipoi-base-env .
+docker build -f dockerfiles/Dockerfile.kipoi-base-env -t haimasree/kipoi-docker:kipoi-base-env .
 ```
 Note: The model specific Dockefiles are sensitive to the name and tag of the base image right now. 
 After the base image is built, build any other image using the following template
