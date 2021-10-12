@@ -51,20 +51,30 @@ class ModelSyncer:
         comparison_obj = self.kipoi_model_repo.compare(
             base=self.source_commit_hash, head=self.target_commit_hash
         )
+
         self.list_of_updated_model_groups = list(
             dict.fromkeys(
                 [
                     f"{f.filename.split('/')[0]}/{f.filename.split('/')[1]}"
-                    if "MMSplice" in f.filename
+                    if any(
+                        special_model_group in f.filename
+                        for special_model_group in ["MMSplice", "APARENT"]
+                    )
                     else f.filename.split("/")[0]
                     for f in comparison_obj.files
                 ]
             )
         )
+
         if "shared" in self.list_of_updated_model_groups:
             self.list_of_updated_model_groups.remove("shared")
         if ".circleci" in self.list_of_updated_model_groups:
             self.list_of_updated_model_groups.remove(".circleci")
+        if "APARENT" in self.list_of_updated_model_groups:
+            self.list_of_updated_model_groups.remove("APARENT")
+        if "APARENT/README.md" in self.list_of_updated_model_groups:
+            self.list_of_updated_model_groups.remove("APARENT/README.md")
+
         # TODO: Fix the special case handling for MMSplice
         if "MMSplice/deltaLogitPSI" in self.list_of_updated_model_groups:
             if (
