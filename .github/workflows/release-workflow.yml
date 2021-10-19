@@ -30,14 +30,14 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Build and test ${{ matrix.image }}
       run: |
-        docker build -f dockerfiles/Dockerfile.kipoi-base-env -t haimasree/kipoi-docker:kipoi-base-env . 
-        docker build -f dockerfiles/Dockerfile.${{ matrix.image }} -t haimasree/kipoi-docker:${{ matrix.image }} . 
-        pytest -s test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:${{ matrix.image }} 
+        docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env . 
+        docker build -f dockerfiles/Dockerfile.${{ matrix.image }} -t kipoi/kipoi-docker:${{ matrix.image }} . 
+        pytest -s test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:${{ matrix.image }} 
     - name: Push ${{ matrix.image }}
       if: ${{ success() }}
       run: |
         docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
-        docker push haimasree/kipoi-docker:${{ matrix.image }} 
+        docker push kipoi/kipoi-docker:${{ matrix.image }} 
         docker system prune -a -f
 
   buildandtestsharedpy3keras2:
@@ -62,9 +62,9 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Build and test sharedpy3keras2 with ${{ matrix.modelgroup }}
       run: |
-        docker build -f dockerfiles/Dockerfile.kipoi-base-env -t haimasree/kipoi-docker:kipoi-base-env . 
-        docker build -f dockerfiles/Dockerfile.sharedpy3keras2 -t haimasree/kipoi-docker:sharedpy3keras2 . 
-        pytest -s test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:sharedpy3keras2 --modelgroup=${{ matrix.modelgroup }}
+        docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env . 
+        docker build -f dockerfiles/Dockerfile.sharedpy3keras2 -t kipoi/kipoi-docker:sharedpy3keras2 . 
+        pytest -s test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2 --modelgroup=${{ matrix.modelgroup }}
 
 
   buildandpushkipoibaseenvandsharedpy3keras2:
@@ -85,12 +85,12 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Build sharedpy3keras2 and kipoi-base-env
       run: |
-        docker build -f dockerfiles/Dockerfile.kipoi-base-env -t haimasree/kipoi-docker:kipoi-base-env . 
-        docker build -f dockerfiles/Dockerfile.sharedpy3keras2 -t haimasree/kipoi-docker:sharedpy3keras2 . 
+        docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env . 
+        docker build -f dockerfiles/Dockerfile.sharedpy3keras2 -t kipoi/kipoi-docker:sharedpy3keras2 . 
     - name: Push kipoi-base-env and sharedpy3keras2
       if: ${{ success() }}
       run: |
         docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
-        docker push haimasree/kipoi-docker:kipoi-base-env
-        docker push haimasree/kipoi-docker:sharedpy3keras2
+        docker push kipoi/kipoi-docker:kipoi-base-env
+        docker push kipoi/kipoi-docker:sharedpy3keras2
         docker system prune -a -f

@@ -104,7 +104,7 @@ def run_docker_image_without_exception(image_name, model_name):
 
 def push_docker_image(tag):
     """
-    This function pushes a docker image to haimasree/kipoi-docker
+    This function pushes a docker image to kipoi/kipoi-docker
     Parameters
     ----------
     tag : str
@@ -117,7 +117,7 @@ def push_docker_image(tag):
     }
     try:
         client.images.push(
-            repository="haimasree/kipoi-docker",
+            repository="kipoi/kipoi-docker",
             tag=tag,
             auth_config=auth_config,
         )
