@@ -13,7 +13,7 @@ from ruamel.yaml.scalarstring import DoubleQuotedScalarString
 @pytest.mark.parametrize(
     "model_group_to_update,image_to_update",
     [
-        ("MMSplice/deltaLogitPSI", "haimasree/kipoi-docker:mmsplice"),
+        ("MMSplice/deltaLogitPSI", "kipoi/kipoi-docker:mmsplice"),
     ],
 )
 def test_update(model_group_to_update, image_to_update, monkeypatch):
@@ -112,8 +112,8 @@ def test_add(monkeypatch):
         "r",
     ) as infile:
         new_image_name_to_model_dict = json.load(infile)
-    assert "haimasree/kipoi-docker:cletimer" in new_image_name_to_model_dict
-    assert new_image_name_to_model_dict["haimasree/kipoi-docker:cletimer"] == [
+    assert "kipoi/kipoi-docker:cletimer" in new_image_name_to_model_dict
+    assert new_image_name_to_model_dict["kipoi/kipoi-docker:cletimer"] == [
         "CleTimer/customBP",
         "CleTimer/default",
     ]
@@ -128,7 +128,7 @@ def test_add(monkeypatch):
     assert "CleTimer" in new_model_group_to_image_dict
     assert (
         new_model_group_to_image_dict["CleTimer"]
-        == "haimasree/kipoi-docker:cletimer"
+        == "kipoi/kipoi-docker:cletimer"
     )
     shutil.copy(
         Path(__file__).resolve().parent / "tmp-image-name-to-model.json",
@@ -163,7 +163,7 @@ def test_add(monkeypatch):
 
 def test_add_is_compatible_with_existing_image(monkeypatch):
     model_group_to_add = "Basset"
-    docker_image = "haimasree/kipoi-docker:sharedpy3keras2"
+    docker_image = "kipoi/kipoi-docker:sharedpy3keras2"
 
     def mock_get_list_of_models_from_repo(*args, **kwargs):
         return []

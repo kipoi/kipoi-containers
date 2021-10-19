@@ -34,7 +34,7 @@ class ModelAdder:
         self.kipoi_model_repo = kipoi_model_repo
         self.kipoi_container_repo = kipoi_container_repo
         self.model_group = model_group
-        self.image_name = f"haimasree/kipoi-docker:{self.model_group.lower()}"
+        self.image_name = f"kipoi/kipoi-docker:{self.model_group.lower()}"
         self.list_of_models = []
 
     def update_github_workflow_files(self):
@@ -140,8 +140,8 @@ class ModelAdder:
         """
         This function tests if the new model group is compatible
         with existng shared images -
-        "haimasree/kipoi-docker:sharedpy3keras2" and
-        "haimasree/kipoi-docker:sharedpy3keras1.2",
+        "kipoi/kipoi-docker:sharedpy3keras2" and
+        "kipoi/kipoi-docker:sharedpy3keras1.2",
 
         Returns
         -------
@@ -153,8 +153,8 @@ class ModelAdder:
 
         """
         for image_name in [
-            "haimasree/kipoi-docker:sharedpy3keras2",
-            "haimasree/kipoi-docker:sharedpy3keras1.2",
+            "kipoi/kipoi-docker:sharedpy3keras2",
+            "kipoi/kipoi-docker:sharedpy3keras1.2",
         ]:
             if self.list_of_models:
                 for model_name in self.list_of_models:
@@ -176,8 +176,8 @@ class ModelAdder:
         """
         This function adds a newly added model group to this repo. The steps are -
         1. Test the model group with two available docker images for shared
-           environments - haimasree/kipoi-docker:sharedpy3keras2 and
-           haimasree/kipoi-docker:sharedpy3keras1.2. If the tests pass go to step
+           environments - kipoi/kipoi-docker:sharedpy3keras2 and
+           kipoi/kipoi-docker:sharedpy3keras1.2. If the tests pass go to step
            5. Otherwise folow step 2-4
         2. Create the appropriate dockerfile using a generator
         3. Build the image

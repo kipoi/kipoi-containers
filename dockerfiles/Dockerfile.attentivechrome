@@ -1,4 +1,4 @@
-FROM haimasree/kipoi-docker:kipoi-base-env
+FROM kipoi/kipoi-docker:kipoi-base-env
 
 
 SHELL ["conda", "run", "-n", "kipoi-env", "/bin/bash", "-c"]
