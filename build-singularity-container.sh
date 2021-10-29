@@ -18,8 +18,8 @@ fi
 
 if [$imageName = ""] && [$modelName = ""]
 then
-    imageNames=(sharedpy3keras1.2 sharedpy3keras2 mpra-dragonn extended_coda mmsplice mmsplice-mtsplice deepmel framepool kipoisplice deeptarget attentivechrome bpnet-oskn)
-    modelNames=(DeepCpG_DNA/Hou2016_HepG2_dna Basset MPRA-DragoNN/DeepFactorizedModel extended_coda MMSplice/deltaLogitPSI MMSplice/mtsplice DeepMEL Framepool KipoiSplice/4 deepTarget AttentiveChrome/E003 BPNet-OSKN)
+    imageNames=(sharedpy3keras1.2 sharedpy3keras2 mpra-dragonn extended_coda mmsplice mmsplice-mtsplice deepmel framepool kipoisplice deeptarget attentivechrome bpnet-oskn seqvec deepflybrain aparent-site_probabilities aparent-veff)
+    modelNames=(DeepCpG_DNA/Hou2016_HepG2_dna Basset MPRA-DragoNN/DeepFactorizedModel extended_coda MMSplice/deltaLogitPSI MMSplice/mtsplice DeepMEL Framepool KipoiSplice/4 deepTarget AttentiveChrome/E003 BPNet-OSKN SeqVec/structure DeepFlyBrain APARENT/site_probabilities APARENT/veff)
     for i in ${!imageNames[@]}; do
         singularity pull docker://kipoi/kipoi-docker:${imageNames[$i]}
         singularity exec kipoi-docker_${imageNames[$i]}.sif kipoi test ${modelNames[$i]} --source=kipoi
