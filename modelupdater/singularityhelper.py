@@ -10,7 +10,7 @@ def cleanup(images=False):
     pass
 
 
-def build_singularity_image(name_of_docker_image):
+def build_singularity_image(name_of_docker_image, name_of_singularity_image):
     """
     This function builds a singularity image from an existing singularity image
     Parameters
@@ -22,9 +22,10 @@ def build_singularity_image(name_of_docker_image):
         "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
     )
     singualrity_image = Client.pull(
-        image="docker://{name_of_docker_image}",
+        image=f"docker://{name_of_docker_image}",
         pull_folder=singularity_image_folder,
         force=True,
+        name=f"{name_of_singularity_image}.sif",
     )
     return singualrity_image
 

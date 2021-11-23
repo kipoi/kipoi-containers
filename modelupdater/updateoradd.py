@@ -131,7 +131,12 @@ class ModelSyncer:
                     model_group=model_group,
                     name_of_docker_image=name_of_docker_image,
                 )
-                build_singularity_image(name_of_docker_image)
+                build_singularity_image(
+                    name_of_docker_image,
+                    self.model_group_to_singularity_image_dict[model_group][
+                        "name"
+                    ],
+                )
                 test_singularity_image(
                     self.model_group_to_singularity_image_dict[model_group][
                         "name"
