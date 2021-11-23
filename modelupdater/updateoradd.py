@@ -2,10 +2,15 @@ import os
 import json
 from pathlib import Path
 
+from kipoi import get_source
+
 from .adder import ModelAdder
 from github import Github
 from .updater import ModelUpdater
 
+from 
+
+CONTAINER_PREFIX = "shared/containers"
 
 class ModelSyncer:
     def __init__(self, github_obj):
@@ -41,6 +46,10 @@ class ModelSyncer:
             "r",
         ) as infile:
             self.model_group_to_image_dict = json.load(infile)
+        src = get_source("kipoi")
+        singularity_container_json = os.path.join(src.local_path, CONTAINER_PREFIX, "model-to-singularity.json")
+        with open(singularity_container_json, 'r') as singularity_container_json_filehandle:
+            self.model_group_to_singularity_image_dict = json.load(singularity_container_json_filehandle)
 
     def get_list_of_updated_model_groups(self):
         """
@@ -116,6 +125,7 @@ class ModelSyncer:
                     model_group=model_group,
                     name_of_docker_image=name_of_docker_image,
                 )
+            # remake singularity image
             else:
                 print(f"We will not be updating {name_of_docker_image}")
         else:
@@ -125,6 +135,8 @@ class ModelSyncer:
                 kipoi_container_repo=self.kipoi_container_repo,
             )
             model_adder.add()
+            # remake singularity image
+
 
     def sync(self):
         """
