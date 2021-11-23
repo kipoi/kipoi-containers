@@ -7,10 +7,10 @@ from kipoi import get_source
 from .adder import ModelAdder
 from github import Github
 from .updater import ModelUpdater
-
-from .singularityhelper import build_singularity_image, push_singularity_image
+from .singularityhelper import build_singularity_image, test_singularity_image
 
 CONTAINER_PREFIX = "shared/containers"
+
 
 class ModelSyncer:
     def __init__(self, github_obj):
@@ -47,9 +47,15 @@ class ModelSyncer:
         ) as infile:
             self.model_group_to_image_dict = json.load(infile)
         src = get_source("kipoi")
-        singularity_container_json = os.path.join(src.local_path, CONTAINER_PREFIX, "model-to-singularity.json")
-        with open(singularity_container_json, 'r') as singularity_container_json_filehandle:
-            self.model_group_to_singularity_image_dict = json.load(singularity_container_json_filehandle)
+        singularity_container_json = os.path.join(
+            src.local_path, CONTAINER_PREFIX, "model-to-singularity.json"
+        )
+        with open(
+            singularity_container_json, "r"
+        ) as singularity_container_json_filehandle:
+            self.model_group_to_singularity_image_dict = json.load(
+                singularity_container_json_filehandle
+            )
 
     def get_list_of_updated_model_groups(self):
         """
@@ -126,7 +132,12 @@ class ModelSyncer:
                     name_of_docker_image=name_of_docker_image,
                 )
                 build_singularity_image(name_of_docker_image)
-                test_singularity_image(self.model_group_to_singularity_image_dict[model_group]["name"], model_group)
+                test_singularity_image(
+                    self.model_group_to_singularity_image_dict[model_group][
+                        "name"
+                    ],
+                    model_group,
+                )
             else:
                 print(f"We will not be updating {name_of_docker_image}")
         else:
@@ -137,8 +148,12 @@ class ModelSyncer:
             )
             model_adder.add()
             build_singularity_image(model_adder.image_name)
-            test_singularity_image(self.model_group_to_singularity_image_dict[model_group]["name"], model_group)
-
+            test_singularity_image(
+                self.model_group_to_singularity_image_dict[model_group][
+                    "name"
+                ],
+                model_group,
+            )
 
     def sync(self):
         """

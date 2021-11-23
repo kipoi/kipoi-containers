@@ -1,6 +1,7 @@
 import os
-
+from pathlib import Path
 from spython.main import Client
+
 
 def cleanup(images=False):
     """
@@ -17,13 +18,17 @@ def build_singularity_image(name_of_docker_image):
     name_of_singularity_image : str
         Name of the singularity image to build
     """
-    singularity_image_folder = os.environ.get("SINGULARITY_PULL_FOLDER", pathlib.Path(__file__).parent.resolve())
+    singularity_image_folder = os.environ.get(
+        "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
+    )
     singualrity_image = Client.pull(
-                        image='docker://{name_of_docker_image}', 
-                        pull_folder=singularity_image_folder,
-                        force=True
-                        )
-    
+        image="docker://{name_of_docker_image}",
+        pull_folder=singularity_image_folder,
+        force=True,
+    )
+    return singualrity_image
+
+
 def test_singularity_image(singularity_image_name, model_name):
     """
     Tests a container for a given singularity image and run
@@ -37,9 +42,15 @@ def test_singularity_image(singularity_image_name, model_name):
     model_name : str
         Name of the model to test
     """
-    result = Client.execute(singularity_image_name, f"kipoi test {model_name} --source=kipoi", return_result=True)
+    result = Client.execute(
+        singularity_image_name,
+        f"kipoi test {model_name} --source=kipoi",
+        return_result=True,
+    )
     # TODO: cleanup
-    
+    return result
+
+
 def push_singularity_image(tag):
     """
     This function pushes a singularity image to zenodo

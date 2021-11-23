@@ -20,3 +20,4 @@ urllib3==1.26.5
 websocket-client==0.57.0
 pandas==1.2.0
 spython
+kipoi
