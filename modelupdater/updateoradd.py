@@ -126,6 +126,7 @@ class ModelSyncer:
                     name_of_docker_image=name_of_docker_image,
                 )
                 build_singularity_image(name_of_docker_image)
+                test_singularity_image(self.model_group_to_singularity_image_dict[model_group]["name"], model_group)
             else:
                 print(f"We will not be updating {name_of_docker_image}")
         else:
@@ -135,7 +136,8 @@ class ModelSyncer:
                 kipoi_container_repo=self.kipoi_container_repo,
             )
             model_adder.add()
-            build_singularity_image(name_of_docker_image)
+            build_singularity_image(model_adder.image_name)
+            test_singularity_image(self.model_group_to_singularity_image_dict[model_group]["name"], model_group)
 
 
     def sync(self):

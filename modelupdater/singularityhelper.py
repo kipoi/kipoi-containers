@@ -17,15 +17,16 @@ def build_singularity_image(name_of_docker_image):
     name_of_singularity_image : str
         Name of the singularity image to build
     """
-
+    singularity_image_folder = os.environ.get("SINGULARITY_PULL_FOLDER", pathlib.Path(__file__).parent.resolve())
     singualrity_image = Client.pull(
                         image='docker://{name_of_docker_image}', 
-                        pull_folder=os.environ["SINGULARITY_PULL_FOLDER"],
-                        force=True)
+                        pull_folder=singularity_image_folder,
+                        force=True
+                        )
     
-def run_singularity_image(singularity_image_name, model_name):
+def test_singularity_image(singularity_image_name, model_name):
     """
-    Runs a container for a given singularity image and run
+    Tests a container for a given singularity image and run
     kipoi test <model_name> --source=kipoi inside
     the container, followed by a cleanup
 
@@ -37,7 +38,7 @@ def run_singularity_image(singularity_image_name, model_name):
         Name of the model to test
     """
     result = Client.execute(singularity_image_name, f"kipoi test {model_name} --source=kipoi", return_result=True)
-
+    # TODO: cleanup
     
 def push_singularity_image(tag):
     """
