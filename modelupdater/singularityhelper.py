@@ -17,7 +17,11 @@ def build_singularity_image(name_of_docker_image):
     name_of_singularity_image : str
         Name of the singularity image to build
     """
-    singualrity_image = Client.pull(image='docker://{name_of_docker_image}', force=True)
+
+    singualrity_image = Client.pull(
+                        image='docker://{name_of_docker_image}', 
+                        pull_folder=os.environ["SINGULARITY_PULL_FOLDER"],
+                        force=True)
     
 def run_singularity_image(singularity_image_name, model_name):
     """
@@ -37,7 +41,7 @@ def run_singularity_image(singularity_image_name, model_name):
     
 def push_singularity_image(tag):
     """
-    This function pushes a singularity image to kipoi/kipoi-singularity
+    This function pushes a singularity image to zenodo
     Parameters
     ----------
     tag : str

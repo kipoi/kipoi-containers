@@ -8,7 +8,7 @@ from .adder import ModelAdder
 from github import Github
 from .updater import ModelUpdater
 
-from 
+from .singularityhelper import build_singularity_image, push_singularity_image
 
 CONTAINER_PREFIX = "shared/containers"
 
@@ -125,7 +125,7 @@ class ModelSyncer:
                     model_group=model_group,
                     name_of_docker_image=name_of_docker_image,
                 )
-            # remake singularity image
+                build_singularity_image(name_of_docker_image)
             else:
                 print(f"We will not be updating {name_of_docker_image}")
         else:
@@ -135,7 +135,7 @@ class ModelSyncer:
                 kipoi_container_repo=self.kipoi_container_repo,
             )
             model_adder.add()
-            # remake singularity image
+            build_singularity_image(name_of_docker_image)
 
 
     def sync(self):
