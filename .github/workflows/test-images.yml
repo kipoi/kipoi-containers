@@ -56,7 +56,7 @@ jobs:
         python-version: 3.9
     - name: Install dependencies
       run: |
-        sudo apt update && apt install -y libhdf5-serial-dev pkg-config
+        sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config
         python -m pip install --upgrade pip
         pip install pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
@@ -76,7 +76,7 @@ jobs:
         python-version: 3.9
     - name: Install dependencies
       run: |
-        sudo apt update && apt install -y libhdf5-serial-dev pkg-config
+        sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config
         python -m pip install --upgrade pip
         pip install pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
