@@ -1,6 +1,7 @@
 import os
 import requests
 import json
+from pathlib import Path
 
 # TODO: Move access token to a pytest fixture and add base url https://zenodo.org/api/
 
@@ -13,15 +14,6 @@ def test_zenodo_access():
         params={"access_token": ACCESS_TOKEN},
     )
     assert r.status_code == 200
-
-
-# def test_upload_new_file():
-#     ACCESS_TOKEN = os.environ.get("ZENODO_ACCESS_TOKEN", "")
-#     assert ACCESS_TOKEN != ""
-#     r = requests.get(
-#         "https://zenodo.org/api/deposit/depositions",
-#         params={"access_token": ACCESS_TOKEN},
-#     )
 
 
 def test_get_available_sc_depositions():
@@ -60,29 +52,22 @@ def test_get_existing_sc_by_recordid():
 def test_add_new_sc():
     ACCESS_TOKEN = os.environ.get("ZENODO_ACCESS_TOKEN", "")
     assert ACCESS_TOKEN != ""
-    # headers = {"Content-Type": "application/json"}
-    # data = {
-    #     "metadata": {
-    #         "title": "Test singulrity container upload",
-    #         "upload_type": "physicalobject",
-    #         "description": "Unit tests from kipoi/kipoi-container repo",
-    #         "creators": [
-    #             {"name": "Bhattacharya, Haimasree", "affiliation": "EMBL"}
-    #         ]
-    #     }
-    # }
-    # r = requests.post(
-    #     'https://sandbox.zenodo.org/api/deposit/depositions',
-    #     params={
-    #         "access_token": ACCESS_TOKEN,
-    #     },
-    #     data=json.dumps(data),
-    #     headers = headers
-    # )
+    params = {"access_token": ACCESS_TOKEN}
     r = requests.post(
-        "https://sandbox.zenodo.org/api/deposit/depositions",
-        params={"access_token": ACCESS_TOKEN},
+        "https://zenodo.org/api/deposit/depositions",
+        params=params,
         json={},
     )
     assert r.status_code == 201
-    print(r.json())
+    bucket_url = r.json()["links"]["bucket"]
+    print(bucket_url)
+    filename = "tiny-container_latest.sif"
+    path = Path(__file__).resolve().parent / filename
+
+    with open(path, "rb") as fp:
+        r = requests.put(
+            "%s/%s" % (bucket_url, filename),
+            data=fp,
+            params=params,
+        )
+    assert r.status_code == 200
