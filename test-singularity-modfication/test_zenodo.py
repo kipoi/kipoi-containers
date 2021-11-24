@@ -89,5 +89,9 @@ def test_add_new_sc():
     r = requests.put(url, data=json.dumps(data), headers=headers)
     assert r.status_code == 200
     assert r.json()["metadata"]["upload_type"] == "physicalobject"
-    # r = requests.delete(f"https://zenodo.org/api/deposit/depositions/{deposition_id}", params={'access_token': ACCESS_TOKEN})
-    # assert r.status_code == 200
+
+    r = requests.delete(
+        f"https://zenodo.org/api/deposit/depositions/{deposition_id}",
+        params={"access_token": ACCESS_TOKEN},
+    )
+    assert r.status_code == 204
