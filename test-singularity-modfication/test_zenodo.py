@@ -55,3 +55,34 @@ def test_get_existing_sc_by_recordid():
         },
     )
     assert r.json()["files"][0]["filename"] == "kipoi-docker_deeptarget.sif"
+
+
+def test_add_new_sc():
+    ACCESS_TOKEN = os.environ.get("ZENODO_ACCESS_TOKEN", "")
+    assert ACCESS_TOKEN != ""
+    # headers = {"Content-Type": "application/json"}
+    # data = {
+    #     "metadata": {
+    #         "title": "Test singulrity container upload",
+    #         "upload_type": "physicalobject",
+    #         "description": "Unit tests from kipoi/kipoi-container repo",
+    #         "creators": [
+    #             {"name": "Bhattacharya, Haimasree", "affiliation": "EMBL"}
+    #         ]
+    #     }
+    # }
+    # r = requests.post(
+    #     'https://sandbox.zenodo.org/api/deposit/depositions',
+    #     params={
+    #         "access_token": ACCESS_TOKEN,
+    #     },
+    #     data=json.dumps(data),
+    #     headers = headers
+    # )
+    r = requests.post(
+        "https://sandbox.zenodo.org/api/deposit/depositions",
+        params={"access_token": ACCESS_TOKEN},
+        json={},
+    )
+    assert r.status_code == 201
+    print(r.json())
