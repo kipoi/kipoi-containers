@@ -59,6 +59,7 @@ def test_add_new_sc():
         json={},
     )
     assert r.status_code == 201
+    deposition_id = r.json()["id"]
     bucket_url = r.json()["links"]["bucket"]
     filename = "tiny-container_latest.sif"
     path = Path(__file__).resolve().parent / filename
@@ -71,3 +72,22 @@ def test_add_new_sc():
         )
     assert r.json()["links"]["self"] == f"{bucket_url}/{filename}"
     assert r.status_code == 200
+
+    data = {
+        "metadata": {
+            "title": "Tiny test container upload and delete",
+            "upload_type": "physicalobject",
+            "description": "Tine test container upload and delete",
+            "creators": [
+                {"name": "Haimasree, Bhattacharya", "affiliation": "EMBL"}
+            ],
+        }
+    }
+    url = f"https://zenodo.org/api/deposit/depositions/{deposition_id}?access_token={ACCESS_TOKEN}"
+    headers = {"Content-Type": "application/json"}
+
+    r = requests.put(url, data=json.dumps(data), headers=headers)
+    assert r.status_code == 200
+    assert r.json()["metadata"]["upload_type"] == "physicalobject"
+    # r = requests.delete(f"https://zenodo.org/api/deposit/depositions/{deposition_id}", params={'access_token': ACCESS_TOKEN})
+    # assert r.status_code == 200
