@@ -60,7 +60,6 @@ def test_add_new_sc():
     )
     assert r.status_code == 201
     bucket_url = r.json()["links"]["bucket"]
-    print(bucket_url)
     filename = "tiny-container_latest.sif"
     path = Path(__file__).resolve().parent / filename
 
@@ -70,4 +69,5 @@ def test_add_new_sc():
             data=fp,
             params=params,
         )
+    assert r.json()["links"]["self"] == f"{bucket_url}/{filename}"
     assert r.status_code == 200
