@@ -171,5 +171,5 @@ def test_get_all_versions_of_anexisting_deposition():
     )
     assert r.status_code == 200
     # Changes url would be {r.json()[0]["metadata"]["prereserve_doi"]["recid"]}/files/{name}?download=1
-    print(r.json()[0]["metadata"]["prereserve_doi"]["recid"])
+    assert r.json()[0]["metadata"]["prereserve_doi"]["recid"] == "5725937"
     assert len(r.json()) == 1

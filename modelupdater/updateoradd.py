@@ -7,7 +7,11 @@ from kipoi import get_source
 from .adder import ModelAdder
 from github import Github
 from .updater import ModelUpdater
-from .singularityhelper import build_singularity_image, test_singularity_image
+from .singularityhelper import (
+    build_singularity_image,
+    test_singularity_image,
+    push_new_singularity_image,
+)
 
 CONTAINER_PREFIX = "shared/containers"
 
@@ -131,18 +135,16 @@ class ModelSyncer:
                     model_group=model_group,
                     name_of_docker_image=name_of_docker_image,
                 )
+                singularity_image_name = (
+                    self.model_group_to_singularity_image_dict[model_group][
+                        "name"
+                    ]
+                )
                 build_singularity_image(
-                    name_of_docker_image,
-                    self.model_group_to_singularity_image_dict[model_group][
-                        "name"
-                    ],
+                    name_of_docker_image, singularity_image_name
                 )
-                test_singularity_image(
-                    self.model_group_to_singularity_image_dict[model_group][
-                        "name"
-                    ],
-                    model_group,
-                )
+                if test_singularity_image(singularity_image_name, model_group):
+                    pass
             else:
                 print(f"We will not be updating {name_of_docker_image}")
         else:
@@ -153,12 +155,14 @@ class ModelSyncer:
             )
             model_adder.add()
             build_singularity_image(model_adder.image_name)
-            test_singularity_image(
-                self.model_group_to_singularity_image_dict[model_group][
-                    "name"
-                ],
-                model_group,
+            singularity_image_name = (
+                self.model_group_to_singularity_image_dict[model_group]["name"]
             )
+            if test_singularity_image(singularity_image_name, model_group):
+                singularity_dict = push_new_singularity_image(
+                    singularity_image_name, model_group
+                )
+                print(singularity_dict)
 
     def sync(self):
         """
