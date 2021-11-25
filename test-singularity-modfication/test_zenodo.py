@@ -26,7 +26,7 @@ def test_get_available_sc_depositions():
             "access_token": ACCESS_TOKEN,
             "status": "published",
             "q": "singularity container",
-            "size": 30,
+            "size": 16,  # TODO: Make this same number as available entries in model-to-singularity-container.json
         },
     )
     assert len(r.json()) == 16
@@ -90,12 +90,12 @@ def test_add_new_sc():
     assert r.status_code == 200
     assert r.json()["metadata"]["upload_type"] == "physicalobject"
 
-    r = requests.get(
-        f"https://zenodo.org/api/deposit/depositions/{deposition_id}",
-        params={
-            "access_token": ACCESS_TOKEN,
-        },
-    )
+    # r = requests.get(
+    #     f"https://zenodo.org/api/deposit/depositions/{deposition_id}",
+    #     params={
+    #         "access_token": ACCESS_TOKEN,
+    #     },
+    # )
     # fileobj = r.json()['files'][0]
     # md5 = fileobj['checksum']
     # name = fileobj['filename']
@@ -105,3 +105,51 @@ def test_add_new_sc():
         params={"access_token": ACCESS_TOKEN},
     )
     assert r.status_code == 204
+
+
+def test_update_existing_sc():
+    ACCESS_TOKEN = os.environ.get("ZENODO_ACCESS_TOKEN", "")
+    assert ACCESS_TOKEN != ""
+    # Create a new version of an existing deposition
+    r = requests.post(
+        "https://zenodo.org/api/deposit/depositions/5725937/actions/newversion",
+        params={"access_token": ACCESS_TOKEN},
+    )
+    assert r.status_code == 201
+    bucket_url = r.json()["links"]["bucket"]
+    print(bucket_url)
+    new_deposition_id = r.json()["links"]["latest_draft"].split("/")[-1]
+    assert new_deposition_id != 5725937
+    # Delete existing file from this new version
+    r = requests.get(
+        f"https://zenodo.org/api/deposit/depositions/{new_deposition_id}/files",
+        params={"access_token": ACCESS_TOKEN},
+    )
+    assert r.status_code == 200
+    print(r.json())
+    r = requests.delete(
+        f'https://zenodo.org/api/deposit/depositions/{new_deposition_id}/files/{r.json()[0]["id"]}',
+        # Assuming there will always be one file associated with each version
+        params={"access_token": ACCESS_TOKEN},
+    )
+    assert r.status_code == 204
+    # Add a new file to this new version
+    filename = "busybox_1.34.1.sif"
+    path = Path(__file__).resolve().parent / filename
+
+    with open(path, "rb") as fp:
+        r = requests.put(
+            f"{bucket_url}/{filename}",
+            data=fp,
+            params={"access_token": ACCESS_TOKEN},
+        )
+    assert r.json()["links"]["self"] == f"{bucket_url}/{filename}"
+    assert r.status_code == 200
+
+    # r = requests.post(f'https://zenodo.org/api/deposit/depositions/{deposition_id}/actions/discard',
+    #               params={'access_token': ACCESS_TOKEN})
+    # assert r.status_code == 201
+
+
+# def test_get_all_versions_of_anexisting_deposition():
+#     pass
