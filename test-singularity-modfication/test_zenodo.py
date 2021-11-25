@@ -90,6 +90,16 @@ def test_add_new_sc():
     assert r.status_code == 200
     assert r.json()["metadata"]["upload_type"] == "physicalobject"
 
+    r = requests.get(
+        f"https://zenodo.org/api/deposit/depositions/{deposition_id}",
+        params={
+            "access_token": ACCESS_TOKEN,
+        },
+    )
+    # fileobj = r.json()['files'][0]
+    # md5 = fileobj['checksum']
+    # name = fileobj['filename']
+    # url = f'https://zenodo.org/record/{r.json()["metadata"]["prereserve_doi"]["recid"]}/files/{name}' # This is only valid after publishing
     r = requests.delete(
         f"https://zenodo.org/api/deposit/depositions/{deposition_id}",
         params={"access_token": ACCESS_TOKEN},
