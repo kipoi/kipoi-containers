@@ -148,6 +148,9 @@ class ModelSyncer:
                         singularity_dict, model_group
                     )
                     print(singularity_dict)
+                    self.model_group_to_singularity_image_dict[
+                        model_group
+                    ] = singularity_dict
             else:
                 print(f"We will not be updating {name_of_docker_image}")
         else:
@@ -166,6 +169,9 @@ class ModelSyncer:
                     singularity_image_name, model_group
                 )
                 print(singularity_dict)
+                self.model_group_to_singularity_image_dict[
+                    model_group
+                ] = singularity_dict
 
     def sync(self):
         """
