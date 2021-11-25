@@ -116,19 +116,19 @@ def test_update_existing_sc():
         params={"access_token": ACCESS_TOKEN},
     )
     assert r.status_code == 201
-    bucket_url = r.json()["links"]["bucket"]
-    print(bucket_url)
     new_deposition_id = r.json()["links"]["latest_draft"].split("/")[-1]
     assert new_deposition_id != 5725937
     # Delete existing file from this new version
     r = requests.get(
-        f"https://zenodo.org/api/deposit/depositions/{new_deposition_id}/files",
+        f"https://zenodo.org/api/deposit/depositions/{new_deposition_id}",
         params={"access_token": ACCESS_TOKEN},
     )
     assert r.status_code == 200
-    print(r.json())
+    bucket_url = r.json()["links"]["bucket"]
+
+    file_id = r.json()["files"][0]["id"]
     r = requests.delete(
-        f'https://zenodo.org/api/deposit/depositions/{new_deposition_id}/files/{r.json()[0]["id"]}',
+        f"https://zenodo.org/api/deposit/depositions/{new_deposition_id}/files/{file_id}",
         # Assuming there will always be one file associated with each version
         params={"access_token": ACCESS_TOKEN},
     )
@@ -143,13 +143,33 @@ def test_update_existing_sc():
             data=fp,
             params={"access_token": ACCESS_TOKEN},
         )
-    assert r.json()["links"]["self"] == f"{bucket_url}/{filename}"
+    assert (
+        r.json()["links"]["self"] == f"{bucket_url}/{filename}"
+    )  # This is same as
     assert r.status_code == 200
 
-    # r = requests.post(f'https://zenodo.org/api/deposit/depositions/{deposition_id}/actions/discard',
-    #               params={'access_token': ACCESS_TOKEN})
-    # assert r.status_code == 201
+    r = requests.delete(
+        f"https://zenodo.org/api/deposit/depositions/{new_deposition_id}",
+        params={"access_token": ACCESS_TOKEN},
+    )
+
+    assert r.status_code == 204
 
 
-# def test_get_all_versions_of_anexisting_deposition():
-#     pass
+def test_get_all_versions_of_anexisting_deposition():
+    ACCESS_TOKEN = os.environ.get("ZENODO_ACCESS_TOKEN", "")
+    assert ACCESS_TOKEN != ""
+    # Following query provides the latest version of the deposition
+    r = requests.get(
+        "https://zenodo.org/api/deposit/depositions",
+        params={
+            "access_token": ACCESS_TOKEN,
+            "status": "published",
+            "q": "Tiny test container upload and delete",
+            "size": 1,
+        },
+    )
+    assert r.status_code == 200
+    # Changes url would be {r.json()[0]["metadata"]["prereserve_doi"]["recid"]}/files/{name}?download=1
+    print(r.json()[0]["metadata"]["prereserve_doi"]["recid"])
+    assert len(r.json()) == 1
