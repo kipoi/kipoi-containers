@@ -122,8 +122,94 @@ def push_new_singularity_image(singularity_image_name, model_group):
         raise SystemExit(err)
 
     try:
-        response = requests.post(
+        response = requests.get(
             f"{ZENODO_API_URL}/deposit/depositions/{deposition_id}",
+            params=params,
+        )
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        raise SystemExit(err)
+
+    fileobj = response.json()["files"][0]
+    md5 = fileobj["checksum"]
+    name = fileobj["filename"]
+    url = f'https://zenodo.org/record/{response.json()["metadata"]["prereserve_doi"]["recid"]}/files/{name}?download=1'
+
+    return {model_group: {"url": url, "name": name, "md5": md5}}
+
+
+def update_existing_singularity_container(sngularity_dict, model_group):
+    ACCESS_TOKEN = os.environ.get("ZENODO_ACCESS_TOKEN", "")
+    url = sngularity_dict["url"]
+    deposition_id = url.split("/")[4]
+    params = {"access_token": ACCESS_TOKEN}
+    # Create a new version of an existing deposition
+    try:
+        response = requests.post(
+            f"https://zenodo.org/api/deposit/depositions/{deposition_id}/actions/newversion",
+            params=params,
+        )
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        raise SystemExit(err)
+
+    new_deposition_id = response.json()["links"]["latest_draft"].split("/")[-1]
+    assert new_deposition_id != deposition_id
+
+    # Delete existing file from this new version
+    try:
+        response = requests.get(
+            f"https://zenodo.org/api/deposit/depositions/{new_deposition_id}",
+            params=params,
+        )
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        raise SystemExit(err)
+
+    bucket_url = response.json()["links"]["bucket"]
+    file_id = response.json()["files"][0]["id"]
+    try:
+        response = requests.delete(
+            f"https://zenodo.org/api/deposit/depositions/{new_deposition_id}/files/{file_id}",
+            # Assuming there will always be one file associated with each version
+            params=params,
+        )
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        raise SystemExit(err)
+    assert response.status_code == 204
+    # Add a new file to this new version
+    filename = sngularity_dict["name"]
+    path = Path(__file__).resolve().parent / filename
+    assert path.exists()
+
+    with open(path, "rb") as fp:
+        try:
+            response = requests.put(
+                f"{bucket_url}/{filename}",
+                data=fp,
+                params=params,
+            )
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            raise SystemExit(err)
+    assert (
+        response.json()["links"]["self"] == f"{bucket_url}/{filename}"
+    )  # This is same as
+    assert response.status_code == 200
+
+    try:
+        response = requests.post(
+            f"{ZENODO_API_URL}/deposit/depositions/{new_deposition_id}/actions/publish",
+            params=params,
+        )
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        raise SystemExit(err)
+
+    try:
+        response = requests.get(
+            f"{ZENODO_API_URL}/deposit/depositions/{new_deposition_id}",
             params=params,
         )
         response.raise_for_status()

@@ -11,6 +11,7 @@ from .singularityhelper import (
     build_singularity_image,
     test_singularity_image,
     push_new_singularity_image,
+    update_existing_singularity_container,
 )
 
 CONTAINER_PREFIX = "shared/containers"
@@ -135,16 +136,18 @@ class ModelSyncer:
                     model_group=model_group,
                     name_of_docker_image=name_of_docker_image,
                 )
-                singularity_image_name = (
-                    self.model_group_to_singularity_image_dict[model_group][
-                        "name"
-                    ]
-                )
+                singularity_dict = self.model_group_to_singularity_image_dict[
+                    model_group
+                ]
+                singularity_image_name = singularity_dict["name"]
                 build_singularity_image(
                     name_of_docker_image, singularity_image_name
                 )
-                if test_singularity_image(singularity_image_name, model_group):
-                    pass
+                if test_singularity_image(singularity_dict, model_group):
+                    singularity_dict = update_existing_singularity_container(
+                        singularity_dict, model_group
+                    )
+                    print(singularity_dict)
             else:
                 print(f"We will not be updating {name_of_docker_image}")
         else:
