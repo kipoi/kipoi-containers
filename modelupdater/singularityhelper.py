@@ -54,8 +54,10 @@ def test_singularity_image(
     singularity_image_folder = os.environ.get(
         "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
     )
-    results = [
-        Client.execute(
+
+    for model in models:
+        print(f"Testing {model} with {singularity_image_name['name']}.sif")
+        result = Client.execute(
             singularity_image_folder
             / Path(
                 f"{singularity_image_name['name']}.sif"
@@ -63,9 +65,6 @@ def test_singularity_image(
             f"kipoi test {model} --source=kipoi",
             return_result=True,
         )
-        for model in models
-    ]
-    for result in results:
         if result["return_code"] != 0:
             print(result["message"])
             raise ValueError(
