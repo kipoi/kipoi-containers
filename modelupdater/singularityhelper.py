@@ -149,7 +149,7 @@ def push_new_singularity_image(singularity_image_name, model_group):
     name = fileobj["filename"]
     url = f'https://zenodo.org/record/{response.json()["metadata"]["prereserve_doi"]["recid"]}/files/{name}?download=1'
 
-    return {model_group: {"url": url, "name": name, "md5": md5}}
+    return {"url": url, "name": name, "md5": md5}
 
 
 def update_existing_singularity_container(sngularity_dict, model_group):
@@ -194,13 +194,16 @@ def update_existing_singularity_container(sngularity_dict, model_group):
     assert response.status_code == 204
     # Add a new file to this new version
     filename = sngularity_dict["name"]
-    path = Path(__file__).resolve().parent / filename
+    singularity_image_folder = os.environ.get(
+        "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
+    )
+    path = singularity_image_folder / f"{filename}.sif"
     assert path.exists()
 
     with open(path, "rb") as fp:
         try:
             response = requests.put(
-                f"{bucket_url}/{filename}",
+                f"{bucket_url}/{filename}.sif",
                 data=fp,
                 params=params,
             )
@@ -208,7 +211,7 @@ def update_existing_singularity_container(sngularity_dict, model_group):
         except requests.exceptions.HTTPError as err:
             raise SystemExit(err)
     assert (
-        response.json()["links"]["self"] == f"{bucket_url}/{filename}"
+        response.json()["links"]["self"] == f"{bucket_url}/{filename}.sif"
     )  # This is same as
     assert response.status_code == 200
 
@@ -235,7 +238,7 @@ def update_existing_singularity_container(sngularity_dict, model_group):
     name = fileobj["filename"]
     url = f'https://zenodo.org/record/{response.json()["metadata"]["prereserve_doi"]["recid"]}/files/{name}?download=1'
 
-    return {model_group: {"url": url, "name": name, "md5": md5}}
+    return {"url": url, "name": name, "md5": md5}
 
 
 def populate_singularity_container_info():
