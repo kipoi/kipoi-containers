@@ -89,6 +89,8 @@ jobs:
   testsingularity:
 
     runs-on: ubuntu-latest
+    env:
+      ZENODO_ACCESS_TOKEN: ${{ secrets.ZENODOACCESSTOKEN }}
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
