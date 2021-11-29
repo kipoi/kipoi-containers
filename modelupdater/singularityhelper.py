@@ -37,7 +37,7 @@ def build_singularity_image(name_of_docker_image, singularity_image_name):
 
 
 def test_singularity_image(
-    singularity_image_name, model_name
+    singularity_image_name, models
 ):  # TODO: Investigate adding this to test_containers_from_command_line
     """
     Tests a container for a given singularity image and run
@@ -48,21 +48,29 @@ def test_singularity_image(
     ----------
     image_name : str
         Name of the singularity image
-    model_name : str
-        Name of the model to test
+    models : List
+        Name of the models to test
     """
-    print(f"image name = {singularity_image_name}, model name = {model_name}")
     singularity_image_folder = os.environ.get(
         "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
     )
-    result = Client.execute(
-        singularity_image_folder
-        / Path(f"{singularity_image_name['name']}.sif"),
-        f"kipoi test {model_name} --source=kipoi",
-        return_result=True,
-    )
-    # TODO: cleanup
-    return result
+    results = [
+        Client.execute(
+            singularity_image_folder
+            / Path(
+                f"{singularity_image_name['name']}.sif"
+            ),  # TODO: Make this pretty
+            f"kipoi test {model} --source=kipoi",
+            return_result=True,
+        )
+        for model in models
+    ]
+    for result in results:
+        if result["return_code"] != 0:
+            print(result["message"])
+            raise ValueError(
+                f"Updated singularity image {singularity_image_name['name']}.sif for {models} did not pass relevant tests"
+            )
 
 
 def push_new_singularity_image(singularity_image_name, model_group):

@@ -126,6 +126,12 @@ class ModelSyncer:
         if model_group in self.model_group_to_image_dict:
             # model_updater = ModelUpdater()
             name_of_docker_image = self.model_group_to_image_dict[model_group]
+            with open(
+                Path.cwd() / "test-containers" / "image-name-to-model.json",
+                "r",
+            ) as infile:
+                image_to_model_dict = json.load(infile)
+                models_to_test = image_to_model_dict[name_of_docker_image]
             if "shared" not in name_of_docker_image:
                 # model_updater.update(
                 #     model_group=model_group,
@@ -138,26 +144,17 @@ class ModelSyncer:
                 # build_singularity_image(
                 #     name_of_docker_image, singularity_image_name
                 # )
-                test_singularity_container_status = test_singularity_image(
+                test_singularity_image(singularity_dict, models_to_test)
+                singularity_dict = update_existing_singularity_container(
                     singularity_dict, model_group
                 )
-                if test_singularity_container_status["return_code"] == 0:
-                    singularity_dict = update_existing_singularity_container(
-                        singularity_dict, model_group
-                    )
-                    print(singularity_dict)
-                    self.model_group_to_singularity_image_dict[
-                        model_group
-                    ] = singularity_dict
-                    write_singularity_container_info(
-                        self.model_group_to_singularity_image_dict
-                    )
-                else:
-                    print(
-                        f"We could not update {singularity_dict['name']}.sif"
-                    )
-                    print(test_singularity_container_status["message"])
-
+                print(singularity_dict)
+                self.model_group_to_singularity_image_dict[
+                    model_group
+                ] = singularity_dict
+                write_singularity_container_info(
+                    self.model_group_to_singularity_image_dict
+                )
             else:
                 print(f"We will not be updating {name_of_docker_image}")
         else:
