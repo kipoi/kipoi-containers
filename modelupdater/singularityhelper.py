@@ -222,3 +222,17 @@ def update_existing_singularity_container(sngularity_dict, model_group):
     url = f'https://zenodo.org/record/{response.json()["metadata"]["prereserve_doi"]["recid"]}/files/{name}?download=1'
 
     return {model_group: {"url": url, "name": name, "md5": md5}}
+
+
+def populate_singularity_container_info():
+    with open(
+        Path.cwd() / "test-containers" / "model-group-to-singularity.json", "r"
+    ) as singularity_container_json_filehandle:
+        return json.load(singularity_container_json_filehandle)
+
+
+def write_singularity_container_info(model_group_to_singularity_image_dict):
+    with open(
+        Path.cwd() / "test-containers" / "model-group-to-singularity.json", "w"
+    ) as fp:
+        json.dump(model_group_to_singularity_image_dict, fp, indent=2)

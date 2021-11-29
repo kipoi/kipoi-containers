@@ -12,6 +12,8 @@ from .singularityhelper import (
     test_singularity_image,
     push_new_singularity_image,
     update_existing_singularity_container,
+    populate_singularity_container_info,
+    write_singularity_container_info,
 )
 
 CONTAINER_PREFIX = "shared/containers"
@@ -51,16 +53,9 @@ class ModelSyncer:
             "r",
         ) as infile:
             self.model_group_to_image_dict = json.load(infile)
-        src = get_source("kipoi")
-        singularity_container_json = os.path.join(
-            src.local_path, CONTAINER_PREFIX, "model-to-singularity.json"
+        self.model_group_to_singularity_image_dict = (
+            populate_singularity_container_info()
         )
-        with open(
-            singularity_container_json, "r"
-        ) as singularity_container_json_filehandle:
-            self.model_group_to_singularity_image_dict = json.load(
-                singularity_container_json_filehandle
-            )
 
     def get_list_of_updated_model_groups(self):
         """
@@ -129,13 +124,13 @@ class ModelSyncer:
             Model group to update or add
         """
         if model_group in self.model_group_to_image_dict:
-            model_updater = ModelUpdater()
+            # model_updater = ModelUpdater()
             name_of_docker_image = self.model_group_to_image_dict[model_group]
             if "shared" not in name_of_docker_image:
-                model_updater.update(
-                    model_group=model_group,
-                    name_of_docker_image=name_of_docker_image,
-                )
+                # model_updater.update(
+                #     model_group=model_group,
+                #     name_of_docker_image=name_of_docker_image,
+                # )
                 singularity_dict = self.model_group_to_singularity_image_dict[
                     model_group
                 ]
@@ -151,7 +146,9 @@ class ModelSyncer:
                     self.model_group_to_singularity_image_dict[
                         model_group
                     ] = singularity_dict
-                    # TODO: Write down to file
+                    write_singularity_container_info(
+                        self.model_group_to_singularity_image_dict
+                    )
             else:
                 print(f"We will not be updating {name_of_docker_image}")
         else:
@@ -173,7 +170,9 @@ class ModelSyncer:
                 self.model_group_to_singularity_image_dict[
                     model_group
                 ] = singularity_dict
-            # TODO: Write down to file
+                write_singularity_container_info(
+                    self.model_group_to_singularity_image_dict
+                )
 
     def sync(self):
         """
