@@ -156,7 +156,7 @@ def test_update_existing_sc():
     assert r.status_code == 204
 
 
-def test_get_all_versions_of_anexisting_deposition():
+def test_get_all_versions_of_an_existing_deposition():
     ACCESS_TOKEN = os.environ.get("ZENODO_ACCESS_TOKEN", "")
     assert ACCESS_TOKEN != ""
     # Following query provides the latest version of the deposition
@@ -171,5 +171,5 @@ def test_get_all_versions_of_anexisting_deposition():
     )
     assert r.status_code == 200
     # Changes url would be {r.json()[0]["metadata"]["prereserve_doi"]["recid"]}/files/{name}?download=1
-    assert r.json()[0]["metadata"]["prereserve_doi"]["recid"] == "5725937"
+    assert r.json()[0]["metadata"]["prereserve_doi"]["recid"] == 5725937
     assert len(r.json()) == 1
