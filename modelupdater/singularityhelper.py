@@ -33,10 +33,12 @@ def build_singularity_image(name_of_docker_image, singularity_image_name):
         force=True,
         name=f"{singularity_image_name}.sif",
     )
-    return singualrity_image
+    return singualrity_image  # TODO: Investigate what does it return?
 
 
-def test_singularity_image(singularity_image_name, model_name):
+def test_singularity_image(
+    singularity_image_name, model_name
+):  # TODO: Investigate adding this to test_containers_from_command_line
     """
     Tests a container for a given singularity image and run
     kipoi test <model_name> --source=kipoi inside
@@ -49,8 +51,13 @@ def test_singularity_image(singularity_image_name, model_name):
     model_name : str
         Name of the model to test
     """
+    print(f"image name = {singularity_image_name}, model name = {model_name}")
+    singularity_image_folder = os.environ.get(
+        "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
+    )
     result = Client.execute(
-        singularity_image_name,
+        singularity_image_folder
+        / Path(f"{singularity_image_name['name']}.sif"),
         f"kipoi test {model_name} --source=kipoi",
         return_result=True,
     )

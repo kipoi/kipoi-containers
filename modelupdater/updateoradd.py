@@ -135,10 +135,13 @@ class ModelSyncer:
                     model_group
                 ]
                 singularity_image_name = singularity_dict["name"]
-                build_singularity_image(
-                    name_of_docker_image, singularity_image_name
+                # build_singularity_image(
+                #     name_of_docker_image, singularity_image_name
+                # )
+                test_singularity_container_status = test_singularity_image(
+                    singularity_dict, model_group
                 )
-                if test_singularity_image(singularity_dict, model_group):
+                if test_singularity_container_status["return_code"] == 0:
                     singularity_dict = update_existing_singularity_container(
                         singularity_dict, model_group
                     )
@@ -149,6 +152,12 @@ class ModelSyncer:
                     write_singularity_container_info(
                         self.model_group_to_singularity_image_dict
                     )
+                else:
+                    print(
+                        f"We could not update {singularity_dict['name']}.sif"
+                    )
+                    print(test_singularity_container_status["message"])
+
             else:
                 print(f"We will not be updating {name_of_docker_image}")
         else:
