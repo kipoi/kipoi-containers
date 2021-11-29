@@ -103,11 +103,11 @@ jobs:
         python-version: 3.9
         auto-activate-base: false
     - name: Install pip dependencies
-        run: |
-          sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config
-          python -m pip install --upgrade pip
-          pip install pytest
-          pip install -r requirements.txt; fi
+      run: |
+        sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config
+        python -m pip install --upgrade pip
+        pip install pytest
+        pip install -r requirements.txt; fi
     - name: Test singularity
-      run: |-
+      run: |
         python -m pytest -s test-singularity-modification/test_zenodo.py
