@@ -141,17 +141,21 @@ class ModelSyncer:
                     model_group
                 ]
                 singularity_image_name = singularity_dict["name"]
-                # build_singularity_image(
-                #     name_of_docker_image, singularity_image_name
-                # )
+                build_singularity_image(
+                    name_of_docker_image, singularity_image_name
+                )
                 test_singularity_image(singularity_dict, models_to_test)
-                singularity_dict = update_existing_singularity_container(
+                (
+                    _,
+                    _,
+                    new_singularity_dict,
+                ) = update_existing_singularity_container(
                     singularity_dict, model_group
                 )
-                print(singularity_dict)
+                print(new_singularity_dict)
                 self.model_group_to_singularity_image_dict[
                     model_group
-                ] = singularity_dict
+                ] = new_singularity_dict
                 write_singularity_container_info(
                     self.model_group_to_singularity_image_dict
                 )
@@ -164,21 +168,22 @@ class ModelSyncer:
                 kipoi_container_repo=self.kipoi_container_repo,
             )
             model_adder.add()
-            build_singularity_image(model_adder.image_name)
-            singularity_image_name = (
-                self.model_group_to_singularity_image_dict[model_group]["name"]
+            singularity_image_name = f"kipoi-docker_{model_group.lower()}.sif"
+            build_singularity_image(
+                model_adder.image_name, singularity_image_name
             )
-            if test_singularity_image(singularity_image_name, model_group):
-                singularity_dict = push_new_singularity_image(
-                    singularity_image_name, model_group
-                )
-                print(singularity_dict)
-                self.model_group_to_singularity_image_dict[
-                    model_group
-                ] = singularity_dict
-                write_singularity_container_info(
-                    self.model_group_to_singularity_image_dict
-                )
+            singularity_dict = {"name": singularity_image_name}
+            test_singularity_image(singularity_dict, models_to_test)
+            _, new_singularity_dict = push_new_singularity_image(
+                singularity_dict, model_group
+            )
+            print(new_singularity_dict)
+            self.model_group_to_singularity_image_dict[
+                model_group
+            ] = new_singularity_dict
+            write_singularity_container_info(
+                self.model_group_to_singularity_image_dict
+            )
 
     def sync(self):
         """
