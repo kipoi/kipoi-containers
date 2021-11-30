@@ -6,7 +6,7 @@ import json
 from spython.main import Client
 
 
-ZENODO_API_URL = "https://zenodo.org/api"
+ZENODO_BASE_URL = "https://zenodo.org"
 
 
 def cleanup(images=False):
@@ -14,6 +14,64 @@ def cleanup(images=False):
     Cleans up unused singularity containers, volumes and networks
     """
     pass
+
+
+def get_zenodo_access_token():
+    ACCESS_TOKEN = os.environ.get("ZENODO_ACCESS_TOKEN", "")
+    return {"access_token": ACCESS_TOKEN}
+
+
+def get_content(url, params):
+    try:
+        response = requests.get(
+            url,
+            params=params,
+        )
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        raise SystemExit(err)
+    assert response.status_code == 200
+    return response.json()
+
+
+def put_content(
+    url, params, data, headers={"Content-Type": "application/json"}
+):
+    try:
+        response = requests.put(url, data=data, params=params, header=headers)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        raise SystemExit(err)
+    assert response.status_code == 200
+    return response.json()
+
+
+def post_content(url, params, json={}):
+    try:
+        response = requests.post(
+            url,
+            params=params,
+            json=json,
+        )
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        raise SystemExit(err)
+    # TODO: Add appropriate status codes
+    return response.status_code, response.json()
+
+
+def delete_content(url, params):
+    try:
+        response = requests.delete(
+            url,
+            # Assuming there will always be one file associated with each version
+            params=params,
+        )
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        raise SystemExit(err)
+    assert response.status_code == 204
+    return response.json()
 
 
 def build_singularity_image(name_of_docker_image, singularity_image_name):
@@ -37,7 +95,7 @@ def build_singularity_image(name_of_docker_image, singularity_image_name):
 
 
 def test_singularity_image(
-    singularity_image_name, models
+    singularity_dict, models
 ):  # TODO: Investigate adding this to test_containers_from_command_line
     """
     Tests a container for a given singularity image and run
@@ -46,29 +104,27 @@ def test_singularity_image(
 
     Parameters
     ----------
-    image_name : str
-        Name of the singularity image
+    singularity_dict: dict
+        Dict containing url, name and md5 checksum of the singularity image
     models : List
         Name of the models to test
     """
     singularity_image_folder = os.environ.get(
         "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
     )
-
+    singularity_image_name = f"{singularity_dict['name']}.sif"
     for model in models:
-        print(f"Testing {model} with {singularity_image_name['name']}.sif")
+        print(f"Testing {model} with {singularity_image_name}")
+
         result = Client.execute(
-            singularity_image_folder
-            / Path(
-                f"{singularity_image_name['name']}.sif"
-            ),  # TODO: Make this pretty
+            singularity_image_folder / Path(f"{singularity_image_name}"),
             f"kipoi test {model} --source=kipoi",
             return_result=True,
         )
         if result["return_code"] != 0:
             print(result["message"])
             raise ValueError(
-                f"Updated singularity image {singularity_image_name['name']}.sif for {models} did not pass relevant tests"
+                f"Updated singularity image {singularity_image_name} for {models} did not pass relevant tests"
             )
 
 
@@ -82,31 +138,20 @@ def push_new_singularity_image(singularity_image_name, model_group):
     """
     ACCESS_TOKEN = os.environ.get("ZENODO_ACCESS_TOKEN", "")
     params = {"access_token": ACCESS_TOKEN}
-    try:
-        response = requests.post(
-            f"{ZENODO_API_URL}/deposit/depositions",
-            params=params,
-            json={},
-        )
-        response.raise_for_status()
-    except requests.exceptions.HTTPError as err:
-        raise SystemExit(err)
+    status_code, response = post_content(
+        f"{ZENODO_BASE_URL}/deposit/depositions", params=params
+    )
+    # TODO: Add status check
 
-    deposition_id = response.json()["id"]
-    bucket_url = response.json()["links"]["bucket"]
+    deposition_id = response["id"]
+    bucket_url = response["links"]["bucket"]
     filename = singularity_image_name
     path = Path(__file__).resolve().parent / filename
 
     with open(path, "rb") as fp:
-        try:
-            response = requests.put(
-                f"{bucket_url}/{filename}",
-                data=fp,
-                params=params,
-            )
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
-            raise SystemExit(err)
+        response = put_content(
+            url=f"{bucket_url}/{filename}", params=params, data=fp
+        )
 
     data = {
         "metadata": {
@@ -118,127 +163,89 @@ def push_new_singularity_image(singularity_image_name, model_group):
             ],
         }
     }
-    url = f"{ZENODO_API_URL}/deposit/depositions/{deposition_id}?access_token={ACCESS_TOKEN}"
-    headers = {"Content-Type": "application/json"}
-    try:
-        response = requests.put(url, data=json.dumps(data), headers=headers)
-        response.raise_for_status()
-    except requests.exceptions.HTTPError as err:
-        raise SystemExit(err)
+    url = f"{ZENODO_BASE_URL}/api/deposit/depositions/{deposition_id}?access_token={ACCESS_TOKEN}"
+    response = put_content(url=url, params=params, data=json.dumps(data))
 
-    try:
-        response = requests.post(
-            f"{ZENODO_API_URL}/deposit/depositions/{deposition_id}/actions/publish",
-            params=params,
-        )
-        response.raise_for_status()
-    except requests.exceptions.HTTPError as err:
-        raise SystemExit(err)
+    response = post_content(
+        f"{ZENODO_BASE_URL}/api/deposit/depositions/{deposition_id}/actions/publish",
+        params=params,
+    )
+    # TODO: Add status check
 
-    try:
-        response = requests.get(
-            f"{ZENODO_API_URL}/deposit/depositions/{deposition_id}",
-            params=params,
-        )
-        response.raise_for_status()
-    except requests.exceptions.HTTPError as err:
-        raise SystemExit(err)
+    response = get_content(
+        f"{ZENODO_BASE_URL}/api/deposit/depositions/{deposition_id}", params
+    )
+    fileobj = response["files"][0]
+    url = f'ZENODO_BASE_URL/record/{response["metadata"]["prereserve_doi"]["recid"]}/files/{filename}?download=1'
 
-    fileobj = response.json()["files"][0]
-    md5 = fileobj["checksum"]
-    name = fileobj["filename"]
-    url = f'https://zenodo.org/record/{response.json()["metadata"]["prereserve_doi"]["recid"]}/files/{name}?download=1'
-
-    return {"url": url, "name": name, "md5": md5}
+    return {
+        "url": url,
+        "name": fileobj["filename"],
+        "md5": fileobj["checksum"],
+    }
 
 
-def update_existing_singularity_container(sngularity_dict, model_group):
+def update_existing_singularity_container(
+    singularity_dict, model_group, push=False
+):
     ACCESS_TOKEN = os.environ.get("ZENODO_ACCESS_TOKEN", "")
-    url = sngularity_dict["url"]
-    deposition_id = url.split("/")[4]
     params = {"access_token": ACCESS_TOKEN}
-    # Create a new version of an existing deposition
-    try:
-        response = requests.post(
-            f"https://zenodo.org/api/deposit/depositions/{deposition_id}/actions/newversion",
-            params=params,
-        )
-        response.raise_for_status()
-    except requests.exceptions.HTTPError as err:
-        raise SystemExit(err)
-
-    new_deposition_id = response.json()["links"]["latest_draft"].split("/")[-1]
-    assert new_deposition_id != deposition_id
-
-    # Delete existing file from this new version
-    try:
-        response = requests.get(
-            f"https://zenodo.org/api/deposit/depositions/{new_deposition_id}",
-            params=params,
-        )
-        response.raise_for_status()
-    except requests.exceptions.HTTPError as err:
-        raise SystemExit(err)
-
-    bucket_url = response.json()["links"]["bucket"]
-    file_id = response.json()["files"][0]["id"]
-    try:
-        response = requests.delete(
-            f"https://zenodo.org/api/deposit/depositions/{new_deposition_id}/files/{file_id}",
-            # Assuming there will always be one file associated with each version
-            params=params,
-        )
-        response.raise_for_status()
-    except requests.exceptions.HTTPError as err:
-        raise SystemExit(err)
-    assert response.status_code == 204
-    # Add a new file to this new version
-    filename = sngularity_dict["name"]
     singularity_image_folder = os.environ.get(
         "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
     )
-    path = singularity_image_folder / f"{filename}.sif"
+
+    # Create a new version of an existing deposition
+    deposition_id = singularity_dict["url"].split("/")[4]
+    status_code, response = post_content(
+        f"ZENODO_BASE_URL/api/deposit/depositions/{deposition_id}/actions/newversion",
+        params=params,
+    )
+    assert status_code == 201
+
+    new_deposition_id = response["links"]["latest_draft"].split("/")[-1]
+    assert new_deposition_id != deposition_id
+
+    # Delete existing file from this new version
+    response = get_content(
+        f"ZENODO_BASE_URL/api/deposit/depositions/{new_deposition_id}", params
+    )
+    bucket_url = response["links"]["bucket"]
+    file_id = response["files"][0]["id"]
+    response = delete_content(
+        f"ZENODO_BASE_URL/api/deposit/depositions/{new_deposition_id}/files/{file_id}",
+        params=params,
+    )
+
+    # Add a new file to this new version
+    filename = f"{singularity_dict['name']}.sif"
+    path = singularity_image_folder / filename
     assert path.exists()
 
     with open(path, "rb") as fp:
-        try:
-            response = requests.put(
-                f"{bucket_url}/{filename}.sif",
-                data=fp,
-                params=params,
-            )
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
-            raise SystemExit(err)
-    assert (
-        response.json()["links"]["self"] == f"{bucket_url}/{filename}.sif"
-    )  # This is same as
-    assert response.status_code == 200
-
-    try:
-        response = requests.post(
-            f"{ZENODO_API_URL}/deposit/depositions/{new_deposition_id}/actions/publish",
+        response = put_content(
+            f"{bucket_url}/{filename}", params=params, data=fp
+        )
+    assert response["links"]["self"] == f"{bucket_url}/{filename}"
+    # publish the newly created revision
+    if push:
+        status_code, response = post_content(
+            f"{ZENODO_BASE_URL}/api/deposit/depositions/{new_deposition_id}/actions/publish",
             params=params,
         )
-        response.raise_for_status()
-    except requests.exceptions.HTTPError as err:
-        raise SystemExit(err)
-
-    try:
-        response = requests.get(
-            f"{ZENODO_API_URL}/deposit/depositions/{new_deposition_id}",
-            params=params,
+        assert status_code == 202
+        response = get_content(
+            f"{ZENODO_BASE_URL}/api/deposit/depositions/{new_deposition_id}",
+            params,
         )
-        response.raise_for_status()
-    except requests.exceptions.HTTPError as err:
-        raise SystemExit(err)
-
-    fileobj = response.json()["files"][0]
-    md5 = fileobj["checksum"]
-    name = fileobj["filename"]
-    url = f'https://zenodo.org/record/{response.json()["metadata"]["prereserve_doi"]["recid"]}/files/{name}?download=1'
-
-    return {"url": url, "name": name, "md5": md5}
+        fileobj = response["files"][0]
+        url = f'{ZENODO_BASE_URL}/record/{response["metadata"]["prereserve_doi"]["recid"]}/files/{filename}?download=1'
+        return {
+            "url": url,
+            "name": fileobj["filename"],
+            "md5": fileobj["checksum"],
+        }
+    else:
+        return singularity_dict
 
 
 def populate_singularity_container_info():
@@ -252,4 +259,4 @@ def write_singularity_container_info(model_group_to_singularity_image_dict):
     with open(
         Path.cwd() / "test-containers" / "model-group-to-singularity.json", "w"
     ) as fp:
-        json.dump(model_group_to_singularity_image_dict, fp, indent=2)
+        json.dump(model_group_to_singularity_image_dict, fp, indent=4)
