@@ -147,7 +147,12 @@ def test_singularity_image(
 
 
 def push_new_singularity_image(
-    singularity_dict, model_group, file_to_upload="", path="", push=False
+    singularity_dict,
+    model_group,
+    file_to_upload="",
+    path="",
+    push=False,
+    cleanup=True,
 ):
     """
     This function pushes a singularity image to zenodo
@@ -181,7 +186,8 @@ def push_new_singularity_image(
     response = put_content(
         f"{bucket_url}/{filename}", params=params, data=path
     )
-    cleanup(path)
+    if cleanup:
+        cleanup(path)
     assert response["links"]["self"] == f"{bucket_url}/{filename}"
 
     data = {
@@ -219,7 +225,12 @@ def push_new_singularity_image(
 
 
 def update_existing_singularity_container(
-    singularity_dict, model_group, file_to_upload="", path="", push=False
+    singularity_dict,
+    model_group,
+    file_to_upload="",
+    path="",
+    push=False,
+    cleanup=True,
 ):
     params = get_zenodo_access_token()
     singularity_image_folder = (
@@ -263,7 +274,8 @@ def update_existing_singularity_container(
     response = put_content(
         f"{bucket_url}/{filename}", params=params, data=path
     )
-    cleanup(path)
+    if cleanup:
+        cleanup(path)
     assert response["links"]["self"] == f"{bucket_url}/{filename}"
     # publish the newly created revision
     if push:

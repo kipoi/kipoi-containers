@@ -63,6 +63,7 @@ def test_push_new_singularity_image():
         model_group="Dummy",
         file_to_upload="busybox_1.34.1.sif",
         path=Path(__file__).parent.resolve(),
+        cleanup=False,
     )
     assert test_singularity_dict == new_singularity_dict
     r = requests.delete(
@@ -87,6 +88,7 @@ def test_update_existing_singularity_container():
         model_group="Test",
         file_to_upload="busybox_1.34.1.sif",
         path=Path(__file__).parent.resolve(),
+        cleanup=False,
     )
     assert (
         new_test_singularity_dict == test_singularity_dict
