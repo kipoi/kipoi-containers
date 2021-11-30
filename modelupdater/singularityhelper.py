@@ -4,16 +4,17 @@ from pathlib import Path
 import json
 
 from spython.main import Client
+from kipoi_utils.external.torchvision.dataset_utils import check_integrity
 
 
 ZENODO_BASE_URL = "https://zenodo.org"
 
 
-def cleanup(images=False):
+def cleanup(singularity_file_path):
     """
-    Cleans up unused singularity containers, volumes and networks
+    Cleans up singularity containers that werecreated in build_singularity_image
     """
-    pass
+    singularity_file_path.unlink()
 
 
 def get_zenodo_access_token():
@@ -83,7 +84,7 @@ def delete_content(url, params):
     assert response.status_code == 204
 
 
-def build_singularity_image(name_of_docker_image, singularity_image_name):
+def build_singularity_image(name_of_docker_image, singularity_dict):
     """
     This function builds a singularity image from an existing singularity image
     Parameters
@@ -91,16 +92,24 @@ def build_singularity_image(name_of_docker_image, singularity_image_name):
     singularity_image_name : str
         Name of the singularity image to build
     """
+    singularity_image_name = f'{singularity_dict["name"]}.sif'
+    singularity_md5 = singularity_dict.get("md5", "")
+
     singularity_image_folder = os.environ.get(
         "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
     )
-    singualrity_image = Client.pull(
+    singularity_image_path = Client.pull(
         image=f"docker://{name_of_docker_image}",
         pull_folder=singularity_image_folder,
         force=True,
-        name=f"{singularity_image_name}.sif",
+        name=singularity_image_name,
     )
-    return singualrity_image  # TODO: Investigate what does it return?
+    checksum_match = check_integrity(singularity_image_path, singularity_md5)
+    if checksum_match:
+        cleanup(singularity_image_path)
+        return False
+    else:
+        return True
 
 
 def test_singularity_image(
@@ -172,6 +181,7 @@ def push_new_singularity_image(
     response = put_content(
         f"{bucket_url}/{filename}", params=params, data=path
     )
+    cleanup(path)
     assert response["links"]["self"] == f"{bucket_url}/{filename}"
 
     data = {
@@ -253,6 +263,7 @@ def update_existing_singularity_container(
     response = put_content(
         f"{bucket_url}/{filename}", params=params, data=path
     )
+    cleanup(path)
     assert response["links"]["self"] == f"{bucket_url}/{filename}"
     # publish the newly created revision
     if push:

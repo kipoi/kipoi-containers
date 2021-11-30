@@ -16,6 +16,7 @@ from .singularityhelper import (
     write_singularity_container_info,
 )
 
+
 CONTAINER_PREFIX = "shared/containers"
 
 
@@ -141,24 +142,32 @@ class ModelSyncer:
                     model_group
                 ]
                 singularity_image_name = singularity_dict["name"]
-                build_singularity_image(
-                    name_of_docker_image, singularity_image_name
+
+                should_update_existing_container_info = (
+                    build_singularity_image(
+                        name_of_docker_image, singularity_dict
+                    )
                 )
-                test_singularity_image(singularity_dict, models_to_test)
-                (
-                    _,
-                    _,
-                    new_singularity_dict,
-                ) = update_existing_singularity_container(
-                    singularity_dict, model_group
-                )
-                print(new_singularity_dict)
-                self.model_group_to_singularity_image_dict[
-                    model_group
-                ] = new_singularity_dict
-                write_singularity_container_info(
-                    self.model_group_to_singularity_image_dict
-                )
+                if should_update_existing_container_info:
+                    test_singularity_image(singularity_dict, models_to_test)
+                    (
+                        _,
+                        _,
+                        new_singularity_dict,
+                    ) = update_existing_singularity_container(
+                        singularity_dict, model_group
+                    )
+                    print(new_singularity_dict)
+                    self.model_group_to_singularity_image_dict[
+                        model_group
+                    ] = new_singularity_dict
+                    write_singularity_container_info(
+                        self.model_group_to_singularity_image_dict
+                    )
+                else:
+                    print(
+                        f"No need to update the existing singularity container for {model_group}"
+                    )
             else:
                 print(f"We will not be updating {name_of_docker_image}")
         else:
