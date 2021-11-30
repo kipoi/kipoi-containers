@@ -125,7 +125,7 @@ class ModelSyncer:
             Model group to update or add
         """
         if model_group in self.model_group_to_image_dict:
-            # model_updater = ModelUpdater()
+            model_updater = ModelUpdater()
             name_of_docker_image = self.model_group_to_image_dict[model_group]
             with open(
                 Path.cwd() / "test-containers" / "image-name-to-model.json",
@@ -134,10 +134,10 @@ class ModelSyncer:
                 image_to_model_dict = json.load(infile)
                 models_to_test = image_to_model_dict[name_of_docker_image]
             if "shared" not in name_of_docker_image:
-                # model_updater.update(
-                #     model_group=model_group,
-                #     name_of_docker_image=name_of_docker_image,
-                # )
+                model_updater.update(
+                    model_group=model_group,
+                    name_of_docker_image=name_of_docker_image,
+                )
                 singularity_dict = self.model_group_to_singularity_image_dict[
                     model_group
                 ]
