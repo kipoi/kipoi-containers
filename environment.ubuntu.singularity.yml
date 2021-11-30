@@ -1,0 +1,9 @@
+name: py39
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - pip
+  - python=3.9
+  - singularity

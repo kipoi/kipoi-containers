@@ -2,9 +2,22 @@ import os
 import json
 from pathlib import Path
 
+from kipoi import get_source
+
 from .adder import ModelAdder
 from github import Github
 from .updater import ModelUpdater
+from .singularityhelper import (
+    build_singularity_image,
+    test_singularity_image,
+    push_new_singularity_image,
+    update_existing_singularity_container,
+    populate_singularity_container_info,
+    write_singularity_container_info,
+)
+
+
+CONTAINER_PREFIX = "shared/containers"
 
 
 class ModelSyncer:
@@ -41,6 +54,9 @@ class ModelSyncer:
             "r",
         ) as infile:
             self.model_group_to_image_dict = json.load(infile)
+        self.model_group_to_singularity_image_dict = (
+            populate_singularity_container_info()
+        )
 
     def get_list_of_updated_model_groups(self):
         """
@@ -111,11 +127,47 @@ class ModelSyncer:
         if model_group in self.model_group_to_image_dict:
             model_updater = ModelUpdater()
             name_of_docker_image = self.model_group_to_image_dict[model_group]
+            with open(
+                Path.cwd() / "test-containers" / "image-name-to-model.json",
+                "r",
+            ) as infile:
+                image_to_model_dict = json.load(infile)
+                models_to_test = image_to_model_dict[name_of_docker_image]
             if "shared" not in name_of_docker_image:
                 model_updater.update(
                     model_group=model_group,
                     name_of_docker_image=name_of_docker_image,
                 )
+                singularity_dict = self.model_group_to_singularity_image_dict[
+                    model_group
+                ]
+                singularity_image_name = singularity_dict["name"]
+
+                should_update_existing_container_info = (
+                    build_singularity_image(
+                        name_of_docker_image, singularity_dict
+                    )
+                )
+                if should_update_existing_container_info:
+                    test_singularity_image(singularity_dict, models_to_test)
+                    (
+                        _,
+                        _,
+                        new_singularity_dict,
+                    ) = update_existing_singularity_container(
+                        singularity_dict, model_group
+                    )
+                    print(new_singularity_dict)
+                    self.model_group_to_singularity_image_dict[
+                        model_group
+                    ] = new_singularity_dict
+                    write_singularity_container_info(
+                        self.model_group_to_singularity_image_dict
+                    )
+                else:
+                    print(
+                        f"No need to update the existing singularity container for {model_group}"
+                    )
             else:
                 print(f"We will not be updating {name_of_docker_image}")
         else:
@@ -125,6 +177,22 @@ class ModelSyncer:
                 kipoi_container_repo=self.kipoi_container_repo,
             )
             model_adder.add()
+            singularity_image_name = f"kipoi-docker_{model_group.lower()}.sif"
+            build_singularity_image(
+                model_adder.image_name, singularity_image_name
+            )
+            singularity_dict = {"name": singularity_image_name}
+            test_singularity_image(singularity_dict, models_to_test)
+            _, new_singularity_dict = push_new_singularity_image(
+                singularity_dict, model_group
+            )
+            print(new_singularity_dict)
+            self.model_group_to_singularity_image_dict[
+                model_group
+            ] = new_singularity_dict
+            write_singularity_container_info(
+                self.model_group_to_singularity_image_dict
+            )
 
     def sync(self):
         """
