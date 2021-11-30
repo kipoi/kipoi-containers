@@ -49,9 +49,27 @@ def test_get_existing_sc_by_recordid():
     )
 
 
-# def test_push_new_singularity_image():
-#     test_singularity_dict = singularityhelper.push_new_singularity_image("tiny-container_latest.sif", "Dummymodel")
-#     assert test_singularity_dict == {"url": "", "name": "tiny-container_latest.sif", "md5": ""}
+def test_push_new_singularity_image():
+    test_singularity_dict = {
+        "url": "https://zenodo.org/record/5725936/files/tiny-container_latest.sif?download=1",
+        "name": "tiny-container_latest.sif",
+        "md5": "0a85bfc85e749894210d1e53b4add11d",
+    }
+    (
+        deposition_id,
+        new_singularity_dict,
+    ) = singularityhelper.push_new_singularity_image(
+        test_singularity_dict,
+        model_group="Dummy",
+        file_to_upload="busybox_1.34.1.sif",
+        path=Path(__file__).parent.resolve(),
+    )
+    assert test_singularity_dict == new_singularity_dict
+    r = requests.delete(
+        f"https://zenodo.org/api/deposit/depositions/{deposition_id}",
+        params=singularityhelper.get_zenodo_access_token(),
+    )
+    assert r.status_code == 204
 
 
 def test_update_existing_singularity_container():

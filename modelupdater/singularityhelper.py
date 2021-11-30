@@ -46,7 +46,9 @@ def put_content(
                 raise SystemExit(err)
     else:
         try:
-            response = requests.put(url, data=json.dumps(data), params=params)
+            response = requests.put(
+                url, data=json.dumps(data), params=params, headers=headers
+            )
             response.raise_for_status()
         except requests.exceptions.HTTPError as err:
             raise SystemExit(err)
@@ -135,7 +137,9 @@ def test_singularity_image(
             )
 
 
-def push_new_singularity_image(singularity_image_name, model_group):
+def push_new_singularity_image(
+    singularity_dict, model_group, file_to_upload="", path="", push=False
+):
     """
     This function pushes a singularity image to zenodo
     Parameters
@@ -143,22 +147,32 @@ def push_new_singularity_image(singularity_image_name, model_group):
     tag : str
        Tag of the singularity image to push
     """
-    ACCESS_TOKEN = os.environ.get("ZENODO_ACCESS_TOKEN", "")
-    params = {"access_token": ACCESS_TOKEN}
+    params = get_zenodo_access_token()
     status_code, response = post_content(
-        f"{ZENODO_BASE_URL}/deposit/depositions", params=params
+        f"{ZENODO_BASE_URL}/api/deposit/depositions", params=params
     )
-    # TODO: Add status check
+    assert status_code == 201
 
     deposition_id = response["id"]
     bucket_url = response["links"]["bucket"]
-    filename = singularity_image_name
-    path = Path(__file__).resolve().parent / filename
 
-    with open(path, "rb") as fp:
-        response = put_content(
-            url=f"{bucket_url}/{filename}", params=params, data=fp
+    singularity_image_folder = (
+        Path(path)
+        if path
+        else os.environ.get(
+            "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
         )
+    )
+    filename = (
+        file_to_upload if file_to_upload else f"{singularity_dict['name']}.sif"
+    )
+    path = singularity_image_folder / filename
+    assert path.exists()
+
+    response = put_content(
+        f"{bucket_url}/{filename}", params=params, data=path
+    )
+    assert response["links"]["self"] == f"{bucket_url}/{filename}"
 
     data = {
         "metadata": {
@@ -170,26 +184,28 @@ def push_new_singularity_image(singularity_image_name, model_group):
             ],
         }
     }
-    url = f"{ZENODO_BASE_URL}/api/deposit/depositions/{deposition_id}?access_token={ACCESS_TOKEN}"
-    response = put_content(url=url, params=params, data=json.dumps(data))
+    url = f"{ZENODO_BASE_URL}/api/deposit/depositions/{deposition_id}"
+    response = put_content(url=url, params=params, data=data)
+    if push:
+        status_code, response = post_content(
+            f"{ZENODO_BASE_URL}/api/deposit/depositions/{deposition_id}/actions/publish",
+            params=params,
+        )
+        assert status_code == 202
+        response = get_content(
+            f"{ZENODO_BASE_URL}/api/deposit/depositions/{deposition_id}",
+            params,
+        )
+        fileobj = response["files"][0]
+        url = f'{ZENODO_BASE_URL}/record/{response["metadata"]["prereserve_doi"]["recid"]}/files/{filename}?download=1'
 
-    response = post_content(
-        f"{ZENODO_BASE_URL}/api/deposit/depositions/{deposition_id}/actions/publish",
-        params=params,
-    )
-    # TODO: Add status check
-
-    response = get_content(
-        f"{ZENODO_BASE_URL}/api/deposit/depositions/{deposition_id}", params
-    )
-    fileobj = response["files"][0]
-    url = f'{ZENODO_BASE_URL}/record/{response["metadata"]["prereserve_doi"]["recid"]}/files/{filename}?download=1'
-
-    return {
-        "url": url,
-        "name": fileobj["filename"],
-        "md5": fileobj["checksum"],
-    }
+        return deposition_id, {
+            "url": url,
+            "name": fileobj["filename"],
+            "md5": fileobj["checksum"],
+        }
+    else:
+        return deposition_id, singularity_dict
 
 
 def update_existing_singularity_container(
