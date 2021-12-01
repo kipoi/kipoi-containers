@@ -120,5 +120,5 @@ Then, install the requirements and run the tests -
 
 ```bash
 pip install -r requirements.txt
-python -m pytest -s test-modelupdater/test_updateoradd.py test-singularity-modification/test_zenodo.py
+python -m pytest -s test-modelupdater/test_updateoradd.py test-singularity/test_singularity_modify.py
 ```

@@ -6,7 +6,7 @@ import json
 
 from spython.main import Client
 
-import zenodoclient
+from modelupdater import zenodoclient
 
 ZENODO_BASE = "https://zenodo.org"
 ZENODO_DEPOSITION = f"{ZENODO_BASE}/api/deposit/depositions"

@@ -112,4 +112,4 @@ jobs:
         pip install -r requirements.txt
     - name: Test singularity
       run: |
-        python -m pytest -s test-singularity-modification/test_zenodo.py
+        python -m pytest -s test-singularity/test_singularity_modify.py

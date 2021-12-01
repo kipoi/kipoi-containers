@@ -79,28 +79,27 @@ def test_get_existing_sc_by_recordid(zenodo_client):
 #     assert r.status_code == 204
 
 
-# def test_update_existing_singularity_container():
-#     test_singularity_dict = {
-#         "url": "https://zenodo.org/record/5725936/files/tiny-container_latest.sif?download=1",
-#         "name": "tiny-container_latest.sif",
-#         "md5": "0a85bfc85e749894210d1e53b4add11d",
-#     }
-#     (
-#         new_deposition_id,
-#         _,
-#         new_test_singularity_dict,
-#     ) = singularityhelper.update_existing_singularity_container(
-#         test_singularity_dict,
-#         model_group="Test",
-#         file_to_upload="busybox_1.34.1.sif",
-#         path=Path(__file__).parent.resolve(),
-#         cleanup=False,
-#     )
-#     assert (
-#         new_test_singularity_dict == test_singularity_dict
-#     )  # If push=True this will be different
-#     r = requests.delete(
-#         f"https://zenodo.org/api/deposit/depositions/{new_deposition_id}",
-#         params=singularityhelper.get_zenodo_access_token(),
-#     )
-#     assert r.status_code == 204
+def test_update_existing_singularity_container():
+    test_singularity_dict = {
+        "url": "https://zenodo.org/record/5725936/files/tiny-container_latest.sif?download=1",
+        "name": "tiny-container_latest.sif",
+        "md5": "0a85bfc85e749894210d1e53b4add11d",
+    }
+    new_test_singularity_dict = (
+        singularityhelper.update_existing_singularity_container(
+            singularity_dict=test_singularity_dict,
+            model_group="Test",
+            file_to_upload="busybox_1.34.1.sif",
+            singularity_image_folder=Path(__file__).parent.resolve(),
+            cleanup=False,
+        )
+    )
+    for key in ["url", "md5", "name"]:
+        assert new_test_singularity_dict.get(key) == test_singularity_dict.get(
+            key
+        )  # If push=True this will be different
+    assert new_test_singularity_dict["file_id"] == ""
+    r = zenodo_client.delete(
+        f"https://zenodo.org/api/deposit/depositions/{new_test_singularity_dict.get('new_deposition_id')}"
+    )
+    assert r.status_code == 204
