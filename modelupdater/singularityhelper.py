@@ -321,7 +321,7 @@ def write_singularity_container_info(model_group_to_singularity_image_dict):
 def total_number_of_singularity_containers(
     available_singularity_container_dict,
 ):
-    list_of_singularity_container_names = Counter(
+    unique_singularity_container_counter = Counter(
         [sc["name"] for sc in available_singularity_container_dict]
     )
-    return len(list_of_singularity_container_names.keys())
+    return len(unique_singularity_container_counter.keys())
