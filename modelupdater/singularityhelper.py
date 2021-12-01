@@ -1,3 +1,4 @@
+from collections import Counter
 import os
 import requests
 from pathlib import Path
@@ -315,3 +316,12 @@ def write_singularity_container_info(model_group_to_singularity_image_dict):
         Path.cwd() / "test-containers" / "model-group-to-singularity.json", "w"
     ) as fp:
         json.dump(model_group_to_singularity_image_dict, fp, indent=4)
+
+
+def total_number_of_singularity_containers(
+    available_singularity_container_dict,
+):
+    list_of_singularity_container_names = Counter(
+        [sc["name"] for sc in available_singularity_container_dict]
+    )
+    return len(list_of_singularity_container_names.keys())

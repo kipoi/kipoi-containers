@@ -5,7 +5,7 @@ import requests
 from typing import Dict, Tuple
 
 
-class ZenodoClient:
+class Client:
     def __init__(self):
         self.params = {
             "access_token": os.environ.get("ZENODO_ACCESS_TOKEN", "")
