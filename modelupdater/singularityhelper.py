@@ -179,6 +179,7 @@ def push_deposition(zenodo_client, filename, deposition_id):
 
 
 def update_existing_singularity_container(
+    zenodo_client,
     singularity_dict,
     singularity_image_folder,
     model_group,
@@ -186,11 +187,11 @@ def update_existing_singularity_container(
     push=False,
     cleanup=True,
 ):
-    zenodo_client = zenodoclient.Client()
-
     # Create a new version of an existing deposition
     deposition_id = singularity_dict["url"].split("/")[4]
     new_deposition_id = create_new_deposition(zenodo_client, deposition_id)
+    print(deposition_id)
+    print(new_deposition_id)
     assert new_deposition_id != deposition_id
     response = get_deposit(zenodo_client, new_deposition_id)
     bucket_url, file_id = (
@@ -245,9 +246,9 @@ def write_singularity_container_info(
 
 
 def total_number_of_singularity_containers(
-    available_singularity_container_dict,
+    available_singularity_containers,
 ):
     unique_singularity_container_counter = Counter(
-        [sc["name"] for sc in available_singularity_container_dict]
+        [sc for sc in available_singularity_containers]
     )
     return len(unique_singularity_container_counter.keys())

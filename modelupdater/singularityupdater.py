@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Union, List
+from typing import Union, List, Type
 import os
 
 from kipoi_utils.external.torchvision.dataset_utils import check_integrity
-from singularityhelper import (
+from .singularityhelper import (
     build_singularity_image,
     populate_singularity_container_info,
     update_existing_singularity_container,
@@ -12,6 +12,7 @@ from singularityhelper import (
     write_singularity_container_info,
     cleanup,
 )
+from modelupdater import zenodoclient
 
 
 @dataclass
@@ -24,6 +25,7 @@ class SingularityUpdater:
     singularity_image_folder: Union[str, Path] = os.environ.get(
         "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
     )
+    zenodo_client: Type(zenodoclient) = zenodoclient.Client()
 
     def construct_dicts(self) -> None:
         self.model_group_to_image_dict = populate_singularity_container_info(
@@ -57,6 +59,7 @@ class SingularityUpdater:
                 models_to_test,
             )
             updated_singularity_dict = update_existing_singularity_container(
+                self.zenodo_client,
                 self.singularity_dict,
                 self.singularity_image_folder,
                 self.model_group,
