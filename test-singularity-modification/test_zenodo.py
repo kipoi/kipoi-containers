@@ -3,21 +3,25 @@ import requests
 import json
 from pathlib import Path
 
-from modelupdater import singularityhelper
+import pytest
 
+from modelupdater import singularityhelper
 from modelupdater import zenodoclient
 
 
-def test_zenodo_get_access():
-    zenodo_client = zenodoclient.Client()
+@pytest.fixture(scope="module")
+def zenodo_client():
+    return zenodoclient.Client()
+
+
+def test_zenodo_get_access(zenodo_client):
     response_json = zenodo_client.get_content(
         "https://zenodo.org/api/deposit/depositions"
     )
     assert len(response_json) == 10  # By default zenodo page size is 10
 
 
-def test_get_available_sc_depositions():
-    zenodo_client = zenodoclient.Client()
+def test_get_available_sc_depositions(zenodo_client):
     singularity_container_number = (
         singularityhelper.total_number_of_singularity_containers(
             singularityhelper.populate_singularity_container_info().values()
@@ -42,8 +46,7 @@ def test_get_available_sc_depositions():
             )
 
 
-def test_get_existing_sc_by_recordid():
-    zenodo_client = zenodoclient.Client()
+def test_get_existing_sc_by_recordid(zenodo_client):
     response_json = zenodo_client.get_content(
         "https://zenodo.org/api/deposit/depositions/5643929"
     )
