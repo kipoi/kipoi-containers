@@ -5,7 +5,6 @@ from pathlib import Path
 import json
 
 from spython.main import Client
-from kipoi_utils.external.torchvision.dataset_utils import check_integrity
 
 
 ZENODO_BASE_URL = "https://zenodo.org"
@@ -94,8 +93,6 @@ def build_singularity_image(name_of_docker_image, singularity_dict):
         Name of the singularity image to build
     """
     singularity_image_name = f'{singularity_dict["name"]}.sif'
-    singularity_md5 = singularity_dict.get("md5", "")
-
     singularity_image_folder = os.environ.get(
         "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
     )
@@ -105,16 +102,11 @@ def build_singularity_image(name_of_docker_image, singularity_dict):
         force=True,
         name=singularity_image_name,
     )
-    checksum_match = check_integrity(singularity_image_path, singularity_md5)
-    if checksum_match:
-        cleanup(singularity_image_path)
-        return False
-    else:
-        return True
+    return singularity_image_path
 
 
 def test_singularity_image(
-    singularity_dict, models
+    singularity_image_folder, singularity_image_name, models
 ):  # TODO: Investigate adding this to test_containers_from_command_line
     """
     Tests a container for a given singularity image and run
@@ -128,13 +120,8 @@ def test_singularity_image(
     models : List
         Name of the models to test
     """
-    singularity_image_folder = os.environ.get(
-        "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
-    )
-    singularity_image_name = f"{singularity_dict['name']}.sif"
     for model in models:
         print(f"Testing {model} with {singularity_image_name}")
-
         result = Client.execute(
             singularity_image_folder / Path(f"{singularity_image_name}"),
             f"kipoi test {model} --source=kipoi",
@@ -304,18 +291,16 @@ def update_existing_singularity_container(
         return new_deposition_id, "", singularity_dict
 
 
-def populate_singularity_container_info():
-    with open(
-        Path.cwd() / "test-containers" / "model-group-to-singularity.json", "r"
-    ) as singularity_container_json_filehandle:
-        return json.load(singularity_container_json_filehandle)
+def populate_singularity_container_info(singularity_json):
+    with open(singularity_json, "r") as file_handle:
+        return json.load(file_handle)
 
 
-def write_singularity_container_info(model_group_to_singularity_image_dict):
-    with open(
-        Path.cwd() / "test-containers" / "model-group-to-singularity.json", "w"
-    ) as fp:
-        json.dump(model_group_to_singularity_image_dict, fp, indent=4)
+def write_singularity_container_info(
+    model_group_to_singularity_image_dict, container_json
+):
+    with open(container_json, "w") as file_handle:
+        json.dump(model_group_to_singularity_image_dict, file_handle, indent=4)
 
 
 def total_number_of_singularity_containers(

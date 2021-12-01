@@ -7,6 +7,7 @@ from kipoi import get_source
 from .adder import ModelAdder
 from github import Github
 from .updater import ModelUpdater
+from .singularityupdater import SingularityUpdater
 from .singularityhelper import (
     build_singularity_image,
     test_singularity_image,
@@ -49,14 +50,6 @@ class ModelSyncer:
         ) as kipoimodelrepohash:
             self.source_commit_hash = kipoimodelrepohash.readline()
         self.list_of_updated_model_groups = []
-        with open(
-            Path.cwd() / "test-containers" / "model-group-to-image-name.json",
-            "r",
-        ) as infile:
-            self.model_group_to_image_dict = json.load(infile)
-        self.model_group_to_singularity_image_dict = (
-            populate_singularity_container_info()
-        )
 
     def get_list_of_updated_model_groups(self):
         """
@@ -127,6 +120,10 @@ class ModelSyncer:
         if model_group in self.model_group_to_image_dict:
             model_updater = ModelUpdater()
             name_of_docker_image = self.model_group_to_image_dict[model_group]
+            singularity_updater = SingularityUpdater(
+                model_group=model_group, docker_image_name=name_of_docker_image
+            )
+
             with open(
                 Path.cwd() / "test-containers" / "image-name-to-model.json",
                 "r",
@@ -138,36 +135,7 @@ class ModelSyncer:
                     model_group=model_group,
                     name_of_docker_image=name_of_docker_image,
                 )
-                singularity_dict = self.model_group_to_singularity_image_dict[
-                    model_group
-                ]
-                singularity_image_name = singularity_dict["name"]
-
-                should_update_existing_container_info = (
-                    build_singularity_image(
-                        name_of_docker_image, singularity_dict
-                    )
-                )
-                if should_update_existing_container_info:
-                    test_singularity_image(singularity_dict, models_to_test)
-                    (
-                        _,
-                        _,
-                        new_singularity_dict,
-                    ) = update_existing_singularity_container(
-                        singularity_dict, model_group
-                    )
-                    print(new_singularity_dict)
-                    self.model_group_to_singularity_image_dict[
-                        model_group
-                    ] = new_singularity_dict
-                    write_singularity_container_info(
-                        self.model_group_to_singularity_image_dict
-                    )
-                else:
-                    print(
-                        f"No need to update the existing singularity container for {model_group}"
-                    )
+                singularity_updater.update(models_to_test)
             else:
                 print(f"We will not be updating {name_of_docker_image}")
         else:
