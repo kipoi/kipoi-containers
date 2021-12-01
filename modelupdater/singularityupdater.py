@@ -38,7 +38,9 @@ class SingularityUpdater:
         self.singularity_image_name = f'{self.singularity_dict["name"]}.sif'
 
         singularity_image_path = build_singularity_image(
-            self.docker_image_name, self.singularity_image_name
+            self.docker_image_name,
+            self.singularity_image_name,
+            self.singularity_image_folder,
         )
         checksum_match = check_integrity(
             self.singularity_image_path, self.singularity_dict["md5"]
@@ -50,18 +52,20 @@ class SingularityUpdater:
             cleanup(singularity_image_path)
         else:
             test_singularity_image(
-                self.singularity_image_folder, models_to_test
+                self.singularity_image_folder,
+                self.singularity_image_name,
+                models_to_test,
             )
-            (
-                _,
-                _,
-                updated_singularity_dict,
-            ) = update_existing_singularity_container(
-                self.singularity_dict, self.model_group
+            updated_singularity_dict = update_existing_singularity_container(
+                self.singularity_dict,
+                self.singularity_image_folder,
+                self.model_group,
             )
-        self.model_group_image_dict[
-            self.model_group
-        ] = updated_singularity_dict
+        self.model_group_image_dict[self.model_group] = {
+            k: v
+            for k, v in updated_singularity_dict.items()
+            if k in ["url", "md5", "name"]
+        }
         write_singularity_container_info(
             self.model_group_to_image_dict, self.container_json
         )
