@@ -35,13 +35,13 @@ class SingularityHandler:
         )
 
     def update_container_info(self, updated_singularity_dict: Dict) -> None:
-        self.model_group_image_dict[self.model_group] = {
+        self.model_group_to_image_dict[self.model_group] = {
             k: v
             for k, v in updated_singularity_dict.items()
             if k in ["url", "md5", "name"]
         }
         write_singularity_container_info(
-            self.model_group_to_image_dict, self.container_json
+            self.model_group_to_image_dict, self.container_info
         )
 
     def add(self, models_to_test: List) -> None:
