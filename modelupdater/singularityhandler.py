@@ -106,4 +106,5 @@ class SingularityHandler:
                 singularity_image_folder=self.singularity_image_folder,
                 model_group=self.model_group,
             )
+            cleanup(singularity_image_path)
             self.update_container_info(updated_singularity_dict)

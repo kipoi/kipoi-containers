@@ -135,24 +135,70 @@ def test_singularityhandler_noupdate(capsys, monkeypatch):
     assert original_container_dict == updated_container_dict
 
 
-# def test_singularityhandler_update(capsys):
-#     models_to_test = [
-#         "MPRA-DragoNN/ConvModel",
-#         "MPRA-DragoNN/DeepFactorizedModel",
-#     ]
-#     singularity_handler = singularityhandler.SingularityHandler(
-#         model_group="MPRA-DragoNN",
-#         docker_image_name="kipoi/kipoi-docker:mpra-dragonn",
-#         singularity_image_folder=Path(__file__).parent.resolve(),
-#     )
-#     with open(singularity_handler.container_info, "r") as file_handle:
-#         original_container_dict = json.load(file_handle)
-#     singularity_handler.update(models_to_test)
-#     captured = capsys.readouterr()
-#     print(captured)
-#     with open(singularity_handler.container_info, "r") as file_handle:
-#         updated_container_dict = json.load(file_handle)
-#     assert original_container_dict == updated_container_dict  # Wont pass
+def test_singularityhandler_update(monkeypatch):
+    def mock_build_singularity_image(*args, **kwargs):
+        return (
+            Path(__file__).parent.resolve() / "kipoi-docker_mpra-dragonn.sif"
+        )
+
+    def mock_check_integrity(*args, **kwargs):
+        return False
+
+    def mock_cleanup(*args, **kwargs):
+        return
+
+    def mock_test_singularity_image(*args, **kwargs):
+        return
+
+    def mock_update_existing_singularity_container(*args, **kwargs):
+        return {
+            "new_deposition_id": "123",
+            "file_id": "456",
+            "url": "https://dummy.url",
+            "name": "wrong_name",
+            "md5": "78758738",
+        }
+
+    models_to_test = [
+        "MPRA-DragoNN/ConvModel",
+        "MPRA-DragoNN/DeepFactorizedModel",
+    ]
+    singularity_handler = singularityhandler.SingularityHandler(
+        model_group="MPRA-DragoNN",
+        docker_image_name="kipoi/kipoi-docker:mpra-dragonn",
+        singularity_image_folder=Path(__file__).parent.resolve(),
+    )
+    monkeypatch.setattr(
+        "modelupdater.singularityhandler.cleanup", mock_cleanup
+    )
+    monkeypatch.setattr(
+        "modelupdater.singularityhandler.build_singularity_image",
+        mock_build_singularity_image,
+    )
+    monkeypatch.setattr(
+        "modelupdater.singularityhandler.test_singularity_image",
+        mock_test_singularity_image,
+    )
+    monkeypatch.setattr(
+        "modelupdater.singularityhandler.update_existing_singularity_container",
+        mock_update_existing_singularity_container,
+    )
+    monkeypatch.setattr(
+        "modelupdater.singularityhandler.check_integrity", mock_check_integrity
+    )
+    with open(singularity_handler.container_info, "r") as file_handle:
+        original_container_dict = json.load(file_handle)
+    singularity_handler.update(models_to_test)
+    with open(singularity_handler.container_info, "r") as file_handle:
+        updated_container_dict = json.load(file_handle)
+    assert updated_container_dict.get("MPRA-DragoNN") == {
+        "url": "https://dummy.url",
+        "name": "wrong_name",
+        "md5": "78758738",
+    }
+    singularityhelper.write_singularity_container_info(
+        original_container_dict, singularity_handler.container_info
+    )
 
 
 # def test_singularityhandler_add(capsys):
