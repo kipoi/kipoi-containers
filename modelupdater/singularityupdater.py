@@ -25,7 +25,7 @@ class SingularityUpdater:
     singularity_image_folder: Union[str, Path] = os.environ.get(
         "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
     )
-    zenodo_client: Type(zenodoclient) = zenodoclient.Client()
+    zenodo_client = zenodoclient.Client()
 
     def construct_dicts(self) -> None:
         self.model_group_to_image_dict = populate_singularity_container_info(
