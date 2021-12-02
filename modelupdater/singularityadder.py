@@ -34,7 +34,9 @@ class SingularityAdder:
 
     def add(self, models_to_test: List) -> None:
         self.construct_dicts()
-        self.singularity_image_name = f'{self.singularity_dict["name"]}.sif'
+        self.singularity_image_name = (
+            f"kipoi-docker_{self.model_group.lower()}.sif"
+        )
         self.singularity_dict = {
             "url": "",
             "md5": "",
