@@ -22,7 +22,7 @@ class SingularityHandler:
     model_group: str
     docker_image_name: str
     container_info: Union[str, Path] = (
-        Path.cwd() / "test-containers" / "model-group-to-image-name.json"
+        Path.cwd() / "test-containers" / "model-group-to-singularity.json"
     )
     singularity_image_folder: Union[str, Path] = os.environ.get(
         "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
