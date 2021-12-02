@@ -75,10 +75,10 @@ class SingularityHandler:
         self.update_container_info(new_singularity_dict)
 
     def update(self, models_to_test: List) -> None:
-        self.singularity_image_name = f'{self.singularity_dict["name"]}.sif'
-        self.singularity_dict = self.model_group_to_image_dict.get(
+        self.singularity_dict = self.model_group_to_image_dict[
             self.model_group
-        )
+        ]
+        self.singularity_image_name = f'{self.singularity_dict["name"]}.sif'
         singularity_image_path = build_singularity_image(
             name_of_docker_image=self.docker_image_name,
             singularity_image_name=self.singularity_image_name,
