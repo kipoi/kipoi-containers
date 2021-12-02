@@ -8,14 +8,7 @@ from .adder import ModelAdder
 from github import Github
 from .updater import ModelUpdater
 from .singularityhandler import SingularityHandler
-from .singularityhelper import (
-    build_singularity_image,
-    test_singularity_image,
-    push_new_singularity_image,
-    update_existing_singularity_container,
-    populate_singularity_container_info,
-    write_singularity_container_info,
-)
+from .singularityhelper import populate_singularity_container_info
 
 
 CONTAINER_PREFIX = "shared/containers"
@@ -49,6 +42,11 @@ class ModelSyncer:
             "./modelupdater/kipoi-model-repo-hash", "r"
         ) as kipoimodelrepohash:
             self.source_commit_hash = kipoimodelrepohash.readline()
+        with open(
+            Path.cwd() / "test-containers" / "model-group-to-image-name.json",
+            "r",
+        ) as infile:
+            self.model_group_to_image_dict = json.load(infile)
         self.list_of_updated_model_groups = []
 
     def get_list_of_updated_model_groups(self):
@@ -117,18 +115,18 @@ class ModelSyncer:
         model_group : str
             Model group to update or add
         """
+        name_of_docker_image = self.model_group_to_image_dict[model_group]
         with open(
             Path.cwd() / "test-containers" / "image-name-to-model.json",
             "r",
         ) as infile:
             image_to_model_dict = json.load(infile)
-            name_of_docker_image = self.model_group_to_image_dict[model_group]
-            models_to_test = image_to_model_dict[name_of_docker_image]
+        models_to_test = image_to_model_dict[name_of_docker_image]
         if model_group in self.model_group_to_image_dict:
-            model_updater = ModelUpdater()
             singularity_handler = SingularityHandler(
                 model_group=model_group, docker_image_name=name_of_docker_image
             )
+            model_updater = ModelUpdater()
             if "shared" not in name_of_docker_image:
                 model_updater.update(
                     model_group=model_group,

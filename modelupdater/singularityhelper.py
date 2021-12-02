@@ -27,6 +27,8 @@ def build_singularity_image(
     singularity_image_name : str
         Name of the singularity image to build
     """
+    if isinstance(singularity_image_folder, Path):
+        singularity_image_folder = str(singularity_image_folder)
     singularity_image_path = Client.pull(
         image=f"docker://{name_of_docker_image}",
         pull_folder=singularity_image_folder,

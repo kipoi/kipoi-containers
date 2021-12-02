@@ -35,8 +35,6 @@ class SingularityHandler:
             self.singularity_image_folder = os.environ.get(
                 "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
             )
-        if isinstance(self.singularity_image_folder, str):
-            self.singularity_image_folder = Path(self.singularity_image_folder)
 
     def update_container_info(self, updated_singularity_dict: Dict) -> None:
         self.model_group_to_image_dict[self.model_group] = {
@@ -57,7 +55,6 @@ class SingularityHandler:
             "md5": "",
             "name": self.singularity_image_name,
         }
-
         build_singularity_image(
             name_of_docker_image=self.docker_image_name,
             singularity_image_name=self.singularity_image_name,
