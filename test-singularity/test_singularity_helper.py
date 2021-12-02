@@ -22,7 +22,7 @@ def test_zenodo_get_access(zenodo_client):
 
 
 def test_get_available_sc_depositions(zenodo_client):
-    singularity_handler = singularityhandler.SingularityHelper(
+    singularity_handler = singularityhandler.SingularityHandler(
         "Basset", "Dummy"
     )
     singularity_container_number = (

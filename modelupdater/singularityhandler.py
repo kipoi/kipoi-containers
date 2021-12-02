@@ -55,20 +55,20 @@ class SingularityHandler:
         }
 
         build_singularity_image(
-            self.docker_image_name,
-            self.singularity_image_name,
-            self.singularity_image_folder,
+            name_of_docker_image=self.docker_image_name,
+            singularity_image_name=self.singularity_image_name,
+            singularity_image_folder=self.singularity_image_folder,
         )
         test_singularity_image(
-            self.singularity_image_folder,
-            self.singularity_image_name,
-            models_to_test,
+            singularity_image_folder=self.singularity_image_folder,
+            singularity_image_name=self.singularity_image_name,
+            models=models_to_test,
         )
         new_singularity_dict = push_new_singularity_image(
-            self.zenodo_client,
-            self.singularity_image_folder,
-            self.singularity_dict,
-            self.model_group,
+            zenodo_client=self.zenodo_client,
+            singularity_image_folder=self.singularity_image_folder,
+            singularity_dict=self.singularity_dict,
+            model_group=self.model_group,
         )
         self.update_container_info(new_singularity_dict)
 
@@ -78,9 +78,9 @@ class SingularityHandler:
             self.model_group
         )
         singularity_image_path = build_singularity_image(
-            self.docker_image_name,
-            self.singularity_image_name,
-            self.singularity_image_folder,
+            name_of_docker_image=self.docker_image_name,
+            singularity_image_name=self.singularity_image_name,
+            singularity_image_folder=self.singularity_image_folder,
         )
         checksum_match = check_integrity(
             self.singularity_image_path, self.singularity_dict["md5"]
@@ -92,14 +92,14 @@ class SingularityHandler:
             cleanup(singularity_image_path)
         else:
             test_singularity_image(
-                self.singularity_image_folder,
-                self.singularity_image_name,
-                models_to_test,
+                singularity_image_folder=self.singularity_image_folder,
+                singularity_image_name=self.singularity_image_name,
+                models=models_to_test,
             )
             updated_singularity_dict = update_existing_singularity_container(
-                self.zenodo_client,
-                self.singularity_dict,
-                self.singularity_image_folder,
-                self.model_group,
+                zenodo_client=self.zenodo_client,
+                singularity_dict=self.singularity_dict,
+                singularity_image_folder=self.singularity_image_folder,
+                model_group=self.model_group,
             )
         self.update_container_info(updated_singularity_dict)
