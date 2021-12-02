@@ -96,7 +96,8 @@ def upload_metadata(zenodo_client, url, model_group):
         "metadata": {
             "title": f"{model_group} singularity container",
             "upload_type": "physicalobject",
-            "description": f"This is a singularity container for models under http://kipoi.org/models/{model_group}/",
+            "description": "This is a singularity container for models "
+            f"under http://kipoi.org/models/{model_group}/",
             "creators": [
                 {"name": "Haimasree, Bhattacharya", "affiliation": "EMBL"}
             ],
@@ -104,7 +105,6 @@ def upload_metadata(zenodo_client, url, model_group):
     }
     response = zenodo_client.put_content(url, data=data)
     assert response["links"]["self"] == url
-    return response
 
 
 def push_deposition(zenodo_client, deposition_id):
@@ -155,10 +155,11 @@ def update_existing_singularity_container(
     # publish the newly created revision
     if push:
         response = push_deposition(zenodo_client, new_deposition_id)
+        record_id = response["metadata"]["prereserve_doi"]["recid"]
         return {
             "new_deposition_id": new_deposition_id,
             "file_id": response["files"][0]["id"],
-            "url": f'{ZENODO_BASE}/record/{response["metadata"]["prereserve_doi"]["recid"]}/files/{filename}?download=1',
+            "url": f"{ZENODO_BASE}/record/{record_id}/files/{filename}?download=1",
             "name": response["files"][0]["filename"],
             "md5": response["files"][0]["checksum"],
         }
@@ -204,16 +205,17 @@ def push_new_singularity_image(
     )
 
     url = f"{ZENODO_DEPOSITION}/{deposition_id}"
-    response = upload_metadata(zenodo_client, url, model_group)
+    upload_metadata(zenodo_client, url, model_group)
     if push:
         push_deposition(zenodo_client, deposition_id)
         response = get_deposit(
             zenodo_client, deposition_id
         )  # TODO: Is this important here?
+        record_id = response["metadata"]["prereserve_doi"]["recid"]
         return {
             "new_deposition_id": deposition_id,
             "file_id": response["files"][0]["id"],
-            "url": f'{ZENODO_BASE}/record/{response["metadata"]["prereserve_doi"]["recid"]}/files/{filename}?download=1',
+            "url": f"{ZENODO_BASE}/record/{record_id}/files/{filename}?download=1",
             "name": response["files"][0]["filename"],
             "md5": response["files"][0]["checksum"],
         }
