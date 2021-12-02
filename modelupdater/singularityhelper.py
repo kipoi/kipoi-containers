@@ -65,82 +65,6 @@ def test_singularity_image(
             )
 
 
-# def push_new_singularity_image(
-#     singularity_dict,
-#     model_group,
-#     file_to_upload="",
-#     path="",
-#     push=False,
-#     cleanup=True,
-# ):
-#     """
-#     This function pushes a singularity image to zenodo
-#     Parameters
-#     ----------
-#     tag : str
-#        Tag of the singularity image to push
-#     """
-#     params = get_zenodo_access_token()
-#     status_code, response = post_content(f"{ZENODO_DEPOSITION}", params=params)
-#     assert status_code == 201
-
-#     deposition_id = response["id"]
-#     bucket_url = response["links"]["bucket"]
-
-#     singularity_image_folder = (
-#         Path(path)
-#         if path
-#         else os.environ.get(
-#             "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
-#         )
-#     )
-#     filename = (
-#         file_to_upload if file_to_upload else f"{singularity_dict['name']}.sif"
-#     )
-#     path = singularity_image_folder / filename
-#     assert path.exists()
-
-#     response = put_content(
-#         f"{bucket_url}/{filename}", params=params, data=path
-#     )
-#     if cleanup:
-#         cleanup(path)
-#     assert response["links"]["self"] == f"{bucket_url}/{filename}"
-
-#     data = {
-#         "metadata": {
-#             "title": f"{model_group} singularity container",
-#             "upload_type": "physicalobject",
-#             "description": f"This is a singularity container for models under http://kipoi.org/models/{model_group}/",
-#             "creators": [
-#                 {"name": "Haimasree, Bhattacharya", "affiliation": "EMBL"}
-#             ],
-#         }
-#     }
-#     url = f"{ZENODO_DEPOSITION}/{deposition_id}"
-#     response = put_content(url=url, params=params, data=data)
-#     if push:
-#         status_code, response = post_content(
-#             f"{ZENODO_DEPOSITION}/{deposition_id}/actions/publish",
-#             params=params,
-#         )
-#         assert status_code == 202
-#         response = get_content(
-#             f"{ZENODO_DEPOSITION}/{deposition_id}",
-#             params,
-#         )
-#         fileobj = response["files"][0]
-#         url = f'{ZENODO_BASE}/record/{response["metadata"]["prereserve_doi"]["recid"]}/files/{filename}?download=1'
-
-#         return deposition_id, {
-#             "url": url,
-#             "name": fileobj["filename"],
-#             "md5": fileobj["checksum"],
-#         }
-#     else:
-#         return deposition_id, singularity_dict
-
-
 def create_new_deposition(zenodo_client, deposition_id):
     status_code, response = zenodo_client.post_content(
         f"{ZENODO_DEPOSITION}/{deposition_id}/actions/newversion"
@@ -167,7 +91,23 @@ def upload_file(
     assert response["links"]["self"] == url
 
 
-def push_deposition(zenodo_client, filename, deposition_id):
+def upload_metadata(zenodo_client, url, model_group):
+    data = {
+        "metadata": {
+            "title": f"{model_group} singularity container",
+            "upload_type": "physicalobject",
+            "description": f"This is a singularity container for models under http://kipoi.org/models/{model_group}/",
+            "creators": [
+                {"name": "Haimasree, Bhattacharya", "affiliation": "EMBL"}
+            ],
+        }
+    }
+    response = zenodo_client.put_content(url, data=data)
+    assert response["links"]["self"] == url
+    return response
+
+
+def push_deposition(zenodo_client, deposition_id):
     status_code, response = zenodo_client.post_content(
         f"{ZENODO_DEPOSITION}/{deposition_id}/actions/publish"
     )
@@ -188,8 +128,6 @@ def update_existing_singularity_container(
     # Create a new version of an existing deposition
     deposition_id = singularity_dict["url"].split("/")[4]
     new_deposition_id = create_new_deposition(zenodo_client, deposition_id)
-    print(deposition_id)
-    print(new_deposition_id)
     assert new_deposition_id != deposition_id
     response = get_deposit(zenodo_client, new_deposition_id)
     bucket_url, file_id = (
@@ -216,7 +154,7 @@ def update_existing_singularity_container(
 
     # publish the newly created revision
     if push:
-        response = push_deposition(zenodo_client, filename, new_deposition_id)
+        response = push_deposition(zenodo_client, new_deposition_id)
         return {
             "new_deposition_id": new_deposition_id,
             "file_id": response["files"][0]["id"],
@@ -227,6 +165,61 @@ def update_existing_singularity_container(
     else:
         return singularity_dict | {
             "new_deposition_id": new_deposition_id,
+            "file_id": "",
+        }
+
+
+def push_new_singularity_image(
+    zenodo_client,
+    singularity_image_folder,
+    singularity_dict,
+    model_group,
+    file_to_upload="",
+    path="",
+    push=False,
+    cleanup=True,
+):
+    """
+    This function pushes a singularity image to zenodo
+    Parameters
+    ----------
+    tag : str
+       Tag of the singularity image to push
+    """
+    status_code, response = zenodo_client.post_content(f"{ZENODO_DEPOSITION}")
+    assert status_code == 201
+
+    deposition_id = response["id"]
+    bucket_url = response["links"]["bucket"]
+
+    filename = (
+        file_to_upload if file_to_upload else f"{singularity_dict['name']}.sif"
+    )
+    upload_file(
+        zenodo_client,
+        f"{bucket_url}/{filename}",
+        singularity_image_folder,
+        filename,
+        cleanup,
+    )
+
+    url = f"{ZENODO_DEPOSITION}/{deposition_id}"
+    response = upload_metadata(zenodo_client, url, model_group)
+    if push:
+        push_deposition(zenodo_client, deposition_id)
+        response = get_deposit(
+            zenodo_client, deposition_id
+        )  # TODO: Is this important here?
+        return {
+            "new_deposition_id": deposition_id,
+            "file_id": response["files"][0]["id"],
+            "url": f'{ZENODO_BASE}/record/{response["metadata"]["prereserve_doi"]["recid"]}/files/{filename}?download=1',
+            "name": response["files"][0]["filename"],
+            "md5": response["files"][0]["checksum"],
+        }
+    else:
+        return singularity_dict | {
+            "new_deposition_id": deposition_id,
             "file_id": "",
         }
 

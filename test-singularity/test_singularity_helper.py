@@ -59,30 +59,6 @@ def test_get_existing_sc_by_recordid(zenodo_client):
     )
 
 
-# def test_push_new_singularity_image():
-#     test_singularity_dict = {
-#         "url": "https://zenodo.org/record/5725936/files/tiny-container_latest.sif?download=1",
-#         "name": "tiny-container_latest.sif",
-#         "md5": "0a85bfc85e749894210d1e53b4add11d",
-#     }
-#     (
-#         deposition_id,
-#         new_singularity_dict,
-#     ) = singularityhelper.push_new_singularity_image(
-#         test_singularity_dict,
-#         model_group="Dummy",
-#         file_to_upload="busybox_1.34.1.sif",
-#         path=Path(__file__).parent.resolve(),
-#         cleanup=False,
-#     )
-#     assert test_singularity_dict == new_singularity_dict
-#     r = requests.delete(
-#         f"https://zenodo.org/api/deposit/depositions/{deposition_id}",
-#         params=singularityhelper.get_zenodo_access_token(),
-#     )
-#     assert r.status_code == 204
-
-
 def test_update_existing_singularity_container(zenodo_client):
     test_singularity_dict = {
         "url": "https://zenodo.org/record/5725936/files/tiny-container_latest.sif?download=1",
@@ -106,4 +82,25 @@ def test_update_existing_singularity_container(zenodo_client):
     assert new_test_singularity_dict["file_id"] == ""
     zenodo_client.delete_content(
         f"https://zenodo.org/api/deposit/depositions/{new_test_singularity_dict.get('new_deposition_id')}"
+    )
+
+
+def test_push_new_singularity_image(zenodo_client):
+    test_singularity_dict = {
+        "url": "https://zenodo.org/record/5725936/files/tiny-container_latest.sif?download=1",
+        "name": "tiny-container_latest.sif",
+        "md5": "0a85bfc85e749894210d1e53b4add11d",
+    }
+    new_singularity_dict = singularityhelper.push_new_singularity_image(
+        zenodo_client=zenodo_client,
+        singularity_image_folder=Path(__file__).parent.resolve(),
+        singularity_dict=test_singularity_dict,
+        model_group="Dummy",
+        file_to_upload="busybox_1.34.1.sif",
+        cleanup=False,
+    )
+    for key in ["url", "md5", "name"]:
+        assert test_singularity_dict.get(key) == new_singularity_dict.get(key)
+    zenodo_client.delete_content(
+        f"https://zenodo.org/api/deposit/depositions/{new_singularity_dict.get('new_deposition_id')}"
     )

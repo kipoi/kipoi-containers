@@ -35,7 +35,7 @@ class Client:
         return response.json()
 
     def post_content(self, url: str, **kwargs) -> Tuple[int, Dict]:
-        response = requests.post(url, params=(self.params | kwargs))
+        response = requests.post(url, params=(self.params | kwargs), json={})
         response.raise_for_status()
         return response.status_code, response.json()
 
