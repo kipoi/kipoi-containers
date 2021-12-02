@@ -10,9 +10,22 @@ from modelupdater import singularityhandler, singularityhelper
 from modelupdater import zenodoclient
 
 
-# @pytest.fixture(scope="module")
-# def zenodo_client():
-#     return zenodoclient.Client()
+def test_pull_folder():
+    os.environ["SINGULARITY_PULL_FOLDER"] = "/usr/src/imaginary-folder"
+    singularity_handler = singularityhandler.SingularityHandler(
+        model_group="Basset",
+        docker_image_name="kipoi://kipoi-docker:basset",
+    )
+    os.environ.pop("SINGULARITY_PULL_FOLDER", None)
+    assert (
+        singularity_handler.container_info
+        == Path.cwd() / "test-containers" / "model-group-to-singularity.json"
+    )
+    print(singularity_handler.singularity_image_folder)
+    assert (
+        singularity_handler.singularity_image_folder
+        == "/usr/src/imaginary-folder"
+    )
 
 
 def test_singularityhandler_init():

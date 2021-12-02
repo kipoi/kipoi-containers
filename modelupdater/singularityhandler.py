@@ -24,15 +24,17 @@ class SingularityHandler:
     container_info: Union[str, Path] = (
         Path.cwd() / "test-containers" / "model-group-to-singularity.json"
     )
-    singularity_image_folder: Union[str, Path] = os.environ.get(
-        "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
-    )
+    singularity_image_folder: Union[str, Path] = None
     zenodo_client = zenodoclient.Client()
 
     def __post_init__(self):
         self.model_group_to_image_dict = populate_singularity_container_info(
             self.container_info
         )
+        if self.singularity_image_folder is None:
+            self.singularity_image_folder = os.environ.get(
+                "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
+            )
 
     def update_container_info(self, updated_singularity_dict: Dict) -> None:
         self.model_group_to_image_dict[self.model_group] = {
