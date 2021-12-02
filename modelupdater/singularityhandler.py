@@ -35,6 +35,8 @@ class SingularityHandler:
             self.singularity_image_folder = os.environ.get(
                 "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
             )
+        if isinstance(self.singularity_image_folder, str):
+            self.singularity_image_folder = Path(self.singularity_image_folder)
 
     def update_container_info(self, updated_singularity_dict: Dict) -> None:
         self.model_group_to_image_dict[self.model_group] = {
@@ -85,7 +87,7 @@ class SingularityHandler:
             singularity_image_folder=self.singularity_image_folder,
         )
         checksum_match = check_integrity(
-            self.singularity_image_path, self.singularity_dict["md5"]
+            singularity_image_path, self.singularity_dict["md5"]
         )
         if checksum_match:
             print(
@@ -104,4 +106,4 @@ class SingularityHandler:
                 singularity_image_folder=self.singularity_image_folder,
                 model_group=self.model_group,
             )
-        self.update_container_info(updated_singularity_dict)
+            self.update_container_info(updated_singularity_dict)
