@@ -7,7 +7,7 @@ from kipoi import get_source
 from .adder import ModelAdder
 from github import Github
 from .updater import ModelUpdater
-from .singularityupdater import SingularityUpdater, SingularityAdder
+from .singularityhandler import SingularityHandler
 from .singularityhelper import (
     build_singularity_image,
     test_singularity_image,
@@ -117,25 +117,24 @@ class ModelSyncer:
         model_group : str
             Model group to update or add
         """
+        with open(
+            Path.cwd() / "test-containers" / "image-name-to-model.json",
+            "r",
+        ) as infile:
+            image_to_model_dict = json.load(infile)
+            name_of_docker_image = self.model_group_to_image_dict[model_group]
+            models_to_test = image_to_model_dict[name_of_docker_image]
         if model_group in self.model_group_to_image_dict:
             model_updater = ModelUpdater()
-            name_of_docker_image = self.model_group_to_image_dict[model_group]
-            singularity_updater = SingularityUpdater(
+            singularity_handler = SingularityHandler(
                 model_group=model_group, docker_image_name=name_of_docker_image
             )
-
-            with open(
-                Path.cwd() / "test-containers" / "image-name-to-model.json",
-                "r",
-            ) as infile:
-                image_to_model_dict = json.load(infile)
-                models_to_test = image_to_model_dict[name_of_docker_image]
             if "shared" not in name_of_docker_image:
                 model_updater.update(
                     model_group=model_group,
                     name_of_docker_image=name_of_docker_image,
                 )
-                singularity_updater.update(models_to_test)
+                singularity_handler.update(models_to_test)
             else:
                 print(f"We will not be updating {name_of_docker_image}")
         else:
@@ -145,11 +144,11 @@ class ModelSyncer:
                 kipoi_container_repo=self.kipoi_container_repo,
             )
             model_adder.add()
-            singularity_adder = SingularityAdder(
+            singularity_handler = SingularityHandler(
                 model_group=model_group,
                 docker_image_name=model_adder.image_name,
             )
-            singularity_adder.add(models_to_test)
+            singularity_handler.add(models_to_test)
 
     def sync(self):
         """
