@@ -7,7 +7,7 @@ from kipoi import get_source
 from .adder import ModelAdder
 from github import Github
 from .updater import ModelUpdater
-from .singularityupdater import SingularityUpdater
+from .singularityupdater import SingularityUpdater, SingularityAdder
 from .singularityhelper import (
     build_singularity_image,
     test_singularity_image,
@@ -145,22 +145,11 @@ class ModelSyncer:
                 kipoi_container_repo=self.kipoi_container_repo,
             )
             model_adder.add()
-            singularity_image_name = f"kipoi-docker_{model_group.lower()}.sif"
-            build_singularity_image(
-                model_adder.image_name, singularity_image_name
+            singularity_adder = SingularityAdder(
+                model_group=model_group,
+                docker_image_name=model_adder.image_name,
             )
-            singularity_dict = {"name": singularity_image_name}
-            test_singularity_image(singularity_dict, models_to_test)
-            _, new_singularity_dict = push_new_singularity_image(
-                singularity_dict, model_group
-            )
-            print(new_singularity_dict)
-            self.model_group_to_singularity_image_dict[
-                model_group
-            ] = new_singularity_dict
-            write_singularity_container_info(
-                self.model_group_to_singularity_image_dict
-            )
+            singularity_adder.add(models_to_test)
 
     def sync(self):
         """
