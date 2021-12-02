@@ -22,9 +22,8 @@ def test_pull_folder():
         == Path.cwd() / "test-containers" / "model-group-to-singularity.json"
     )
     print(singularity_handler.singularity_image_folder)
-    assert (
-        singularity_handler.singularity_image_folder
-        == "/usr/src/imaginary-folder"
+    assert Path(singularity_handler.singularity_image_folder) == Path(
+        "/usr/src/imaginary-folder"
     )
 
 
