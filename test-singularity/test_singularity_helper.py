@@ -99,12 +99,11 @@ def test_update_existing_singularity_container(zenodo_client):
             cleanup=False,
         )
     )
-    # for key in ["url", "md5", "name"]:
-    #     assert new_test_singularity_dict.get(key) == test_singularity_dict.get(
-    #         key
-    #     )  # If push=True this will be different
-    # assert new_test_singularity_dict["file_id"] == ""
-    r = zenodo_client.delete_content(
+    for key in ["url", "md5", "name"]:
+        assert new_test_singularity_dict.get(key) == test_singularity_dict.get(
+            key
+        )  # If push=True this will be different
+    assert new_test_singularity_dict["file_id"] == ""
+    zenodo_client.delete_content(
         f"https://zenodo.org/api/deposit/depositions/{new_test_singularity_dict.get('new_deposition_id')}"
     )
-    assert r.status_code == 204

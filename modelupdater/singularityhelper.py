@@ -6,8 +6,6 @@ import json
 
 from spython.main import Client
 
-from modelupdater import zenodoclient
-
 ZENODO_BASE = "https://zenodo.org"
 ZENODO_DEPOSITION = f"{ZENODO_BASE}/api/deposit/depositions"
 
@@ -227,7 +225,7 @@ def update_existing_singularity_container(
             "md5": response["files"][0]["checksum"],
         }
     else:
-        singularity_dict | {
+        return singularity_dict | {
             "new_deposition_id": new_deposition_id,
             "file_id": "",
         }
