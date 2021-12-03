@@ -8,7 +8,7 @@ from .adder import ModelAdder
 from github import Github
 from .updater import ModelUpdater
 from .singularityhandler import SingularityHandler
-from .singularityhelper import populate_singularity_container_info
+from .helper import populate_info
 
 
 CONTAINER_PREFIX = "shared/containers"

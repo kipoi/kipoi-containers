@@ -223,24 +223,3 @@ def push_new_singularity_image(
             "new_deposition_id": deposition_id,
             "file_id": "",
         }
-
-
-def populate_singularity_container_info(singularity_json):
-    with open(singularity_json, "r") as file_handle:
-        return json.load(file_handle)
-
-
-def write_singularity_container_info(
-    model_group_to_singularity_image_dict, container_json
-):
-    with open(container_json, "w") as file_handle:
-        json.dump(model_group_to_singularity_image_dict, file_handle, indent=4)
-
-
-def total_number_of_singularity_containers(
-    available_singularity_containers,
-):
-    unique_singularity_container_counter = Counter(
-        [sc for sc in available_singularity_containers]
-    )
-    return len(unique_singularity_container_counter.keys())

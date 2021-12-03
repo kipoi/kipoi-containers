@@ -1,7 +1,7 @@
 from pathlib import Path
 import pytest
 
-from .helper import build_docker_image, cleanup, push_docker_image
+from .dockerhelper import build_docker_image, cleanup, push_docker_image
 
 
 class ModelUpdater:

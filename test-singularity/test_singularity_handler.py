@@ -6,7 +6,7 @@ import random
 
 import pytest
 
-from modelupdater import singularityhandler, singularityhelper
+from modelupdater import helper, singularityhandler, singularityhelper
 from modelupdater import zenodoclient
 
 
@@ -74,7 +74,7 @@ def test_singularityhandler_update_container_info():
         "name": new_container_dict["name"],
         "md5": new_container_dict["md5"],
     }
-    singularityhelper.write_singularity_container_info(
+    helper.write_info(
         original_container_dict, singularity_handler.container_info
     )
 
@@ -180,7 +180,7 @@ def test_singularityhandler_update(monkeypatch):
         "name": "wrong_name",
         "md5": "78758738",
     }
-    singularityhelper.write_singularity_container_info(
+    helper.write_info(
         original_container_dict, singularity_handler.container_info
     )
 
@@ -245,6 +245,6 @@ def test_singularityhandler_add(monkeypatch):
         "name": "wrong_name",
         "md5": "78758738",
     }
-    singularityhelper.write_singularity_container_info(
+    helper.write_info(
         original_container_dict, singularity_handler.container_info
     )

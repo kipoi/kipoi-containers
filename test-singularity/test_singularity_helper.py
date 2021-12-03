@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from modelupdater import singularityhelper, singularityhandler
+from modelupdater import helper, singularityhelper, singularityhandler
 from modelupdater import zenodoclient
 
 
@@ -29,10 +29,8 @@ def test_get_available_sc_depositions(zenodo_client):
         container["name"]
         for container in singularity_handler.model_group_to_image_dict.values()
     ]
-    singularity_container_number = (
-        singularityhelper.total_number_of_singularity_containers(
-            available_singularity_containers
-        )
+    singularity_container_number = helper.total_number_of_unique_containers(
+        available_singularity_containers
     )
 
     extra_kwargs = {

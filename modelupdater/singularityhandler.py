@@ -3,15 +3,16 @@ from pathlib import Path
 from typing import Dict, Union, List, Type
 import os
 
+from .helper import populate_info, write_info
+
 from .singularityhelper import (
     build_singularity_image,
-    populate_singularity_container_info,
     update_existing_singularity_container,
     push_new_singularity_image,
     test_singularity_image,
-    write_singularity_container_info,
     cleanup,
 )
+
 from modelupdater import zenodoclient
 
 from kipoi_utils.external.torchvision.dataset_utils import check_integrity
@@ -28,9 +29,7 @@ class SingularityHandler:
     zenodo_client = zenodoclient.Client()
 
     def __post_init__(self):
-        self.model_group_to_image_dict = populate_singularity_container_info(
-            self.container_info
-        )
+        self.model_group_to_image_dict = populate_info(self.container_info)
         if self.singularity_image_folder is None:
             self.singularity_image_folder = os.environ.get(
                 "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
@@ -42,9 +41,7 @@ class SingularityHandler:
             for k, v in updated_singularity_dict.items()
             if k in ["url", "md5", "name"]
         }
-        write_singularity_container_info(
-            self.model_group_to_image_dict, self.container_info
-        )
+        write_info(self.model_group_to_image_dict, self.container_info)
 
     def add(self, models_to_test: List) -> None:
         self.singularity_image_name = (

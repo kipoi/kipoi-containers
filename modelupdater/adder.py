@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import subprocess
 
-from .helper import (
+from .dockerhelper import (
     build_docker_image,
     cleanup,
     run_docker_image,
