@@ -1,4 +1,5 @@
 from collections import Counter
+from datetime import datetime
 import os
 import requests
 from pathlib import Path
@@ -97,10 +98,11 @@ def upload_metadata(zenodo_client, url, model_group):
             "title": f"{model_group} singularity container",
             "upload_type": "physicalobject",
             "description": "This is a singularity container for models "
-            f"under http://kipoi.org/models/{model_group}/",
+            f"under https://kipoi.org/models/{model_group}/",
             "creators": [
                 {"name": "Haimasree, Bhattacharya", "affiliation": "EMBL"}
             ],
+            "publication_date": datetime.today().strftime("%Y-%m-%d"),
         }
     }
     response = zenodo_client.put_content(url, data=data)
@@ -112,7 +114,7 @@ def push_deposition(zenodo_client, deposition_id):
         f"{ZENODO_DEPOSITION}/{deposition_id}/actions/publish"
     )
     assert status_code == 202
-    response = get_deposit(f"{ZENODO_DEPOSITION}/{deposition_id}")
+    response = get_deposit(zenodo_client, deposition_id)
     return response
 
 
@@ -158,7 +160,7 @@ def update_existing_singularity_container(
             "new_deposition_id": new_deposition_id,
             "file_id": response["files"][0]["id"],
             "url": f"{ZENODO_BASE}/record/{record_id}/files/{filename}?download=1",
-            "name": response["files"][0]["filename"],
+            "name": response["files"][0]["filename"].replace(".sif", ""),
             "md5": response["files"][0]["checksum"],
         }
     else:
@@ -212,7 +214,7 @@ def push_new_singularity_image(
             "new_deposition_id": deposition_id,
             "file_id": response["files"][0]["id"],
             "url": f"{ZENODO_BASE}/record/{record_id}/files/{filename}?download=1",
-            "name": response["files"][0]["filename"],
+            "name": response["files"][0]["filename"].replace(".sif", ""),
             "md5": response["files"][0]["checksum"],
         }
     else:
