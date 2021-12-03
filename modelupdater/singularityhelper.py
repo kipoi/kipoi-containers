@@ -103,6 +103,7 @@ def upload_metadata(zenodo_client, url, model_group):
                 {"name": "Haimasree, Bhattacharya", "affiliation": "EMBL"}
             ],
             "publication_date": datetime.today().strftime("%Y-%m-%d"),
+            "license": "MIT",
         }
     }
     response = zenodo_client.put_content(url, data=data)
