@@ -14,7 +14,6 @@ class Client:
     def get_content(self, url, **kwargs) -> Dict:
         response = requests.get(url, params=self.params | kwargs)
         response.raise_for_status()
-        assert response.status_code == 200
         return response.json()
 
     def put_content(self, url: str, data, **kwargs) -> Dict:
@@ -31,7 +30,6 @@ class Client:
                 headers={"Content-Type": "application/json"},
             )
         response.raise_for_status()
-        assert response.status_code == 200
         return response.json()
 
     def post_content(self, url: str, **kwargs) -> Tuple[int, Dict]:
@@ -46,4 +44,3 @@ class Client:
             params=(self.params | kwargs),
         )
         response.raise_for_status()
-        assert response.status_code == 204

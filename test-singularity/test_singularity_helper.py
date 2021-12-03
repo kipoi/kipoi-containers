@@ -23,11 +23,15 @@ def test_zenodo_get_access(zenodo_client):
 
 def test_get_available_sc_depositions(zenodo_client):
     singularity_handler = singularityhandler.SingularityHandler(
-        "Basset", "Dummy"
+        "Basset",
+        "Dummy",
+        helper.populate_json(
+            Path.cwd() / "container-info" / "model-group-to-singularity.json"
+        ),
     )
     available_singularity_containers = [
         container["name"]
-        for container in singularity_handler.model_group_to_image_dict.values()
+        for container in singularity_handler.model_group_to_docker_dict.values()
     ]
     singularity_container_number = helper.total_number_of_unique_containers(
         available_singularity_containers

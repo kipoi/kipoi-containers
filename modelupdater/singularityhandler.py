@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Dict, Union, List, Type
 import os
 
-from .helper import populate_info, write_info
+from .helper import write_json
 
 from .singularityhelper import (
     build_singularity_image,
@@ -22,26 +22,23 @@ from kipoi_utils.external.torchvision.dataset_utils import check_integrity
 class SingularityHandler:
     model_group: str
     docker_image_name: str
-    container_info: Union[str, Path] = (
-        Path.cwd() / "container-info" / "model-group-to-singularity.json"
-    )
+    model_group_to_singularity_dict: Dict
     singularity_image_folder: Union[str, Path] = None
     zenodo_client = zenodoclient.Client()
 
     def __post_init__(self):
-        self.model_group_to_image_dict = populate_info(self.container_info)
         if self.singularity_image_folder is None:
             self.singularity_image_folder = os.environ.get(
                 "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
             )
 
     def update_container_info(self, updated_singularity_dict: Dict) -> None:
-        self.model_group_to_image_dict[self.model_group] = {
+        self.model_group_to_singularity_dict[self.model_group] = {
             k: v
             for k, v in updated_singularity_dict.items()
             if k in ["url", "md5", "name"]
         }
-        write_info(self.model_group_to_image_dict, self.container_info)
+        write_json(self.model_group_to_singularity_dict, self.container_info)
 
     def add(self, models_to_test: List) -> None:
         self.singularity_image_name = (
@@ -71,7 +68,7 @@ class SingularityHandler:
         self.update_container_info(new_singularity_dict)
 
     def update(self, models_to_test: List) -> None:
-        self.singularity_dict = self.model_group_to_image_dict[
+        self.singularity_dict = self.model_group_to_singularity_dict[
             self.model_group
         ]
         self.singularity_image_name = f'{self.singularity_dict["name"]}.sif'

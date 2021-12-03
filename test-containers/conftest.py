@@ -17,7 +17,7 @@ def pytest_generate_tests(metafunc):
     with open(
         Path.cwd() / "container-info" / "model-group-to-docker.json", "r"
     ) as infile:
-        metafunc.cls.model_group_to_image_dict = json.load(infile)
+        metafunc.cls.model_group_to_docker_dict = json.load(infile)
 
     with open(
         Path.cwd() / "container-info" / "docker-to-model.json", "r"

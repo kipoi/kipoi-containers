@@ -8,10 +8,9 @@ from .adder import ModelAdder
 from github import Github
 from .updater import ModelUpdater
 from .singularityhandler import SingularityHandler
-from .helper import populate_info
+from .helper import populate_json
 
-
-CONTAINER_PREFIX = "shared/containers"
+CONTAINER_PREFIX = Path.cwd() / "container-info"
 
 
 class ModelSyncer:
@@ -42,11 +41,15 @@ class ModelSyncer:
             "./modelupdater/kipoi-model-repo-hash", "r"
         ) as kipoimodelrepohash:
             self.source_commit_hash = kipoimodelrepohash.readline()
-        with open(
-            Path.cwd() / "container-info" / "model-group-to-docker.json",
-            "r",
-        ) as infile:
-            self.model_group_to_image_dict = json.load(infile)
+        self.model_group_to_docker_dict = populate_json(
+            CONTAINER_PREFIX / "model-group-to-docker.json"
+        )
+        self.image_to_model_dict = populate_json(
+            CONTAINER_PREFIX / "docker-to-model.json.json"
+        )
+        self.model_group_to_singularity_dict = populate_json(
+            CONTAINER_PREFIX / "model-group-to-singularity.json"
+        )
         self.list_of_updated_model_groups = []
 
     def get_list_of_updated_model_groups(self):
@@ -113,16 +116,13 @@ class ModelSyncer:
         model_group : str
             Model group to update or add
         """
-        name_of_docker_image = self.model_group_to_image_dict[model_group]
-        with open(
-            Path.cwd() / "container-info" / "docker-to-model.json",
-            "r",
-        ) as infile:
-            image_to_model_dict = json.load(infile)
-        models_to_test = image_to_model_dict[name_of_docker_image]
-        if model_group in self.model_group_to_image_dict:
+        if model_group in self.model_group_to_docker_dict:
+            name_of_docker_image = self.model_group_to_docker_dict[model_group]
+            models_to_test = self.docker_to_model_dict[name_of_docker_image]
             singularity_handler = SingularityHandler(
-                model_group=model_group, docker_image_name=name_of_docker_image
+                model_group=model_group,
+                docker_image_name=name_of_docker_image,
+                model_group_to_singularity_dict=self.model_group_to_singularity_dict,
             )
             model_updater = ModelUpdater()
             if "shared" not in name_of_docker_image:
@@ -139,10 +139,13 @@ class ModelSyncer:
                 kipoi_model_repo=self.kipoi_model_repo,
                 kipoi_container_repo=self.kipoi_container_repo,
             )
-            model_adder.add()
+            model_adder.add(
+                self.model_group_to_docker_dict, self.docker_to_model_dict
+            )
             singularity_handler = SingularityHandler(
                 model_group=model_group,
                 docker_image_name=model_adder.image_name,
+                model_group_to_singularity_dict=self.model_group_to_singularity_dict,
             )
             singularity_handler.add(models_to_test)
 

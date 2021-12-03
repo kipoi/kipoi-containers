@@ -74,7 +74,6 @@ def create_new_deposition(zenodo_client, deposition_id):
     status_code, response = zenodo_client.post_content(
         f"{ZENODO_DEPOSITION}/{deposition_id}/actions/newversion"
     )
-    assert status_code == 201
     return response["links"]["latest_draft"].split("/")[-1]
 
 
@@ -87,9 +86,7 @@ def get_deposit(zenodo_client, deposition_id):
 
 def upload_file(zenodo_client, url, singularity_image_folder, filename):
     path = singularity_image_folder / filename
-    assert path.exists()
-    response = zenodo_client.put_content(url, data=path)
-    assert response["links"]["self"] == url
+    zenodo_client.put_content(url, data=path)
 
 
 def upload_metadata(zenodo_client, url, model_group):
@@ -106,15 +103,13 @@ def upload_metadata(zenodo_client, url, model_group):
             "license": "MIT",
         }
     }
-    response = zenodo_client.put_content(url, data=data)
-    assert response["links"]["self"] == url
+    zenodo_client.put_content(url, data=data)
 
 
 def push_deposition(zenodo_client, deposition_id):
     status_code, response = zenodo_client.post_content(
         f"{ZENODO_DEPOSITION}/{deposition_id}/actions/publish"
     )
-    assert status_code == 202
     response = get_deposit(zenodo_client, deposition_id)
     return response
 
@@ -130,7 +125,6 @@ def update_existing_singularity_container(
     # Create a new version of an existing deposition
     deposition_id = singularity_dict["url"].split("/")[4]
     new_deposition_id = create_new_deposition(zenodo_client, deposition_id)
-    assert new_deposition_id != deposition_id
     response = get_deposit(zenodo_client, new_deposition_id)
     bucket_url, file_id = (
         response["links"]["bucket"],
@@ -188,7 +182,6 @@ def push_new_singularity_image(
        Tag of the singularity image to push
     """
     status_code, response = zenodo_client.post_content(f"{ZENODO_DEPOSITION}")
-    assert status_code == 201
 
     deposition_id = response["id"]
     bucket_url = response["links"]["bucket"]

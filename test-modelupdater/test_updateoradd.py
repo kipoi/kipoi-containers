@@ -209,13 +209,13 @@ def test_add_is_compatible_with_existing_image(monkeypatch):
         model_group_to_image_name_file_path,
         "r",
     ) as infile:
-        model_group_to_image_dict = json.load(infile)
-    model_group_to_image_dict.pop(model_group_to_add)
+        model_group_to_docker_dict = json.load(infile)
+    model_group_to_docker_dict.pop(model_group_to_add)
     with open(
         model_group_to_image_name_file_path,
         "w",
     ) as fp:
-        json.dump(model_group_to_image_dict, fp, indent=2)
+        json.dump(model_group_to_docker_dict, fp, indent=2)
 
     with open(
         image_name_to_model_file_path,

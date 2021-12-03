@@ -3,6 +3,9 @@ import json
 from pathlib import Path
 import subprocess
 
+import pandas as pd
+from ruamel.yaml.scalarstring import DoubleQuotedScalarString
+
 from .dockerhelper import (
     build_docker_image,
     cleanup,
@@ -10,9 +13,7 @@ from .dockerhelper import (
     run_docker_image_without_exception,
     push_docker_image,
 )
-import pandas as pd
-from ruamel.yaml import round_trip_load, round_trip_dump
-from ruamel.yaml.scalarstring import DoubleQuotedScalarString
+from .helper import populate_yaml, write_yaml
 
 
 class ModelAdder:
@@ -37,31 +38,23 @@ class ModelAdder:
         self.image_name = f"kipoi/kipoi-docker:{self.model_group.lower()}"
         self.list_of_models = []
 
-    def update_github_workflow_files(self):
+    def update_github_workflow_files(
+        self, test_image_yaml, release_workflow_yaml
+    ):
         """
         Update github actions CI workflow files with the newly added model
         """
-        with open(
-            ".github/workflows/test-images.yml",
-            "r",
-        ) as f:
-            data = round_trip_load(f, preserve_quotes=True)
+        data = populate_yaml(test_image_yaml)
+        update_list = data["jobs"]["test"]["strategy"]["matrix"]["model"]
         if self.list_of_models:
-            data["jobs"]["test"]["strategy"]["matrix"]["model"].append(
+            update_list.append(
                 DoubleQuotedScalarString(self.list_of_models[0])
             )
         else:
-            data["jobs"]["test"]["strategy"]["matrix"]["model"].append(
-                DoubleQuotedScalarString(self.model_group)
-            )
-        with open(".github/workflows/test-images.yml", "w") as f:
-            round_trip_dump(data, f)
+            update_list.append(DoubleQuotedScalarString(self.model_group))
+        write_yaml(test_image_yaml, data)
 
-        with open(
-            ".github/workflows/release-workflow.yml",
-            "r",
-        ) as f:
-            data = round_trip_load(f, preserve_quotes=True)
+        data = populate_yaml(release_workflow_yaml)
         if "sharedpy3keras2" in self.image_name:
             data["jobs"]["buildandtestsharedpy3keras2"]["strategy"]["matrix"][
                 "modelgroup"
@@ -70,52 +63,31 @@ class ModelAdder:
             data["jobs"]["buildtestandpush"]["strategy"]["matrix"][
                 "image"
             ].append(DoubleQuotedScalarString(self.image_name.split(":")[1]))
+        write_yaml(release_workflow_yaml, data)
 
-        with open(".github/workflows/release-workflow.yml", "w") as f:
-            round_trip_dump(data, f)
-
-    def update_test_and_json_files(self):
+    def update_test_and_json_files(
+        self, model_group_to_docker_dict, docker_to_model_dict
+    ):
         """
         Update docker-to-model.json and model-group-to-docker.json
         with the newly added model and the corresponding docker image
         """
-        with open(
-            Path.cwd() / "container-info" / "model-group-to-docker.json",
-            "r",
-        ) as infile:
-            model_group_to_image_dict = json.load(infile)
-        model_group_to_image_dict.update(
+        model_group_to_docker_dict.update(
             {f"{self.model_group}": f"{self.image_name}"}
         )
-        with open(
-            Path.cwd() / "container-info" / "model-group-to-docker.json",
-            "w",
-        ) as fp:
-            json.dump(model_group_to_image_dict, fp, indent=2)
-
-        with open(
-            Path.cwd() / "container-info" / "docker-to-model.json", "r"
-        ) as infile:
-            image_name_to_model_dict = json.load(infile)
-        if self.image_name in image_name_to_model_dict:
+        if self.image_name in docker_to_model_dict:
             if self.list_of_models:
-                image_name_to_model_dict[self.image_name].extend(
+                docker_to_model_dict[self.image_name].extend(
                     self.list_of_models
                 )
             else:
-                image_name_to_model_dict[self.image_name].append(
-                    self.model_group
-                )
+                docker_to_model_dict[self.image_name].append(self.model_group)
         else:
-            image_name_to_model_dict.update(
+            docker_to_model_dict.update(
                 {self.image_name: self.list_of_models}
                 if self.list_of_models
                 else {self.image_name: [self.model_group]}
             )
-        with open(
-            Path.cwd() / "container-info" / "docker-to-model.json", "w"
-        ) as fp:
-            json.dump(image_name_to_model_dict, fp, indent=2)
 
     def get_list_of_models_from_repo(self):
 
@@ -172,7 +144,7 @@ class ModelAdder:
                     return True
         return False
 
-    def add(self):
+    def add(self, model_group_to_docker_dict, docker_to_model_dict):
         """
         This function adds a newly added model group to this repo. The steps are -
         1. Test the model group with two available docker images for shared
@@ -187,7 +159,9 @@ class ModelAdder:
         """
         self.list_of_models = self.get_list_of_models_from_repo()
         if self.is_compatible_with_existing_image():
-            self.update_test_and_json_files()
+            self.update_test_and_json_files(
+                model_group_to_docker_dict, docker_to_model_dict
+            )
             self.update_github_workflow_files()
         else:
             dockerfile_generator_path = "dockerfiles/dockerfile-generator.sh"
@@ -226,5 +200,12 @@ class ModelAdder:
             push_docker_image(tag=self.image_name.split(":")[1])
             cleanup(images=True)
 
-            self.update_test_and_json_files()
-            self.update_github_workflow_files()
+            test_image_yaml = ".github/workflows/test-images.yml"
+            release_workflow_yaml = ".github/workflows/release-workflow.yml"
+
+            self.update_test_and_json_files(
+                model_group_to_docker_dict, docker_to_model_dict
+            )
+            self.update_github_workflow_files(
+                test_image_yaml, release_workflow_yaml
+            )
