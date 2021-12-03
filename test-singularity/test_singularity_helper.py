@@ -31,7 +31,7 @@ def test_get_available_sc_depositions(zenodo_client):
     )
     available_singularity_containers = [
         container["name"]
-        for container in singularity_handler.model_group_to_docker_dict.values()
+        for container in singularity_handler.model_group_to_singularity_dict.values()
     ]
     singularity_container_number = helper.total_number_of_unique_containers(
         available_singularity_containers

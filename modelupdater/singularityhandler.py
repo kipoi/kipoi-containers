@@ -26,6 +26,7 @@ class SingularityHandler:
     zenodo_client = zenodoclient.Client()
 
     def __post_init__(self):
+        print()
         if self.singularity_image_folder is None:
             self.singularity_image_folder = os.environ.get(
                 "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()

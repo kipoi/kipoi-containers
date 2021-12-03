@@ -32,8 +32,14 @@ class ModelUpdater:
             is working with all the models under the group named <model_group>
         """
         print(f"Updating {model_group} and {name_of_docker_image}")
-        if model_group == "MMSplice/mtsplice":
-            dockerfile_name = "Dockerfile.mmsplice-mtsplice"
+        if model_group in [
+            "MMSplice/mtsplice",
+            "APARENT/veff",
+            "APARENT/site_probabilities",
+        ]:
+            dockerfile_name = (
+                f"Dockerfile.{model_group.replace('/', '-').lower()}"
+            )
         elif model_group in [
             "MMSplice/pathogenicity",
             "MMSplice/splicingEfficiency",
@@ -41,10 +47,6 @@ class ModelUpdater:
             "MMSplice/modularPredictions",
         ]:
             dockerfile_name = "Dockerfile.mmsplice"
-        elif "APARENT" in model_group:
-            dockerfile_name = (
-                f"Dockerfile.aparent-{model_group.split('/')[1].lower()}"
-            )
         else:
             dockerfile_name = f"Dockerfile.{model_group.split('/')[0].lower()}"
         dockerfile_path = Path.cwd() / "dockerfiles" / dockerfile_name
