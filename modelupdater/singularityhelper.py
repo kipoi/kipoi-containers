@@ -14,6 +14,8 @@ def cleanup(singularity_file_path):
     """
     Cleans up singularity containers that werecreated in build_singularity_image
     """
+    if isinstance(singularity_file_path, str):
+        singularity_file_path = Path(singularity_file_path)
     singularity_file_path.unlink()
 
 
@@ -44,7 +46,7 @@ def test_singularity_image(
     """
     Tests a container for a given singularity image and run
     kipoi test <model_name> --source=kipoi inside
-    the container, followed by a cleanup
+    the container
 
     Parameters
     ----------
@@ -82,14 +84,10 @@ def get_deposit(zenodo_client, deposition_id):
     return response
 
 
-def upload_file(
-    zenodo_client, url, singularity_image_folder, filename, cleanup=True
-):
+def upload_file(zenodo_client, url, singularity_image_folder, filename):
     path = singularity_image_folder / filename
     assert path.exists()
     response = zenodo_client.put_content(url, data=path)
-    if cleanup:
-        cleanup(path)
     assert response["links"]["self"] == url
 
 
@@ -125,7 +123,6 @@ def update_existing_singularity_container(
     model_group,
     file_to_upload="",
     push=False,
-    cleanup=True,
 ):
     # Create a new version of an existing deposition
     deposition_id = singularity_dict["url"].split("/")[4]
@@ -151,7 +148,6 @@ def update_existing_singularity_container(
         f"{bucket_url}/{filename}",
         singularity_image_folder,
         filename,
-        cleanup,
     )
 
     # publish the newly created revision
@@ -180,7 +176,6 @@ def push_new_singularity_image(
     file_to_upload="",
     path="",
     push=False,
-    cleanup=True,
 ):
     """
     This function pushes a singularity image to zenodo
@@ -203,7 +198,6 @@ def push_new_singularity_image(
         f"{bucket_url}/{filename}",
         singularity_image_folder,
         filename,
-        cleanup,
     )
 
     url = f"{ZENODO_DEPOSITION}/{deposition_id}"
