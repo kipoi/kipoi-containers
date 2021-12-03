@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Dict, Union, List, Type
 import os
 
-from .helper import write_json
 
 from .singularityhelper import (
     build_singularity_image,
@@ -38,7 +37,6 @@ class SingularityHandler:
             for k, v in updated_singularity_dict.items()
             if k in ["url", "md5", "name"]
         }
-        write_json(self.model_group_to_singularity_dict, self.container_info)
 
     def add(self, models_to_test: List) -> None:
         self.singularity_image_name = (

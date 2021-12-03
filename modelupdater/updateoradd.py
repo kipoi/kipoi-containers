@@ -2,15 +2,18 @@ import os
 import json
 from pathlib import Path
 
-from kipoi import get_source
-
 from .adder import ModelAdder
 from github import Github
 from .updater import ModelUpdater
 from .singularityhandler import SingularityHandler
-from .helper import populate_json
+from .helper import populate_json, write_json
 
 CONTAINER_PREFIX = Path.cwd() / "container-info"
+MODEL_GROUP_TO_DOCKER_JSON = CONTAINER_PREFIX / "model-group-to-docker.json"
+DOCKER_TO_MODEL_JSON = CONTAINER_PREFIX / "docker-to-model.json.json"
+MODEL_GROUP_TO_SINGULARITY_JSON = (
+    CONTAINER_PREFIX / "model-group-to-singularity.json"
+)
 
 
 class ModelSyncer:
@@ -42,13 +45,11 @@ class ModelSyncer:
         ) as kipoimodelrepohash:
             self.source_commit_hash = kipoimodelrepohash.readline()
         self.model_group_to_docker_dict = populate_json(
-            CONTAINER_PREFIX / "model-group-to-docker.json"
+            MODEL_GROUP_TO_DOCKER_JSON
         )
-        self.image_to_model_dict = populate_json(
-            CONTAINER_PREFIX / "docker-to-model.json.json"
-        )
+        self.docker_to_model_dict = populate_json(DOCKER_TO_MODEL_JSON)
         self.model_group_to_singularity_dict = populate_json(
-            CONTAINER_PREFIX / "model-group-to-singularity.json"
+            MODEL_GROUP_TO_SINGULARITY_JSON
         )
         self.list_of_updated_model_groups = []
 
@@ -140,7 +141,8 @@ class ModelSyncer:
                 kipoi_container_repo=self.kipoi_container_repo,
             )
             model_adder.add(
-                self.model_group_to_docker_dict, self.docker_to_model_dict
+                model_group_to_docker_dict=self.model_group_to_docker_dict,
+                docker_to_model_dict=self.docker_to_model_dict,
             )
             singularity_handler = SingularityHandler(
                 model_group=model_group,
@@ -158,6 +160,15 @@ class ModelSyncer:
             self.get_list_of_updated_model_groups()
             for model_group in self.list_of_updated_model_groups:
                 self.update_or_add_model_container(model_group=model_group)
+            write_json(self.docker_to_model_dict, DOCKER_TO_MODEL_JSON)
+            write_json(
+                self.model_group_to_docker_dict, MODEL_GROUP_TO_DOCKER_JSON
+            )
+            write_json(
+                self.model_group_to_singularity_dict,
+                MODEL_GROUP_TO_SINGULARITY_JSON,
+            )
+
         else:
             print("No need to update the repo")
 
