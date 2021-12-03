@@ -62,21 +62,21 @@ def test_add(monkeypatch):
     image_name_to_model_file_path = (
         Path(__file__).resolve().parent
         / "../test-containers"
-        / "image-name-to-model.json"
+        / "docker-to-model.json"
     )
     model_group_to_image_name_file_path = (
         Path(__file__).resolve().parent
         / "../test-containers"
-        / "model-group-to-image-name.json"
+        / "model-group-to-docker.json"
     )
 
     shutil.copy(
         image_name_to_model_file_path,
-        Path(__file__).resolve().parent / "tmp-image-name-to-model.json",
+        Path(__file__).resolve().parent / "tmp-docker-to-model.json",
     )
     shutil.copy(
         model_group_to_image_name_file_path,
-        Path(__file__).resolve().parent / "tmp-model-group-to-image-name.json",
+        Path(__file__).resolve().parent / "tmp-model-group-to-docker.json",
     )
 
     workflow_test_images_file_path = (
@@ -108,7 +108,7 @@ def test_add(monkeypatch):
     with open(
         Path(__file__).resolve().parent
         / "../test-containers"
-        / "image-name-to-model.json",
+        / "docker-to-model.json",
         "r",
     ) as infile:
         new_image_name_to_model_dict = json.load(infile)
@@ -121,7 +121,7 @@ def test_add(monkeypatch):
     with open(
         Path(__file__).resolve().parent
         / "../test-containers"
-        / "model-group-to-image-name.json",
+        / "model-group-to-docker.json",
         "r",
     ) as infile:
         new_model_group_to_image_dict = json.load(infile)
@@ -131,16 +131,16 @@ def test_add(monkeypatch):
         == "kipoi/kipoi-docker:cletimer"
     )
     shutil.copy(
-        Path(__file__).resolve().parent / "tmp-image-name-to-model.json",
+        Path(__file__).resolve().parent / "tmp-docker-to-model.json",
         image_name_to_model_file_path,
     )
     shutil.copy(
-        Path(__file__).resolve().parent / "tmp-model-group-to-image-name.json",
+        Path(__file__).resolve().parent / "tmp-model-group-to-docker.json",
         model_group_to_image_name_file_path,
     )
-    (Path(__file__).resolve().parent / "tmp-image-name-to-model.json").unlink()
+    (Path(__file__).resolve().parent / "tmp-docker-to-model.json").unlink()
     (
-        Path(__file__).resolve().parent / "tmp-model-group-to-image-name.json"
+        Path(__file__).resolve().parent / "tmp-model-group-to-docker.json"
     ).unlink()
 
     with open(
@@ -190,20 +190,20 @@ def test_add_is_compatible_with_existing_image(monkeypatch):
     image_name_to_model_file_path = (
         Path(__file__).resolve().parent
         / "../test-containers"
-        / "image-name-to-model.json"
+        / "docker-to-model.json"
     )
     model_group_to_image_name_file_path = (
         Path(__file__).resolve().parent
         / "../test-containers"
-        / "model-group-to-image-name.json"
+        / "model-group-to-docker.json"
     )
     shutil.copy(
         image_name_to_model_file_path,
-        Path(__file__).resolve().parent / "tmp-image-name-to-model.json",
+        Path(__file__).resolve().parent / "tmp-docker-to-model.json",
     )
     shutil.copy(
         model_group_to_image_name_file_path,
-        Path(__file__).resolve().parent / "tmp-model-group-to-image-name.json",
+        Path(__file__).resolve().parent / "tmp-model-group-to-docker.json",
     )
     with open(
         model_group_to_image_name_file_path,
@@ -259,7 +259,7 @@ def test_add_is_compatible_with_existing_image(monkeypatch):
     with open(
         Path(__file__).resolve().parent
         / "../test-containers"
-        / "image-name-to-model.json",
+        / "docker-to-model.json",
         "r",
     ) as infile:
         new_image_name_to_model_dict = json.load(infile)
@@ -268,23 +268,23 @@ def test_add_is_compatible_with_existing_image(monkeypatch):
     with open(
         Path(__file__).resolve().parent
         / "../test-containers"
-        / "model-group-to-image-name.json",
+        / "model-group-to-docker.json",
         "r",
     ) as infile:
         new_model_group_to_image_dict = json.load(infile)
     assert "CleTimer" in new_model_group_to_image_dict
     assert new_model_group_to_image_dict[model_group_to_add] == docker_image
     shutil.copy(
-        Path(__file__).resolve().parent / "tmp-image-name-to-model.json",
+        Path(__file__).resolve().parent / "tmp-docker-to-model.json",
         image_name_to_model_file_path,
     )
     shutil.copy(
-        Path(__file__).resolve().parent / "tmp-model-group-to-image-name.json",
+        Path(__file__).resolve().parent / "tmp-model-group-to-docker.json",
         model_group_to_image_name_file_path,
     )
-    (Path(__file__).resolve().parent / "tmp-image-name-to-model.json").unlink()
+    (Path(__file__).resolve().parent / "tmp-docker-to-model.json").unlink()
     (
-        Path(__file__).resolve().parent / "tmp-model-group-to-image-name.json"
+        Path(__file__).resolve().parent / "tmp-model-group-to-docker.json"
     ).unlink()
 
     with open(

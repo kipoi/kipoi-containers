@@ -19,7 +19,7 @@ def test_pull_folder():
     os.environ.pop("SINGULARITY_PULL_FOLDER", None)
     assert (
         singularity_handler.container_info
-        == Path.cwd() / "test-containers" / "model-group-to-singularity.json"
+        == Path.cwd() / "container-info" / "model-group-to-singularity.json"
     )
     print(singularity_handler.singularity_image_folder)
     assert Path(singularity_handler.singularity_image_folder) == Path(
@@ -35,7 +35,7 @@ def test_singularityhandler_init():
     )
     assert (
         singularity_handler.container_info
-        == Path.cwd() / "test-containers" / "model-group-to-singularity.json"
+        == Path.cwd() / "container-info" / "model-group-to-singularity.json"
     )
     assert (
         singularity_handler.singularity_image_folder

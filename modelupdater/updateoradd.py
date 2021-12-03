@@ -19,7 +19,7 @@ class ModelSyncer:
         """
         This function initializes several class variables with the
         logged in github instance an from kipoi-model-repo-hash
-        and model-group-to-image-name.json.
+        and model-group-to-docker.json.
 
         Parameters
         ----------
@@ -43,7 +43,7 @@ class ModelSyncer:
         ) as kipoimodelrepohash:
             self.source_commit_hash = kipoimodelrepohash.readline()
         with open(
-            Path.cwd() / "test-containers" / "model-group-to-image-name.json",
+            Path.cwd() / "container-info" / "model-group-to-docker.json",
             "r",
         ) as infile:
             self.model_group_to_image_dict = json.load(infile)
@@ -72,36 +72,34 @@ class ModelSyncer:
                 ]
             )
         )
-
-        if "shared" in self.list_of_updated_model_groups:
-            self.list_of_updated_model_groups.remove("shared")
-        if ".circleci" in self.list_of_updated_model_groups:
-            self.list_of_updated_model_groups.remove(".circleci")
-        if "APARENT" in self.list_of_updated_model_groups:
-            self.list_of_updated_model_groups.remove("APARENT")
-        if "APARENT/README.md" in self.list_of_updated_model_groups:
-            self.list_of_updated_model_groups.remove("APARENT/README.md")
-
-        # TODO: Fix the special case handling for MMSplice
-        if "MMSplice/deltaLogitPSI" in self.list_of_updated_model_groups:
-            if (
-                "MMSplice/modularPredictions"
-                in self.list_of_updated_model_groups
-            ):
-                self.list_of_updated_model_groups.remove(
-                    "MMSplice/modularPredictions"
-                )
-            if "MMSplice/pathogenicity" in self.list_of_updated_model_groups:
-                self.list_of_updated_model_groups.remove(
-                    "MMSplice/pathogenicity"
-                )
-            if (
-                "MMSplice/splicingEfficiency"
-                in self.list_of_updated_model_groups
-            ):
-                self.list_of_updated_model_groups.remove(
-                    "MMSplice/splicingEfficiency"
-                )
+        invalid_options = [
+            "shared",
+            ".circleci",
+            "APARENT",
+            "APARENT/README.md",
+        ]
+        self.list_of_updated_model_groups = [
+            mg
+            for mg in self.list_of_updated_model_groups
+            if mg not in invalid_options
+        ]
+        # Keep only one MMSPlice model which share image kipoi/kipoi-docker:mmsplice
+        mmsplice_models = [
+            "MMSplice/deltaLogitPSI",
+            "MMSplice/modularPredictions",
+            "MMSplice/pathogenicity",
+            "MMSplice/splicingEfficiency",
+        ]
+        for model in mmsplice_models:
+            if model in self.list_of_updated_model_groups:
+                mmsplice_models_to_remove = [
+                    mg for mg in mmsplice_models if mg != model
+                ]
+                self.list_of_updated_model_groups = [
+                    mg
+                    for mg in self.list_of_updated_model_groups
+                    if mg not in mmsplice_models_to_remove
+                ]
 
         print(self.list_of_updated_model_groups)
 
@@ -117,7 +115,7 @@ class ModelSyncer:
         """
         name_of_docker_image = self.model_group_to_image_dict[model_group]
         with open(
-            Path.cwd() / "test-containers" / "image-name-to-model.json",
+            Path.cwd() / "container-info" / "docker-to-model.json",
             "r",
         ) as infile:
             image_to_model_dict = json.load(infile)

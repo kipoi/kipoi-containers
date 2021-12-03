@@ -76,11 +76,11 @@ class ModelAdder:
 
     def update_test_and_json_files(self):
         """
-        Update image-name-to-model.json and model-group-to-image-name.json
+        Update docker-to-model.json and model-group-to-docker.json
         with the newly added model and the corresponding docker image
         """
         with open(
-            Path.cwd() / "test-containers" / "model-group-to-image-name.json",
+            Path.cwd() / "container-info" / "model-group-to-docker.json",
             "r",
         ) as infile:
             model_group_to_image_dict = json.load(infile)
@@ -88,13 +88,13 @@ class ModelAdder:
             {f"{self.model_group}": f"{self.image_name}"}
         )
         with open(
-            Path.cwd() / "test-containers" / "model-group-to-image-name.json",
+            Path.cwd() / "container-info" / "model-group-to-docker.json",
             "w",
         ) as fp:
             json.dump(model_group_to_image_dict, fp, indent=2)
 
         with open(
-            Path.cwd() / "test-containers" / "image-name-to-model.json", "r"
+            Path.cwd() / "container-info" / "docker-to-model.json", "r"
         ) as infile:
             image_name_to_model_dict = json.load(infile)
         if self.image_name in image_name_to_model_dict:
@@ -113,7 +113,7 @@ class ModelAdder:
                 else {self.image_name: [self.model_group]}
             )
         with open(
-            Path.cwd() / "test-containers" / "image-name-to-model.json", "w"
+            Path.cwd() / "container-info" / "docker-to-model.json", "w"
         ) as fp:
             json.dump(image_name_to_model_dict, fp, indent=2)
 

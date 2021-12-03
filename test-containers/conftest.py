@@ -15,12 +15,12 @@ def pytest_addoption(parser):
 
 def pytest_generate_tests(metafunc):
     with open(
-        Path.cwd() / "test-containers" / "model-group-to-image-name.json", "r"
+        Path.cwd() / "container-info" / "model-group-to-docker.json", "r"
     ) as infile:
         metafunc.cls.model_group_to_image_dict = json.load(infile)
 
     with open(
-        Path.cwd() / "test-containers" / "image-name-to-model.json", "r"
+        Path.cwd() / "container-info" / "docker-to-model.json", "r"
     ) as infile:
         metafunc.cls.image_to_model_dict = json.load(infile)
     if metafunc.config.getoption("image"):

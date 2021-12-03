@@ -15,11 +15,11 @@ docker build -f dockerfiles/Dockerfile.<model-group-name-in-lowercase> -t kipoi/
 ```
 # Map between model group and docker images
 
-See [here](https://github.com/kipoi/kipoi-containers/blob/main/test-containers/model-group-to-image-name.json)
+See [here](https://github.com/kipoi/kipoi-containers/blob/main/test-containers/model-group-to-docker.json)
 
 # Map between docker image and model(s)
 
-See [here](https://github.com/kipoi/kipoi-containers/blob/main/test-containers/image-name-to-model.json)
+See [here](https://github.com/kipoi/kipoi-containers/blob/main/test-containers/docker-to-model.json)
 
 
 # Running the images
@@ -86,7 +86,7 @@ This workflow gets triggered on the 1st of every month and can also be trigerred
 
 ## Mapping between model and docker images
 
-To know which model group/model is represented by which docker image pleae take a look at https://github.com/kipoi/kipoi-containers/blob/main/test-containers/model-group-to-image-name.json.
+To know which model group/model is represented by which docker image pleae take a look at https://github.com/kipoi/kipoi-containers/blob/main/test-containers/model-group-to-docker.json.
 
 Due to conflicting package requirements, all models in group MMSplice could not be represented by a single docker image. MMSplice/mtsplice has its own docker image named kipoi/kipoi-docker:mmsplice-mtsplice and the rest can be tested with kipoi/kipoi-docker:mmsplice
 

@@ -23,7 +23,7 @@ class SingularityHandler:
     model_group: str
     docker_image_name: str
     container_info: Union[str, Path] = (
-        Path.cwd() / "test-containers" / "model-group-to-singularity.json"
+        Path.cwd() / "container-info" / "model-group-to-singularity.json"
     )
     singularity_image_folder: Union[str, Path] = None
     zenodo_client = zenodoclient.Client()
