@@ -38,10 +38,12 @@ def test_singularityhandler_init():
         singularity_handler.singularity_image_folder
         == Path(__file__).parent.resolve()
     )
-    assert "Basset" in singularity_handler.model_group_to_docker_dict.keys()
+    assert (
+        "Basset" in singularity_handler.model_group_to_singularity_dict.keys()
+    )
     assert all(
         sorted(list(container_dict.keys())) == ["md5", "name", "url"]
-        for container_dict in singularity_handler.model_group_to_docker_dict.values()
+        for container_dict in singularity_handler.model_group_to_singularity_dict.values()
     )
 
 
@@ -53,8 +55,12 @@ def test_singularityhandler_update_container_info():
         model_group_to_singularity_dict=MODEL_GROUP_TO_SINGULARITY,
         singularity_image_folder=Path(__file__).parent.resolve(),
     )
-    with open(singularity_handler.container_info, "r") as file_handle:
-        original_container_dict = json.load(file_handle)
+    singularity_json = (
+        Path.cwd() / "container-info" / "model-group-to-singularity.json"
+    )
+
+    original_container_dict = helper.populate_json(singularity_json)
+
     new_container_dict = {
         "url": "https://www.dummy.url",
         "name": "Dummy_container.sif",
@@ -63,18 +69,19 @@ def test_singularityhandler_update_container_info():
         "file_id": "123",
     }
     singularity_handler.update_container_info(new_container_dict)
-    with open(singularity_handler.container_info, "r") as file_handle:
-        updated_container_dict = json.load(file_handle)
 
-    assert "DummyModel" in updated_container_dict
-    assert updated_container_dict.get("DummyModel") == {
+    assert (
+        original_container_dict
+        != singularity_handler.model_group_to_singularity_dict
+    )
+    assert "DummyModel" in singularity_handler.model_group_to_singularity_dict
+    assert singularity_handler.model_group_to_singularity_dict.get(
+        "DummyModel"
+    ) == {
         "url": new_container_dict["url"],
         "name": new_container_dict["name"],
         "md5": new_container_dict["md5"],
     }
-    helper.write_json(
-        original_container_dict, singularity_handler.container_info
-    )
 
 
 def test_singularityhandler_noupdate(capsys, monkeypatch):
@@ -104,17 +111,17 @@ def test_singularityhandler_noupdate(capsys, monkeypatch):
     monkeypatch.setattr(
         "modelupdater.singularityhandler.check_integrity", mock_check_integrity
     )
-
-    with open(singularity_handler.container_info, "r") as file_handle:
-        original_container_dict = json.load(file_handle)
+    singularity_json = (
+        Path.cwd() / "container-info" / "model-group-to-singularity.json"
+    )
+    original_container_dict = helper.populate_json(singularity_json)
     singularity_handler.update(models_to_test)
     captured = capsys.readouterr()
     assert (
         captured.out.strip()
         == "No need to update the existing singularity container for DeepMEL"
     )
-    with open(singularity_handler.container_info, "r") as file_handle:
-        updated_container_dict = json.load(file_handle)
+    updated_container_dict = helper.populate_json(singularity_json)
     assert original_container_dict == updated_container_dict
 
 
@@ -170,18 +177,23 @@ def test_singularityhandler_update(monkeypatch):
     monkeypatch.setattr(
         "modelupdater.singularityhandler.check_integrity", mock_check_integrity
     )
-    with open(singularity_handler.container_info, "r") as file_handle:
-        original_container_dict = json.load(file_handle)
+    singularity_json = (
+        Path.cwd() / "container-info" / "model-group-to-singularity.json"
+    )
+    original_container_dict = helper.populate_json(singularity_json)
     singularity_handler.update(models_to_test)
-    with open(singularity_handler.container_info, "r") as file_handle:
-        updated_container_dict = json.load(file_handle)
+    updated_container_dict = (
+        singularity_handler.model_group_to_singularity_dict
+    )
+
     assert updated_container_dict.get("MPRA-DragoNN") == {
         "url": "https://dummy.url",
         "name": "wrong_name",
         "md5": "78758738",
     }
-    helper.write_json(
-        original_container_dict, singularity_handler.container_info
+    assert (
+        original_container_dict
+        != singularity_handler.model_group_to_singularity_dict
     )
 
 
@@ -236,16 +248,20 @@ def test_singularityhandler_add(monkeypatch):
     monkeypatch.setattr(
         "modelupdater.singularityhandler.check_integrity", mock_check_integrity
     )
-    with open(singularity_handler.container_info, "r") as file_handle:
-        original_container_dict = json.load(file_handle)
+    singularity_json = (
+        Path.cwd() / "container-info" / "model-group-to-singularity.json"
+    )
+    original_container_dict = helper.populate_json(singularity_json)
     singularity_handler.add(models_to_test)
-    with open(singularity_handler.container_info, "r") as file_handle:
-        updated_container_dict = json.load(file_handle)
+    updated_container_dict = (
+        singularity_handler.model_group_to_singularity_dict
+    )
     assert updated_container_dict.get("MPRA-DragoNN/ConvModel") == {
         "url": "https://dummy.url",
         "name": "wrong_name",
         "md5": "78758738",
     }
-    helper.write_json(
-        original_container_dict, singularity_handler.container_info
+    assert (
+        original_container_dict
+        != singularity_handler.model_group_to_singularity_dict
     )
