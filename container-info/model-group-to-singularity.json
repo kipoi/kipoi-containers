@@ -151,7 +151,7 @@
     },
     "SeqVec": {
         "url": "https://zenodo.org/record/5750929/files/kipoi-docker_seqvec.sif?download=1",
-        "name": "kipoi-docker_seqvec.sif",
+        "name": "kipoi-docker_seqvec",
         "md5": "fc4a817f7e0421ed4c7cb8abd2de4c63"
     },
     "Xpresso": {
