@@ -26,6 +26,6 @@ def populate_yaml(yaml_file):
         return round_trip_load(f, preserve_quotes=True)
 
 
-def write_yaml(yaml_file, data):  # flip the order
+def write_yaml(data, yaml_file):
     with open(yaml_file, "w") as f:
         round_trip_dump(data, f)

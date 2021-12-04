@@ -6,14 +6,17 @@ from .adder import ModelAdder
 from github import Github
 from .updater import ModelUpdater
 from .singularityhandler import SingularityHandler
-from .helper import populate_json, write_json
+from .helper import populate_json, write_json, populate_yaml, write_yaml
 
 CONTAINER_PREFIX = Path.cwd() / "container-info"
+WORKFLOW_PREFIX = Path.cwd() / ".github/workflows"
 MODEL_GROUP_TO_DOCKER_JSON = CONTAINER_PREFIX / "model-group-to-docker.json"
-DOCKER_TO_MODEL_JSON = CONTAINER_PREFIX / "docker-to-model.json.json"
+DOCKER_TO_MODEL_JSON = CONTAINER_PREFIX / "docker-to-model.json"
 MODEL_GROUP_TO_SINGULARITY_JSON = (
     CONTAINER_PREFIX / "model-group-to-singularity.json"
 )
+TEST_IMAGES_WORKFLOW = WORKFLOW_PREFIX / "test-images.yml"
+RELEASE_WORKFLOW = WORKFLOW_PREFIX / "release-workflow.yml"
 
 
 class ModelSyncer:
@@ -51,6 +54,8 @@ class ModelSyncer:
         self.model_group_to_singularity_dict = populate_json(
             MODEL_GROUP_TO_SINGULARITY_JSON
         )
+        self.workflow_test_data = populate_yaml(TEST_IMAGES_WORKFLOW)
+        self.workflow_release_data = populate_yaml(RELEASE_WORKFLOW)
         self.list_of_updated_model_groups = []
 
     def get_list_of_updated_model_groups(self):
@@ -143,6 +148,8 @@ class ModelSyncer:
             model_adder.add(
                 model_group_to_docker_dict=self.model_group_to_docker_dict,
                 docker_to_model_dict=self.docker_to_model_dict,
+                workflow_test_data=self.workflow_test_data,
+                workflow_release_data=self.workflow_release_data,
             )
             singularity_handler = SingularityHandler(
                 model_group=model_group,
@@ -168,7 +175,8 @@ class ModelSyncer:
                 self.model_group_to_singularity_dict,
                 MODEL_GROUP_TO_SINGULARITY_JSON,
             )
-
+            write_yaml(self.workflow_test_data, TEST_IMAGES_WORKFLOW)
+            write_yaml(self.workflow_release_data, RELEASE_WORKFLOW)
         else:
             print("No need to update the repo")
 

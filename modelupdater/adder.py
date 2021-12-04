@@ -38,35 +38,12 @@ class ModelAdder:
         self.image_name = f"kipoi/kipoi-docker:{self.model_group.lower()}"
         self.list_of_models = []
 
-    def update_github_workflow_files(
-        self, test_image_yaml, release_workflow_yaml
-    ):
-        """
-        Update github actions CI workflow files with the newly added model
-        """
-        data = populate_yaml(test_image_yaml)
-        update_list = data["jobs"]["test"]["strategy"]["matrix"]["model"]
-        if self.list_of_models:
-            update_list.append(
-                DoubleQuotedScalarString(self.list_of_models[0])
-            )
-        else:
-            update_list.append(DoubleQuotedScalarString(self.model_group))
-        write_yaml(test_image_yaml, data)
-
-        data = populate_yaml(release_workflow_yaml)
-        if "sharedpy3keras2" in self.image_name:
-            data["jobs"]["buildandtestsharedpy3keras2"]["strategy"]["matrix"][
-                "modelgroup"
-            ].append(DoubleQuotedScalarString(self.model_group))
-        else:
-            data["jobs"]["buildtestandpush"]["strategy"]["matrix"][
-                "image"
-            ].append(DoubleQuotedScalarString(self.image_name.split(":")[1]))
-        write_yaml(release_workflow_yaml, data)
-
-    def update_test_and_json_files(
-        self, model_group_to_docker_dict, docker_to_model_dict
+    def update_content(
+        self,
+        model_group_to_docker_dict,
+        docker_to_model_dict,
+        workflow_test_data,
+        workflow_release_data,
     ):
         """
         Update docker-to-model.json and model-group-to-docker.json
@@ -87,6 +64,29 @@ class ModelAdder:
                 {self.image_name: self.list_of_models}
                 if self.list_of_models
                 else {self.image_name: [self.model_group]}
+            )
+
+        update_test_list = workflow_test_data["jobs"]["test"]["strategy"][
+            "matrix"
+        ]["model"]
+        if self.list_of_models:
+            update_test_list.append(
+                DoubleQuotedScalarString(self.list_of_models[0])
+            )
+        else:
+            update_test_list.append(DoubleQuotedScalarString(self.model_group))
+
+        if "sharedpy3keras2" in self.image_name:
+            workflow_release_data["jobs"]["buildandtestsharedpy3keras2"][
+                "strategy"
+            ]["matrix"]["modelgroup"].append(
+                DoubleQuotedScalarString(self.model_group)
+            )
+        else:
+            workflow_release_data["jobs"]["buildtestandpush"]["strategy"][
+                "matrix"
+            ]["image"].append(
+                DoubleQuotedScalarString(self.image_name.split(":")[1])
             )
 
     def get_list_of_models_from_repo(self):
@@ -144,7 +144,13 @@ class ModelAdder:
                     return True
         return False
 
-    def add(self, model_group_to_docker_dict, docker_to_model_dict):
+    def add(
+        self,
+        model_group_to_docker_dict,
+        docker_to_model_dict,
+        workflow_test_data,
+        workflow_release_data,
+    ):
         """
         This function adds a newly added model group to this repo. The steps are -
         1. Test the model group with two available docker images for shared
@@ -184,7 +190,6 @@ class ModelAdder:
             )
 
             # Test the newly created container
-
             if self.list_of_models:
                 for model_name in self.list_of_models:
                     # Run the newly created container
@@ -200,12 +205,9 @@ class ModelAdder:
             push_docker_image(tag=self.image_name.split(":")[1])
             cleanup(images=True)
 
-            test_image_yaml = ".github/workflows/test-images.yml"
-            release_workflow_yaml = ".github/workflows/release-workflow.yml"
-
-            self.update_test_and_json_files(
-                model_group_to_docker_dict, docker_to_model_dict
-            )
-            self.update_github_workflow_files(
-                test_image_yaml, release_workflow_yaml
+            self.update_content(
+                model_group_to_docker_dict,
+                docker_to_model_dict,
+                workflow_test_data,
+                workflow_release_data,
             )

@@ -9,7 +9,13 @@ from ruamel.yaml.scalarstring import DoubleQuotedScalarString
 
 from modelupdater.updater import ModelUpdater
 from modelupdater.adder import ModelAdder
-from modelupdater.helper import populate_json
+from modelupdater.helper import populate_json, populate_yaml
+from modelupdater.updateoradd import (
+    DOCKER_TO_MODEL_JSON,
+    MODEL_GROUP_TO_DOCKER_JSON,
+    TEST_IMAGES_WORKFLOW,
+    RELEASE_WORKFLOW,
+)
 
 
 @pytest.fixture
@@ -17,27 +23,27 @@ def parent_path():
     return Path(__file__).resolve().parent
 
 
-# @pytest.mark.parametrize(
-#     "model_group_to_update,image_to_update",
-#     [
-#         ("MMSplice/deltaLogitPSI", "kipoi/kipoi-docker:mmsplice"),
-#     ],
-# )
-# def test_update(model_group_to_update, image_to_update, monkeypatch):
-#     def mock_push_docker_image(*args, **kwargs):
-#         return True
+@pytest.mark.parametrize(
+    "model_group_to_update,image_to_update",
+    [
+        ("MMSplice/deltaLogitPSI", "kipoi/kipoi-docker:mmsplice"),
+    ],
+)
+def test_update(model_group_to_update, image_to_update, monkeypatch):
+    def mock_push_docker_image(*args, **kwargs):
+        return True
 
-#     monkeypatch.setattr(
-#         "modelupdater.updater.push_docker_image",
-#         mock_push_docker_image,
-#     )
-#     client = docker.from_env()
-#     original_shortid = client.images.get(image_to_update).short_id
-#     ModelUpdater().update(
-#         model_group=model_group_to_update,
-#         name_of_docker_image=image_to_update,
-#     )
-#     assert client.images.get(image_to_update).short_id != original_shortid
+    monkeypatch.setattr(
+        "modelupdater.updater.push_docker_image",
+        mock_push_docker_image,
+    )
+    client = docker.from_env()
+    original_shortid = client.images.get(image_to_update).short_id
+    ModelUpdater().update(
+        model_group=model_group_to_update,
+        name_of_docker_image=image_to_update,
+    )
+    assert client.images.get(image_to_update).short_id != original_shortid
 
 
 def test_add(monkeypatch, parent_path, tmpdir):
@@ -65,32 +71,23 @@ def test_add(monkeypatch, parent_path, tmpdir):
         mock_push_docker_image,
     )
     # p = tmpdir.mkdir("copies").join("hello.txt")
-    docker_to_model_file_path = (
-        parent_path / "../container-info" / "docker-to-model.json"
-    )
-    model_group_to_docker_file_path = (
-        parent_path / "../container-info" / "model-group-to-docker.json"
-    )
-    model_group_to_docker_dict = populate_json(model_group_to_docker_file_path)
-    docker_to_model_dict = populate_json(docker_to_model_file_path)
 
-    workflow_test_images_file_path = (
-        parent_path / "../.github/workflows/test-images.yml"
-    )
-
-    shutil.copy(
-        workflow_test_images_file_path,
-        parent_path / "tmp-test-images.yml",
-    )
-
-    assert model_group_to_add
+    model_group_to_docker_dict = populate_json(MODEL_GROUP_TO_DOCKER_JSON)
+    docker_to_model_dict = populate_json(DOCKER_TO_MODEL_JSON)
+    workflow_test_data = populate_yaml(TEST_IMAGES_WORKFLOW)
+    workflow_release_data = populate_yaml(RELEASE_WORKFLOW)
 
     model_adder = ModelAdder(
         model_group=model_group_to_add,
         kipoi_model_repo=None,
         kipoi_container_repo=None,
     )
-    model_adder.add(model_group_to_docker_dict, docker_to_model_dict)
+    model_adder.add(
+        model_group_to_docker_dict,
+        docker_to_model_dict,
+        workflow_test_data,
+        workflow_release_data,
+    )
 
     # Revert the change
     dockerfile_path = (
@@ -99,28 +96,25 @@ def test_add(monkeypatch, parent_path, tmpdir):
     assert dockerfile_path.exists()
     dockerfile_path.unlink()
 
-    assert "kipoi/kipoi-docker:cletimer" in model_group_to_docker_dict
+    assert (
+        model_group_to_docker_dict["CleTimer"] == "kipoi/kipoi-docker:cletimer"
+    )
     assert docker_to_model_dict["kipoi/kipoi-docker:cletimer"] == [
         "CleTimer/customBP",
         "CleTimer/default",
     ]
-
-    with open(
-        workflow_test_images_file_path,
-        "r",
-    ) as f:
-        data = round_trip_load(f, preserve_quotes=True)
-        assert (
-            "CleTimer/customBP"
-            in data["jobs"]["test"]["strategy"]["matrix"]["model"]
-        )
-
-    shutil.copy(
-        parent_path / "tmp-test-images.yml",
-        workflow_test_images_file_path,
+    assert (
+        model_group_to_add
+        in workflow_test_data["jobs"]["test"]["strategy"]["matrix"]["model"][
+            -1
+        ]
     )
-
-    (parent_path / "tmp-test-images.yml").unlink()
+    assert (
+        workflow_release_data["jobs"]["buildtestandpush"]["strategy"][
+            "matrix"
+        ]["image"][-1]
+        == "cletimer"
+    )
 
 
 # def test_add_is_compatible_with_existing_image(monkeypatch):
