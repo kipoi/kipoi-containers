@@ -165,10 +165,12 @@ class ModelAdder:
         """
         self.list_of_models = self.get_list_of_models_from_repo()
         if self.is_compatible_with_existing_image():
-            self.update_test_and_json_files(
-                model_group_to_docker_dict, docker_to_model_dict
+            self.update_content(
+                model_group_to_docker_dict,
+                docker_to_model_dict,
+                workflow_test_data,
+                workflow_release_data,
             )
-            self.update_github_workflow_files()
         else:
             dockerfile_generator_path = "dockerfiles/dockerfile-generator.sh"
             # Create a new dockerfile
