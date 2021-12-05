@@ -1,4 +1,4 @@
-from modelupdater.dockerhelper import test_docker_image
+from kipoi_containers.dockerhelper import test_docker_image
 
 
 class TestServerCode(object):
