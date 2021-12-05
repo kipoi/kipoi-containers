@@ -83,7 +83,7 @@ jobs:
     - name: Test updateoradd
       run: |-
         docker pull kipoi/kipoi-docker:mmsplice
-        python -m pytest -s test-modelupdater/test_updateoradd.py
+        python -m pytest -s test-docker/test_docker_handler.py
 
 
   testsingularity:

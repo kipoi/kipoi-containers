@@ -1,26 +1,4 @@
-import docker
-
-
-def run_test(model_name, image_name):
-    if model_name == "Basenji":
-        test_cmd = f"kipoi test {model_name} --source=kipoi --batch_size=2"
-    else:
-        test_cmd = f"kipoi test {model_name} --source=kipoi"
-    client = docker.from_env()
-    try:
-        container_log = client.containers.run(
-            image=image_name, command=test_cmd
-        )
-    except docker.errors.ImageNotFound:
-        raise (f"Image {image_name} is not found")
-    except docker.errors.ContainerError as e:
-        raise (e)
-    except docker.errors.APIError as e:
-        raise (e)
-    client.images.prune(filters={"dangling": True})
-    client.volumes.prune()
-    client.containers.prune()
-    print(container_log.decode("utf-8"))
+from modelupdater.dockerhelper import test_docker_image
 
 
 class TestServerCode(object):
@@ -49,8 +27,8 @@ class TestServerCode(object):
         if self.list_of_models:
             for model in self.list_of_models:
                 image_name = self.get_image_name(model=model)
-                run_test(model_name=model, image_name=image_name)
+                test_docker_image(model_name=model, image_name=image_name)
         elif self.model_name is not None:
             for model in self.model_name:
                 image_name = self.get_image_name(model=model)
-                run_test(model_name=model, image_name=image_name)
+                test_docker_image(model_name=model, image_name=image_name)

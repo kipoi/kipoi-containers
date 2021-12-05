@@ -120,5 +120,5 @@ Then, install the requirements and run the tests -
 
 ```bash
 pip install -r requirements.txt
-python -m pytest -s test-modelupdater/test_updateoradd.py test-singularity/test_singularity_modify.py
+python -m pytest -s test-docker/test_docker_handler.py test-singularity/test_singularity_modify.py
 ```

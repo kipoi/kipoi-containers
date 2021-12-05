@@ -40,7 +40,7 @@ def build_docker_image(dockerfile_path, name_of_docker_image):
         raise (e)
 
 
-def run_docker_image(image_name, model_name):
+def test_docker_image(image_name, model_name):
     """
     Runs a container for a given docker image and run
     kipoi test <model_name> --source=kipoi inside
@@ -53,11 +53,15 @@ def run_docker_image(image_name, model_name):
     model_name : str
         Name of the model to test
     """
+    if model_name == "Basenji":
+        test_cmd = f"kipoi test {model_name} --source=kipoi --batch_size=2"
+    else:
+        test_cmd = f"kipoi test {model_name} --source=kipoi"
     client = docker.from_env()
     try:
         container_log = client.containers.run(
             image=image_name,
-            command=f"kipoi test {model_name} --source=kipoi",
+            command=test_cmd,
         )
     except docker.errors.ImageNotFound:
         raise (f"Image {image_name} is not found")
@@ -69,7 +73,7 @@ def run_docker_image(image_name, model_name):
     print(container_log.decode("utf-8"))
 
 
-def run_docker_image_without_exception(image_name, model_name):
+def test_docker_image_without_exception(image_name, model_name):
     """
     Runs a container for a given docker image and run
     kipoi test <model_name> --source=kipoi inside

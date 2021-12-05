@@ -9,8 +9,8 @@ from ruamel.yaml.scalarstring import DoubleQuotedScalarString
 from .dockerhelper import (
     build_docker_image,
     cleanup,
-    run_docker_image,
-    run_docker_image_without_exception,
+    test_docker_image,
+    test_docker_image_without_exception,
     push_docker_image,
 )
 from .helper import populate_yaml, write_yaml
@@ -131,13 +131,13 @@ class ModelAdder:
             if self.list_of_models:
                 for model_name in self.list_of_models:
                     # Run the newly created container
-                    if run_docker_image_without_exception(
+                    if test_docker_image_without_exception(
                         image_name=image_name, model_name=model_name
                     ):
                         self.image_name = image_name
                         return True
             else:
-                if run_docker_image_without_exception(
+                if test_docker_image_without_exception(
                     image_name=image_name, model_name=self.model_group
                 ):
                     self.image_name = image_name
@@ -195,11 +195,11 @@ class ModelAdder:
             if self.list_of_models:
                 for model_name in self.list_of_models:
                     # Run the newly created container
-                    run_docker_image(
+                    test_docker_image(
                         image_name=self.image_name, model_name=model_name
                     )
             else:
-                run_docker_image(
+                test_docker_image(
                     image_name=self.image_name, model_name=self.model_group
                 )
 

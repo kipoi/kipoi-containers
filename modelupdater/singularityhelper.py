@@ -58,9 +58,14 @@ def test_singularity_image(
     """
     for model in models:
         print(f"Testing {model} with {singularity_image_name}")
+        if model == "Basenji":
+            test_cmd = f"kipoi test {model} --source=kipoi --batch_size=2"
+        else:
+            test_cmd = f"kipoi test {model} --source=kipoi"
+
         result = Client.execute(
             singularity_image_folder / Path(f"{singularity_image_name}"),
-            f"kipoi test {model} --source=kipoi",
+            test_cmd,
             return_result=True,
         )
         if result["return_code"] != 0:
