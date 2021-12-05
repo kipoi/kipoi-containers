@@ -4,15 +4,14 @@ from typing import Dict, Union, List, Type
 import os
 
 
-from .singularityhelper import (
+from kipoi_containers.singularityhelper import (
     build_singularity_image,
     update_existing_singularity_container,
     push_new_singularity_image,
     test_singularity_image,
     cleanup,
 )
-
-from modelupdater import zenodoclient
+from kipoi_containers import zenodoclient
 
 from kipoi_utils.external.torchvision.dataset_utils import check_integrity
 

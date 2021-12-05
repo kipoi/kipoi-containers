@@ -7,10 +7,10 @@ import shutil
 from ruamel.yaml import round_trip_load, round_trip_dump
 from ruamel.yaml.scalarstring import DoubleQuotedScalarString
 
-from modelupdater.dockerupdater import DockerUpdater
-from modelupdater.dockeradder import DockerAdder
-from modelupdater.helper import populate_json, populate_yaml
-from modelupdater.updateoradd import (
+from kipoi_containers.dockerupdater import DockerUpdater
+from kipoi_containers.dockeradder import DockerAdder
+from kipoi_containers.helper import populate_json, populate_yaml
+from kipoi_containers.updateoradd import (
     DOCKER_TO_MODEL_JSON,
     MODEL_GROUP_TO_DOCKER_JSON,
     TEST_IMAGES_WORKFLOW,
@@ -34,7 +34,7 @@ def test_update(model_group_to_update, image_to_update, monkeypatch):
         return True
 
     monkeypatch.setattr(
-        "modelupdater.dockerupdater.push_docker_image",
+        "kipoi_containers.dockerupdater.push_docker_image",
         mock_push_docker_image,
     )
     client = docker.from_env()
@@ -58,15 +58,15 @@ def test_add(monkeypatch, parent_path):
         return True
 
     monkeypatch.setattr(
-        "modelupdater.dockeradder.DockerAdder.get_list_of_models_from_repo",
+        "kipoi_containers.dockeradder.DockerAdder.get_list_of_models_from_repo",
         staticmethod(mock_get_list_of_models_from_repo),
     )
     monkeypatch.setattr(
-        "modelupdater.dockeradder.DockerAdder.is_compatible_with_existing_image",
+        "kipoi_containers.dockeradder.DockerAdder.is_compatible_with_existing_image",
         staticmethod(mock_is_compatible_with_existing_image),
     )
     monkeypatch.setattr(
-        "modelupdater.dockeradder.push_docker_image",
+        "kipoi_containers.dockeradder.push_docker_image",
         mock_push_docker_image,
     )
 
@@ -129,15 +129,15 @@ def test_add_is_compatible_with_existing_image(monkeypatch):
         return True
 
     monkeypatch.setattr(
-        "modelupdater.dockeradder.DockerAdder.get_list_of_models_from_repo",
+        "kipoi_containers.dockeradder.DockerAdder.get_list_of_models_from_repo",
         staticmethod(mock_get_list_of_models_from_repo),
     )
     monkeypatch.setattr(
-        "modelupdater.dockeradder.DockerAdder.is_compatible_with_existing_image",
+        "kipoi_containers.dockeradder.DockerAdder.is_compatible_with_existing_image",
         staticmethod(mock_is_compatible_with_existing_image),
     )
     monkeypatch.setattr(
-        "modelupdater.dockeradder.push_docker_image",
+        "kipoi_containers.dockeradder.push_docker_image",
         mock_push_docker_image,
     )
 

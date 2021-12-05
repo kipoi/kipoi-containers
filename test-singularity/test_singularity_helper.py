@@ -5,13 +5,13 @@ from pathlib import Path
 
 import pytest
 
-from modelupdater import (
+from kipoi_containers import (
     helper,
     singularityhelper,
     singularityhandler,
     zenodoclient,
 )
-from modelupdater.updateoradd import MODEL_GROUP_TO_SINGULARITY_JSON
+from kipoi_containers.updateoradd import MODEL_GROUP_TO_SINGULARITY_JSON
 
 
 @pytest.fixture(scope="module")

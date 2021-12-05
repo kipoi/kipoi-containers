@@ -6,9 +6,9 @@ import random
 
 import pytest
 
-from modelupdater import helper, singularityhandler, singularityhelper
-from modelupdater import zenodoclient
-from modelupdater.updateoradd import MODEL_GROUP_TO_SINGULARITY_JSON
+from kipoi_containers import helper, singularityhandler, singularityhelper
+from kipoi_containers import zenodoclient
+from kipoi_containers.updateoradd import MODEL_GROUP_TO_SINGULARITY_JSON
 
 
 @pytest.fixture
@@ -107,14 +107,15 @@ def test_singularityhandler_noupdate(
         model_group_to_singularity_dict=model_group_to_singularity_dict,
     )
     monkeypatch.setattr(
-        "modelupdater.singularityhandler.cleanup", mock_cleanup
+        "kipoi_containers.singularityhandler.cleanup", mock_cleanup
     )
     monkeypatch.setattr(
-        "modelupdater.singularityhandler.build_singularity_image",
+        "kipoi_containers.singularityhandler.build_singularity_image",
         mock_build_singularity_image,
     )
     monkeypatch.setattr(
-        "modelupdater.singularityhandler.check_integrity", mock_check_integrity
+        "kipoi_containers.singularityhandler.check_integrity",
+        mock_check_integrity,
     )
     singularity_json = MODEL_GROUP_TO_SINGULARITY_JSON
     original_container_dict = helper.populate_json(singularity_json)
@@ -163,22 +164,23 @@ def test_singularityhandler_update(
         model_group_to_singularity_dict=model_group_to_singularity_dict,
     )
     monkeypatch.setattr(
-        "modelupdater.singularityhandler.cleanup", mock_cleanup
+        "kipoi_containers.singularityhandler.cleanup", mock_cleanup
     )
     monkeypatch.setattr(
-        "modelupdater.singularityhandler.build_singularity_image",
+        "kipoi_containers.singularityhandler.build_singularity_image",
         mock_build_singularity_image,
     )
     monkeypatch.setattr(
-        "modelupdater.singularityhandler.test_singularity_image",
+        "kipoi_containers.singularityhandler.test_singularity_image",
         mock_test_singularity_image,
     )
     monkeypatch.setattr(
-        "modelupdater.singularityhandler.update_existing_singularity_container",
+        "kipoi_containers.singularityhandler.update_existing_singularity_container",
         mock_update_existing_singularity_container,
     )
     monkeypatch.setattr(
-        "modelupdater.singularityhandler.check_integrity", mock_check_integrity
+        "kipoi_containers.singularityhandler.check_integrity",
+        mock_check_integrity,
     )
     singularity_json = MODEL_GROUP_TO_SINGULARITY_JSON
     original_container_dict = helper.populate_json(singularity_json)
@@ -232,22 +234,23 @@ def test_singularityhandler_add(
         model_group_to_singularity_dict=model_group_to_singularity_dict,
     )
     monkeypatch.setattr(
-        "modelupdater.singularityhandler.cleanup", mock_cleanup
+        "kipoi_containers.singularityhandler.cleanup", mock_cleanup
     )
     monkeypatch.setattr(
-        "modelupdater.singularityhandler.build_singularity_image",
+        "kipoi_containers.singularityhandler.build_singularity_image",
         mock_build_singularity_image,
     )
     monkeypatch.setattr(
-        "modelupdater.singularityhandler.test_singularity_image",
+        "kipoi_containers.singularityhandler.test_singularity_image",
         mock_test_singularity_image,
     )
     monkeypatch.setattr(
-        "modelupdater.singularityhandler.push_new_singularity_image",
+        "kipoi_containers.singularityhandler.push_new_singularity_image",
         mock_push_singularity_container,
     )
     monkeypatch.setattr(
-        "modelupdater.singularityhandler.check_integrity", mock_check_integrity
+        "kipoi_containers.singularityhandler.check_integrity",
+        mock_check_integrity,
     )
     singularity_json = MODEL_GROUP_TO_SINGULARITY_JSON
     original_container_dict = helper.populate_json(singularity_json)

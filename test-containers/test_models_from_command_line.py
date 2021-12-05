@@ -1,7 +1,7 @@
 from kipoi_containers.dockerhelper import test_docker_image
 
 
-class TestServerCode(object):
+class TestServerCode:
     model_name = None
     model_group_to_docker_dict = {}
     list_of_models = []

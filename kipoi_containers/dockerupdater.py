@@ -1,7 +1,7 @@
 from pathlib import Path
 import pytest
 
-from .dockerhelper import (
+from kipoi_containers.dockerhelper import (
     build_docker_image,
     cleanup,
     push_docker_image,

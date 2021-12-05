@@ -2,11 +2,17 @@ import os
 import json
 from pathlib import Path
 
-from .dockeradder import DockerAdder
 from github import Github
-from .dockerupdater import DockerUpdater
-from .singularityhandler import SingularityHandler
-from .helper import populate_json, write_json, populate_yaml, write_yaml
+
+from kipoi_containers.dockeradder import DockerAdder
+from kipoi_containers.dockerupdater import DockerUpdater
+from kipoi_containers.singularityhandler import SingularityHandler
+from kipoi_containers.helper import (
+    populate_json,
+    write_json,
+    populate_yaml,
+    write_yaml,
+)
 
 CONTAINER_PREFIX = Path.cwd() / "container-info"
 WORKFLOW_PREFIX = Path.cwd() / ".github/workflows"

@@ -6,14 +6,14 @@ import subprocess
 import pandas as pd
 from ruamel.yaml.scalarstring import DoubleQuotedScalarString
 
-from .dockerhelper import (
+from kipoi_containers.dockerhelper import (
     build_docker_image,
     cleanup,
     test_docker_image,
     test_docker_image_without_exception,
     push_docker_image,
 )
-from .helper import populate_yaml, write_yaml
+from kipoi_containers.helper import populate_yaml, write_yaml
 
 
 class DockerAdder:
