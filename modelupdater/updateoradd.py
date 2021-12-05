@@ -2,9 +2,9 @@ import os
 import json
 from pathlib import Path
 
-from .adder import ModelAdder
+from .dockeradder import DockerAdder
 from github import Github
-from .updater import ModelUpdater
+from .dockerupdater import DockerUpdater
 from .singularityhandler import SingularityHandler
 from .helper import populate_json, write_json, populate_yaml, write_yaml
 
@@ -130,17 +130,17 @@ class ModelSyncer:
                 docker_image_name=name_of_docker_image,
                 model_group_to_singularity_dict=self.model_group_to_singularity_dict,
             )
-            model_updater = ModelUpdater()
             if "shared" not in name_of_docker_image:
-                model_updater.update(
+                docker_updater = DockerUpdater(
                     model_group=model_group,
                     name_of_docker_image=name_of_docker_image,
                 )
+                docker_updater.update()
                 singularity_handler.update(models_to_test)
             else:
                 print(f"We will not be updating {name_of_docker_image}")
         else:
-            model_adder = ModelAdder(
+            model_adder = DockerAdder(
                 model_group=model_group,
                 kipoi_model_repo=self.kipoi_model_repo,
                 kipoi_container_repo=self.kipoi_container_repo,

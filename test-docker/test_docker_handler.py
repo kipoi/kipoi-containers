@@ -7,8 +7,8 @@ import shutil
 from ruamel.yaml import round_trip_load, round_trip_dump
 from ruamel.yaml.scalarstring import DoubleQuotedScalarString
 
-from modelupdater.updater import ModelUpdater
-from modelupdater.adder import ModelAdder
+from modelupdater.dockerupdater import DockerUpdater
+from modelupdater.dockeradder import DockerAdder
 from modelupdater.helper import populate_json, populate_yaml
 from modelupdater.updateoradd import (
     DOCKER_TO_MODEL_JSON,
@@ -34,15 +34,14 @@ def test_update(model_group_to_update, image_to_update, monkeypatch):
         return True
 
     monkeypatch.setattr(
-        "modelupdater.updater.push_docker_image",
+        "modelupdater.dockerupdater.push_docker_image",
         mock_push_docker_image,
     )
     client = docker.from_env()
     original_shortid = client.images.get(image_to_update).short_id
-    ModelUpdater().update(
-        model_group=model_group_to_update,
-        name_of_docker_image=image_to_update,
-    )
+    DockerUpdater(
+        model_group=model_group_to_update, name_of_docker_image=image_to_update
+    ).update()
     assert client.images.get(image_to_update).short_id != original_shortid
 
 
@@ -59,15 +58,15 @@ def test_add(monkeypatch, parent_path):
         return True
 
     monkeypatch.setattr(
-        "modelupdater.adder.ModelAdder.get_list_of_models_from_repo",
+        "modelupdater.dockeradder.DockerAdder.get_list_of_models_from_repo",
         staticmethod(mock_get_list_of_models_from_repo),
     )
     monkeypatch.setattr(
-        "modelupdater.adder.ModelAdder.is_compatible_with_existing_image",
+        "modelupdater.dockeradder.DockerAdder.is_compatible_with_existing_image",
         staticmethod(mock_is_compatible_with_existing_image),
     )
     monkeypatch.setattr(
-        "modelupdater.adder.push_docker_image",
+        "modelupdater.dockeradder.push_docker_image",
         mock_push_docker_image,
     )
 
@@ -76,7 +75,7 @@ def test_add(monkeypatch, parent_path):
     workflow_test_data = populate_yaml(TEST_IMAGES_WORKFLOW)
     workflow_release_data = populate_yaml(RELEASE_WORKFLOW)
 
-    model_adder = ModelAdder(
+    model_adder = DockerAdder(
         model_group=model_group_to_add,
         kipoi_model_repo=None,
         kipoi_container_repo=None,
@@ -130,15 +129,15 @@ def test_add_is_compatible_with_existing_image(monkeypatch):
         return True
 
     monkeypatch.setattr(
-        "modelupdater.adder.ModelAdder.get_list_of_models_from_repo",
+        "modelupdater.dockeradder.DockerAdder.get_list_of_models_from_repo",
         staticmethod(mock_get_list_of_models_from_repo),
     )
     monkeypatch.setattr(
-        "modelupdater.adder.ModelAdder.is_compatible_with_existing_image",
+        "modelupdater.dockeradder.DockerAdder.is_compatible_with_existing_image",
         staticmethod(mock_is_compatible_with_existing_image),
     )
     monkeypatch.setattr(
-        "modelupdater.adder.push_docker_image",
+        "modelupdater.dockeradder.push_docker_image",
         mock_push_docker_image,
     )
 
@@ -150,7 +149,7 @@ def test_add_is_compatible_with_existing_image(monkeypatch):
     model_group_to_docker_dict.pop(model_group_to_add)
     docker_to_model_dict[docker_image].remove(model_group_to_add)
 
-    model_adder = ModelAdder(
+    model_adder = DockerAdder(
         model_group=model_group_to_add,
         kipoi_model_repo=None,
         kipoi_container_repo=None,

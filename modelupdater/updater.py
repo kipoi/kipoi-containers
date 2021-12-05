@@ -4,10 +4,10 @@ import pytest
 from .dockerhelper import build_docker_image, cleanup, push_docker_image
 
 
-class ModelUpdater:
+class DockerUpdater:
     def __init__(self, model_group, name_of_docker_image):
         """
-        This function instantiate the ModelUpdater class
+        This function instantiate the DockerUpdater class
         """
         self.model_group = model_group
         self.name_of_docker_image = name_of_docker_image
