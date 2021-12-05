@@ -1,7 +1,12 @@
 from pathlib import Path
 import pytest
 
-from .dockerhelper import build_docker_image, cleanup, push_docker_image
+from .dockerhelper import (
+    build_docker_image,
+    cleanup,
+    push_docker_image,
+    test_docker_image,
+)
 
 
 class DockerUpdater:
@@ -12,7 +17,7 @@ class DockerUpdater:
         self.model_group = model_group
         self.name_of_docker_image = name_of_docker_image
 
-    def update(self):
+    def update(self, models_to_test):
         """
         This functions rebuilds the given docker image for the given modelgroup and
         tests all the models with this new image. The steps are -
@@ -58,20 +63,10 @@ class DockerUpdater:
                 dockerfile_path=dockerfile_path,
                 name_of_docker_image=self.name_of_docker_image,
             )
-            exitcode = pytest.main(
-                [
-                    "-s",
-                    "test-containers/test_containers_from_command_line.py",
-                    f"--image={self.name_of_docker_image}",
-                ]
-            )
-            if exitcode != 0:
-                raise ValueError(
-                    f"Updated docker image {self.name_of_docker_image} for {self.model_group} did not pass relevant tests"
-                )
-            else:
-                push_docker_image(tag=self.name_of_docker_image.split(":")[1])
-                cleanup(images=True)
+            for model in models_to_test:
+                test_docker_image(image_name=self.image_name, model_name=model)
+            push_docker_image(tag=self.name_of_docker_image.split(":")[1])
+            cleanup(images=True)
         else:
             raise ValueError(
                 f"{self.model_group} needs to be containerized first"

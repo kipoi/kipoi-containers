@@ -41,7 +41,7 @@ def test_update(model_group_to_update, image_to_update, monkeypatch):
     original_shortid = client.images.get(image_to_update).short_id
     DockerUpdater(
         model_group=model_group_to_update, name_of_docker_image=image_to_update
-    ).update()
+    ).update(models_to_test=["MMSplice/modularPredictions"])
     assert client.images.get(image_to_update).short_id != original_shortid
 
 

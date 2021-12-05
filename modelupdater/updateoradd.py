@@ -135,7 +135,7 @@ class ModelSyncer:
                     model_group=model_group,
                     name_of_docker_image=name_of_docker_image,
                 )
-                docker_updater.update()
+                docker_updater.update(models_to_test)
                 singularity_handler.update(models_to_test)
             else:
                 print(f"We will not be updating {name_of_docker_image}")
