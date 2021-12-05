@@ -60,9 +60,7 @@ def test_singularityhandler_update_container_info(
         model_group_to_singularity_dict=model_group_to_singularity_dict,
         singularity_image_folder=cwd,
     )
-    singularity_json = (
-        cwd / "container-info" / "model-group-to-singularity.json"
-    )
+    singularity_json = MODEL_GROUP_TO_SINGULARITY_JSON
 
     original_container_dict = helper.populate_json(singularity_json)
 
@@ -118,9 +116,7 @@ def test_singularityhandler_noupdate(
     monkeypatch.setattr(
         "modelupdater.singularityhandler.check_integrity", mock_check_integrity
     )
-    singularity_json = (
-        cwd / "container-info" / "model-group-to-singularity.json"
-    )
+    singularity_json = MODEL_GROUP_TO_SINGULARITY_JSON
     original_container_dict = helper.populate_json(singularity_json)
     singularity_handler.update(models_to_test)
     captured = capsys.readouterr()
@@ -184,9 +180,7 @@ def test_singularityhandler_update(
     monkeypatch.setattr(
         "modelupdater.singularityhandler.check_integrity", mock_check_integrity
     )
-    singularity_json = (
-        cwd / "container-info" / "model-group-to-singularity.json"
-    )
+    singularity_json = MODEL_GROUP_TO_SINGULARITY_JSON
     original_container_dict = helper.populate_json(singularity_json)
     singularity_handler.update(models_to_test)
     updated_container_dict = (
@@ -255,9 +249,7 @@ def test_singularityhandler_add(
     monkeypatch.setattr(
         "modelupdater.singularityhandler.check_integrity", mock_check_integrity
     )
-    singularity_json = (
-        cwd / "container-info" / "model-group-to-singularity.json"
-    )
+    singularity_json = MODEL_GROUP_TO_SINGULARITY_JSON
     original_container_dict = helper.populate_json(singularity_json)
     singularity_handler.add(models_to_test)
     updated_container_dict = (
