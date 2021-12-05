@@ -64,7 +64,9 @@ class DockerUpdater:
                 name_of_docker_image=self.name_of_docker_image,
             )
             for model in models_to_test:
-                test_docker_image(image_name=self.image_name, model_name=model)
+                test_docker_image(
+                    image_name=self.name_of_docker_image, model_name=model
+                )
             push_docker_image(tag=self.name_of_docker_image.split(":")[1])
             cleanup(images=True)
         else:
