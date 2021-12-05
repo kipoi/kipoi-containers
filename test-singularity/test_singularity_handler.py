@@ -8,36 +8,39 @@ import pytest
 
 from modelupdater import helper, singularityhandler, singularityhelper
 from modelupdater import zenodoclient
-
-MODEL_GROUP_TO_SINGULARITY = helper.populate_json(
-    Path.cwd() / "container-info" / "model-group-to-singularity.json"
-)
+from modelupdater.updateoradd import MODEL_GROUP_TO_SINGULARITY_JSON
 
 
-def test_pull_folder():
-    os.environ["SINGULARITY_PULL_FOLDER"] = "/usr/src/imaginary-folder"
+@pytest.fixture
+def model_group_to_singularity_dict():
+    return helper.populate_json(MODEL_GROUP_TO_SINGULARITY_JSON)
+
+
+@pytest.fixture
+def cwd():
+    return Path.cwd()
+
+
+def test_pull_folder(monkeypatch, model_group_to_singularity_dict):
+    monkeypatch.setenv("SINGULARITY_PULL_FOLDER", "/usr/src/imaginary-folder")
     singularity_handler = singularityhandler.SingularityHandler(
         model_group="Basset",
         docker_image_name="kipoi://kipoi-docker:basset",
-        model_group_to_singularity_dict=MODEL_GROUP_TO_SINGULARITY,
+        model_group_to_singularity_dict=model_group_to_singularity_dict,
     )
-    os.environ.pop("SINGULARITY_PULL_FOLDER", None)
     assert Path(singularity_handler.singularity_image_folder) == Path(
         "/usr/src/imaginary-folder"
     )
 
 
-def test_singularityhandler_init():
+def test_singularityhandler_init(model_group_to_singularity_dict, cwd):
     singularity_handler = singularityhandler.SingularityHandler(
         model_group="Basset",
         docker_image_name="kipoi://kipoi-docker:basset",
-        model_group_to_singularity_dict=MODEL_GROUP_TO_SINGULARITY,
-        singularity_image_folder=Path(__file__).parent.resolve(),
+        model_group_to_singularity_dict=model_group_to_singularity_dict,
+        singularity_image_folder=cwd,
     )
-    assert (
-        singularity_handler.singularity_image_folder
-        == Path(__file__).parent.resolve()
-    )
+    assert singularity_handler.singularity_image_folder == cwd
     assert (
         "Basset" in singularity_handler.model_group_to_singularity_dict.keys()
     )
@@ -47,16 +50,18 @@ def test_singularityhandler_init():
     )
 
 
-def test_singularityhandler_update_container_info():
+def test_singularityhandler_update_container_info(
+    model_group_to_singularity_dict, cwd
+):
     model_group = "DummyModel"
     singularity_handler = singularityhandler.SingularityHandler(
         model_group=model_group,
         docker_image_name="kipoi://kipoi-docker:dummymodel",
-        model_group_to_singularity_dict=MODEL_GROUP_TO_SINGULARITY,
-        singularity_image_folder=Path(__file__).parent.resolve(),
+        model_group_to_singularity_dict=model_group_to_singularity_dict,
+        singularity_image_folder=cwd,
     )
     singularity_json = (
-        Path.cwd() / "container-info" / "model-group-to-singularity.json"
+        cwd / "container-info" / "model-group-to-singularity.json"
     )
 
     original_container_dict = helper.populate_json(singularity_json)
@@ -84,9 +89,11 @@ def test_singularityhandler_update_container_info():
     }
 
 
-def test_singularityhandler_noupdate(capsys, monkeypatch):
+def test_singularityhandler_noupdate(
+    capsys, monkeypatch, model_group_to_singularity_dict, cwd
+):
     def mock_build_singularity_image(*args, **kwargs):
-        return Path(__file__).parent.resolve() / "kipoi-docker_deepmel.sif"
+        return cwd / "kipoi-docker_deepmel.sif"
 
     def mock_check_integrity(*args, **kwargs):
         return True
@@ -98,8 +105,8 @@ def test_singularityhandler_noupdate(capsys, monkeypatch):
     singularity_handler = singularityhandler.SingularityHandler(
         model_group="DeepMEL",
         docker_image_name="kipoi/kipoi-docker:deepmel",
-        singularity_image_folder=Path(__file__).parent.resolve(),
-        model_group_to_singularity_dict=MODEL_GROUP_TO_SINGULARITY,
+        singularity_image_folder=cwd,
+        model_group_to_singularity_dict=model_group_to_singularity_dict,
     )
     monkeypatch.setattr(
         "modelupdater.singularityhandler.cleanup", mock_cleanup
@@ -112,7 +119,7 @@ def test_singularityhandler_noupdate(capsys, monkeypatch):
         "modelupdater.singularityhandler.check_integrity", mock_check_integrity
     )
     singularity_json = (
-        Path.cwd() / "container-info" / "model-group-to-singularity.json"
+        cwd / "container-info" / "model-group-to-singularity.json"
     )
     original_container_dict = helper.populate_json(singularity_json)
     singularity_handler.update(models_to_test)
@@ -125,11 +132,11 @@ def test_singularityhandler_noupdate(capsys, monkeypatch):
     assert original_container_dict == updated_container_dict
 
 
-def test_singularityhandler_update(monkeypatch):
+def test_singularityhandler_update(
+    monkeypatch, model_group_to_singularity_dict, cwd
+):
     def mock_build_singularity_image(*args, **kwargs):
-        return (
-            Path(__file__).parent.resolve() / "kipoi-docker_mpra-dragonn.sif"
-        )
+        return cwd / "kipoi-docker_mpra-dragonn.sif"
 
     def mock_check_integrity(*args, **kwargs):
         return False
@@ -156,8 +163,8 @@ def test_singularityhandler_update(monkeypatch):
     singularity_handler = singularityhandler.SingularityHandler(
         model_group="MPRA-DragoNN",
         docker_image_name="kipoi/kipoi-docker:mpra-dragonn",
-        singularity_image_folder=Path(__file__).parent.resolve(),
-        model_group_to_singularity_dict=MODEL_GROUP_TO_SINGULARITY,
+        singularity_image_folder=cwd,
+        model_group_to_singularity_dict=model_group_to_singularity_dict,
     )
     monkeypatch.setattr(
         "modelupdater.singularityhandler.cleanup", mock_cleanup
@@ -178,7 +185,7 @@ def test_singularityhandler_update(monkeypatch):
         "modelupdater.singularityhandler.check_integrity", mock_check_integrity
     )
     singularity_json = (
-        Path.cwd() / "container-info" / "model-group-to-singularity.json"
+        cwd / "container-info" / "model-group-to-singularity.json"
     )
     original_container_dict = helper.populate_json(singularity_json)
     singularity_handler.update(models_to_test)
@@ -197,11 +204,11 @@ def test_singularityhandler_update(monkeypatch):
     )
 
 
-def test_singularityhandler_add(monkeypatch):
+def test_singularityhandler_add(
+    monkeypatch, model_group_to_singularity_dict, cwd
+):
     def mock_build_singularity_image(*args, **kwargs):
-        return (
-            Path(__file__).parent.resolve() / "kipoi-docker_mpra-dragonn.sif"
-        )
+        return cwd / "kipoi-docker_mpra-dragonn.sif"
 
     def mock_check_integrity(*args, **kwargs):
         return False
@@ -227,8 +234,8 @@ def test_singularityhandler_add(monkeypatch):
     singularity_handler = singularityhandler.SingularityHandler(
         model_group="MPRA-DragoNN/ConvModel",
         docker_image_name="kipoi/kipoi-docker:mpra-dragonn",
-        singularity_image_folder=Path(__file__).parent.resolve(),
-        model_group_to_singularity_dict=MODEL_GROUP_TO_SINGULARITY,
+        singularity_image_folder=cwd,
+        model_group_to_singularity_dict=model_group_to_singularity_dict,
     )
     monkeypatch.setattr(
         "modelupdater.singularityhandler.cleanup", mock_cleanup
@@ -249,7 +256,7 @@ def test_singularityhandler_add(monkeypatch):
         "modelupdater.singularityhandler.check_integrity", mock_check_integrity
     )
     singularity_json = (
-        Path.cwd() / "container-info" / "model-group-to-singularity.json"
+        cwd / "container-info" / "model-group-to-singularity.json"
     )
     original_container_dict = helper.populate_json(singularity_json)
     singularity_handler.add(models_to_test)
