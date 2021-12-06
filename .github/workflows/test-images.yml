@@ -26,8 +26,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install flake8 
+        pip install -e .
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -58,8 +58,7 @@ jobs:
       run: |
         sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config
         python -m pip install --upgrade pip
-        pip install pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install -e .
     - name: Test with pytest
       run: |
         pytest -s test-containers/test_models_from_command_line.py --model=${{ matrix.model }}
@@ -78,8 +77,7 @@ jobs:
       run: |
         sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config
         python -m pip install --upgrade pip
-        pip install pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install -e .
     - name: Test updateoradd
       run: |-
         docker pull kipoi/kipoi-docker:mmsplice
@@ -108,7 +106,6 @@ jobs:
       run: |
         sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config
         python -m pip install --upgrade pip
-        pip install pytest
         pip install -e .
     - name: Test singularity
       run: |
