@@ -48,6 +48,8 @@ jobs:
           "SeqVec/embedding", "Xpresso/human_GM12878", "epidermal_basset/encode-roadmap.basset.clf.testfold-0",
           "DeepFlyBrain", "APARENT/site_probabilities", "APARENT/veff"]
     runs-on: ubuntu-latest
+    env:
+      SINGULARITY_PULL_FOLDER: "~/singularity"
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
@@ -63,6 +65,7 @@ jobs:
       run: |
         pytest -s test-containers/test_models_from_command_line.py --model=${{ matrix.model }}
         docker system prune -a -f
+        rm -rf ~/singularity
 
   testupdateoradd:
 
