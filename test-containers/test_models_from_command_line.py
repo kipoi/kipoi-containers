@@ -4,7 +4,7 @@ from kipoi_containers.updateoradd import MODEL_GROUP_TO_DOCKER_JSON
 from kipoi_containers.helper import populate_json
 
 
-class TestServerCode:
+class TestModels:
     model_name = None
     model_group_to_docker_dict = populate_json(MODEL_GROUP_TO_DOCKER_JSON)
     list_of_models = []
@@ -26,9 +26,7 @@ class TestServerCode:
         assert self.model_name is not None or self.list_of_models != []
         assert self.model_group_to_docker_dict != {}
 
-    def test_models(self):
-        from kipoi_containers.dockerhelper import test_docker_image
-
+    def test_models(self, test_docker_image):
         if self.list_of_models:
             for model in self.list_of_models:
                 image_name = self.get_image_name(model=model)

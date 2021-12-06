@@ -1,6 +1,15 @@
 from pathlib import Path
 import json
 
+import pytest
+
+
+@pytest.fixture
+def test_docker_image():
+    from kipoi_containers.dockerhelper import test_docker_image
+
+    return test_docker_image
+
 
 def pytest_addoption(parser):
     """attaches optional cmd-line args to the pytest machinery"""
