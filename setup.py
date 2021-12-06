@@ -14,8 +14,9 @@ requirements = [
     "pandas",
     "spython",
     "kipoi",
+    "pre-commit",
 ]
-setup_requirements = ["pre-commit"]
+setup_requirements = []
 
 test_requirements = []
 
