@@ -74,7 +74,6 @@ jobs:
       run: |
         pytest -s test-containers/test_models_from_command_line.py --model=${{ matrix.model }}
         docker system prune -a -f
-        rm -rf ~/singularity
 
   testdocker:
 

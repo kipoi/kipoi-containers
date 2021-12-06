@@ -57,7 +57,9 @@ def test_singularity_image(
     models : List
         Name of the models to test
     """
-    print(f"Testing {model} with {singularity_image_name}")
+    print(
+        f"Testing {model} with {singularity_image_folder}{singularity_image_name}"
+    )
     if model == "Basenji":
         test_cmd = f"kipoi test {model} --source=kipoi --batch_size=2"
     else:
@@ -71,7 +73,7 @@ def test_singularity_image(
     if result["return_code"] != 0:
         print(result["message"])
         raise ValueError(
-            f"Updated singularity image {singularity_image_name} for {model} did not pass relevant tests"
+            f"Singularity image {singularity_image_name} for {model} did not pass relevant tests"
         )
 
 
