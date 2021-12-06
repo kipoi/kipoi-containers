@@ -239,7 +239,13 @@ def get_singularity_image(
         image_name = f"{singularity_image_dict[model_group]['name']}.sif"
         image_url = f"{singularity_image_dict[model_group]['url']}"
         image_md5 = f"{singularity_image_dict[model_group]['md5']}"
-    if not Path(singularity_image_folder / image_name).exists():
+
+    if isinstance(singularity_image_folder, str):
+        singularity_image_folder = Path(singularity_image_folder)
+    if isinstance(image_name, str):
+        image_name = Path(image_name)
+
+    if not (singularity_image_folder / image_name).exists():
         download_url(
             url=image_url,
             root=singularity_image_folder,
