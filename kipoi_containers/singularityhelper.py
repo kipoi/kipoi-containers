@@ -64,9 +64,12 @@ def test_singularity_image(
         test_cmd = f"kipoi test {model} --source=kipoi --batch_size=2"
     else:
         test_cmd = f"kipoi test {model} --source=kipoi"
-
+    if isinstance(singularity_image_folder, str):
+        singularity_image_folder = Path(singularity_image_folder)
+    if isinstance(singularity_image_name, str):
+        singularity_image_name = Path(singularity_image_name)
     result = Client.execute(
-        singularity_image_folder / Path(f"{singularity_image_name}"),
+        singularity_image_folder / singularity_image_name,
         test_cmd,
         return_result=True,
     )
