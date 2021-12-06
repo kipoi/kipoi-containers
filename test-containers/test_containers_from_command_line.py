@@ -29,7 +29,6 @@ class TestContainers:
         singularity_pull_folder = os.environ.get(
             "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
         )
-        print(singularity_pull_folder)
         if self.modelgroup_name and self.image_name not in [
             None,
             "kipoi-base-env",

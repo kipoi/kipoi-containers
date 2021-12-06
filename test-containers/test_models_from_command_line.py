@@ -1,12 +1,22 @@
+import os
+from pathlib import Path
+
 import docker
 
+from kipoi_containers.updateoradd import (
+    MODEL_GROUP_TO_SINGULARITY_JSON,
+)
 from kipoi_containers.updateoradd import MODEL_GROUP_TO_DOCKER_JSON
 from kipoi_containers.helper import populate_json
+from kipoi_containers.singularityhelper import get_singularity_image
 
 
 class TestModels:
     model_name = None
     model_group_to_docker_dict = populate_json(MODEL_GROUP_TO_DOCKER_JSON)
+    model_group_to_singularity_dict = populate_json(
+        MODEL_GROUP_TO_SINGULARITY_JSON
+    )
     list_of_models = []
 
     def get_image_name(self, model):
@@ -25,13 +35,37 @@ class TestModels:
     def test_parameters(self):
         assert self.model_name is not None or self.list_of_models != []
         assert self.model_group_to_docker_dict != {}
+        assert self.model_group_to_singularity_dict != {}
 
-    def test_models(self, test_docker_image):
+    def test_models(self, test_docker_image, test_singularity_image):
+        singularity_pull_folder = os.environ.get(
+            "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
+        )
         if self.list_of_models:
             for model in self.list_of_models:
+                singularity_image = get_singularity_image(
+                    singularity_pull_folder,
+                    self.model_group_to_singularity_dict,
+                    model,
+                )
                 image_name = self.get_image_name(model=model)
                 test_docker_image(image_name=image_name, model_name=model)
+                test_singularity_image(
+                    singularity_image_folder=singularity_pull_folder,
+                    singularity_image_name=singularity_image,
+                    model=model,
+                )
         elif self.model_name is not None:
             for model in self.model_name:
+                singularity_image = get_singularity_image(
+                    singularity_pull_folder,
+                    self.model_group_to_singularity_dict,
+                    model,
+                )
                 image_name = self.get_image_name(model=model)
                 test_docker_image(image_name=image_name, model_name=model)
+                test_singularity_image(
+                    singularity_image_folder=singularity_pull_folder,
+                    singularity_image_name=singularity_image,
+                    model=model,
+                )
