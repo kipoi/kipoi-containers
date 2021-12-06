@@ -36,7 +36,7 @@ def run_update(docker_image: str) -> None:
     singularity_handler.update(models_to_test)
     model_group_to_singularity_dict = {
         k: model_group_to_singularity_dict_ci[k.lower()]
-        for k, _ in model_group_to_singularity_dict_ci.items()
+        for k, _ in model_group_to_singularity_dict.items()
     }
     write_json(
         model_group_to_singularity_dict, MODEL_GROUP_TO_SINGULARITY_JSON
