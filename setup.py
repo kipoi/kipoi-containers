@@ -15,6 +15,7 @@ requirements = [
     "spython",
     "kipoi",
     "pre-commit",
+    "click",
 ]
 setup_requirements = []
 
