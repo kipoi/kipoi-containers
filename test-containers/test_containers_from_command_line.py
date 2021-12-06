@@ -1,10 +1,11 @@
-from kipoi_containers.dockerhelper import test_docker_image
+from kipoi_containers.updateoradd import DOCKER_TO_MODEL_JSON
+from kipoi_containers.helper import populate_json
 
 
 class TestServerCode(object):
     image_name = None
     modelgroup_name = None
-    image_to_model_dict = {}
+    image_to_model_dict = populate_json(DOCKER_TO_MODEL_JSON)
 
     def test_parameters(self):
         assert self.image_name not in [None, "kipoi-base-env"]
@@ -15,6 +16,8 @@ class TestServerCode(object):
         assert self.image_to_model_dict != {}
 
     def test_images(self):
+        from kipoi_containers.dockerhelper import test_docker_image
+
         if self.modelgroup_name and self.image_name not in [
             None,
             "kipoi-base-env",
