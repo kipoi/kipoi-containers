@@ -6,4 +6,4 @@ channels:
 dependencies:
   - pip
   - python=3.9
-  - singularity
+  - singularity>=3.5
