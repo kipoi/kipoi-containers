@@ -74,7 +74,7 @@ jobs:
         docker system prune -a -f
         rm -rf ~/singularity
 
-  testupdateoradd:
+  testdocker:
 
     runs-on: ubuntu-latest
     steps:
