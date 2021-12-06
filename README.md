@@ -97,14 +97,14 @@ Native support for singularity has been added to kipoi_containers.updateoradd. T
 
 ## Adding new containers
 
-If new models are added to kipoi repository it is prudent to add all the necessary files in this repo and build, test and push a container to kipoi-docker dockerhub repo. For this purpose, I have provided ```modelupdater/updateoradd.py```. Run it as - 
+If new models are added to kipoi repository it is prudent to add all the necessary files in this repo and build, test and push a container to kipoi-docker dockerhub repo. For this purpose, I have provided ```kipoi_containers/updateoradd.py```. Run it as - 
 
  ```bash
- pip install -r requirements.txt
- python -m  kipoi_containersupdateoradd
+ pip install -e .
+ python kipoi_containers/updateoradd.py
  ```
  
- A Personal Access Token is required since we will read from and write to github repos using PyGithub. Please add it as an environment variable named ```GITHUB_PAT```. Docker username and access token is also required for pushing the container to [the docker hub](https://index.docker.io/v1/kipoi/kipoi-docker/). Please add them as environment variables named ```DOCKER_USERNAME``` and ```DOCKER_PASSWORD```. ZENODO access token must also be added as an environment variable named ```ZENODO_ACCESS_TOKEN```. Create it [here](https://zenodo.org/account/settings/applications/tokens/new/) and make sure to click deposit:actions, deposit:write and user:email. This script will update existing images and rerun the tests. If a new model group needs to be updated, add a new dockerfile for model group which has not been containerized yet, build the docker  image, run tests to ensure all corresponding models in the group are compatible with this image, update the json files, update github workflow files, repeat these steps for the singularity containers and finally update ```modelupdater/kipoi-model-repo-hash```.  If everything goes well, at this point feel free to push the image and create a PR on github.
+ A Personal Access Token is required since we will read from and write to github repos using PyGithub. Please add it as an environment variable named ```GITHUB_PAT```. Docker username and access token is also required for pushing the container to [the docker hub](https://index.docker.io/v1/kipoi/kipoi-docker/). Please add them as environment variables named ```DOCKER_USERNAME``` and ```DOCKER_PASSWORD```. ZENODO access token must also be added as an environment variable named ```ZENODO_ACCESS_TOKEN```. Create it [here](https://zenodo.org/account/settings/applications/tokens/new/) and make sure to click deposit:actions, deposit:write and user:email. This script will update existing images and rerun the tests. If a new model group needs to be updated, add a new dockerfile for model group which has not been containerized yet, build the docker  image, run tests to ensure all corresponding models in the group are compatible with this image, update the json files, update github workflow files, repeat these steps for the singularity containers and finally update ```kipoi_containers/kipoi-model-repo-hash```.  If everything goes well, at this point feel free to push the image and create a PR on github.
 
 
 ### Tests

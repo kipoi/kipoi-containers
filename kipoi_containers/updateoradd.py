@@ -50,7 +50,7 @@ class ModelSyncer:
             "master"
         ).commit.sha
         with open(
-            "./modelupdater/kipoi-model-repo-hash", "r"
+            "kipoi_containers/kipoi-model-repo-hash", "r"
         ) as kipoimodelrepohash:
             self.source_commit_hash = kipoimodelrepohash.readline()
         self.model_group_to_docker_dict = populate_json(
@@ -188,7 +188,7 @@ class ModelSyncer:
 
         # If everything has gone well so far update kipoi-model-hash
         with open(
-            "./modelupdater/kipoi-model-repo-hash", "w"
+            "kipoi_containers/kipoi-model-repo-hash", "w"
         ) as kipoimodelrepohash:
             kipoimodelrepohash.write(self.target_commit_hash)
 
