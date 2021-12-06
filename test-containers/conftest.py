@@ -1,12 +1,6 @@
 from pathlib import Path
 import json
 
-from kipoi_containers.updateoradd import (
-    MODEL_GROUP_TO_DOCKER_JSON,
-    DOCKER_TO_MODEL_JSON,
-)
-from kipoi_containers.helper import populate_json
-
 
 def pytest_addoption(parser):
     """attaches optional cmd-line args to the pytest machinery"""
@@ -20,11 +14,6 @@ def pytest_addoption(parser):
 
 
 def pytest_generate_tests(metafunc):
-    metafunc.cls.model_group_to_docker_dict = populate_json(
-        MODEL_GROUP_TO_DOCKER_JSON
-    )
-    metafunc.cls.image_to_model_dict = populate_json(DOCKER_TO_MODEL_JSON)
-
     if metafunc.config.getoption("image"):
         image_from_cmd_line = metafunc.config.getoption("image")
         if image_from_cmd_line and hasattr(metafunc.cls, "image_name"):
