@@ -4,9 +4,18 @@
 
 from setuptools import setup, find_packages
 
-requirements = []
-
-setup_requirements = []
+requirements = [
+    "docker",
+    "pytest",
+    "PyGithub",
+    "requests",
+    "ruamel.yaml",
+    "ruamel.yaml.clib",
+    "pandas",
+    "spython",
+    "kipoi",
+]
+setup_requirements = ["pre-commit"]
 
 test_requirements = []
 
