@@ -52,11 +52,12 @@ class SingularityHandler:
             singularity_image_name=self.singularity_image_name,
             singularity_image_folder=self.singularity_image_folder,
         )
-        test_singularity_image(
-            singularity_image_folder=self.singularity_image_folder,
-            singularity_image_name=self.singularity_image_name,
-            models=models_to_test,
-        )
+        for model in models_to_test:
+            test_singularity_image(
+                singularity_image_folder=self.singularity_image_folder,
+                singularity_image_name=self.singularity_image_name,
+                model=model,
+            )
         new_singularity_dict = push_new_singularity_image(
             zenodo_client=self.zenodo_client,
             singularity_image_folder=self.singularity_image_folder,
@@ -84,11 +85,12 @@ class SingularityHandler:
             )
             cleanup(singularity_image_path)
         else:
-            test_singularity_image(
-                singularity_image_folder=self.singularity_image_folder,
-                singularity_image_name=self.singularity_image_name,
-                models=models_to_test,
-            )
+            for model in models_to_test:
+                test_singularity_image(
+                    singularity_image_folder=self.singularity_image_folder,
+                    singularity_image_name=self.singularity_image_name,
+                    model=model,
+                )
             updated_singularity_dict = update_existing_singularity_container(
                 zenodo_client=self.zenodo_client,
                 singularity_dict=self.singularity_dict,

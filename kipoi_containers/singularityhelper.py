@@ -5,6 +5,7 @@ import requests
 from pathlib import Path
 import json
 
+from kipoi_utils.external.torchvision.dataset_utils import download_url
 from spython.main import Client
 
 ZENODO_BASE = "https://zenodo.org"
@@ -42,7 +43,7 @@ def build_singularity_image(
 
 
 def test_singularity_image(
-    singularity_image_folder, singularity_image_name, models
+    singularity_image_folder, singularity_image_name, model
 ):  # TODO: Investigate adding this to test_containers_from_command_line
     """
     Tests a container for a given singularity image and run
@@ -56,23 +57,22 @@ def test_singularity_image(
     models : List
         Name of the models to test
     """
-    for model in models:
-        print(f"Testing {model} with {singularity_image_name}")
-        if model == "Basenji":
-            test_cmd = f"kipoi test {model} --source=kipoi --batch_size=2"
-        else:
-            test_cmd = f"kipoi test {model} --source=kipoi"
+    print(f"Testing {model} with {singularity_image_name}")
+    if model == "Basenji":
+        test_cmd = f"kipoi test {model} --source=kipoi --batch_size=2"
+    else:
+        test_cmd = f"kipoi test {model} --source=kipoi"
 
-        result = Client.execute(
-            singularity_image_folder / Path(f"{singularity_image_name}"),
-            test_cmd,
-            return_result=True,
+    result = Client.execute(
+        singularity_image_folder / Path(f"{singularity_image_name}"),
+        test_cmd,
+        return_result=True,
+    )
+    if result["return_code"] != 0:
+        print(result["message"])
+        raise ValueError(
+            f"Updated singularity image {singularity_image_name} for {model} did not pass relevant tests"
         )
-        if result["return_code"] != 0:
-            print(result["message"])
-            raise ValueError(
-                f"Updated singularity image {singularity_image_name} for {models} did not pass relevant tests"
-            )
 
 
 def create_new_deposition(zenodo_client, deposition_id):
@@ -221,3 +221,29 @@ def push_new_singularity_image(
             "new_deposition_id": deposition_id,
             "file_id": "",
         }
+
+
+def get_singularity_image(
+    singularity_image_folder, singularity_image_dict, model_or_model_group
+):
+    if (
+        model_or_model_group in singularity_image_dict
+    ):  # Special case for MMSPlice/mtsplice, APARENT/veff
+        image_name = (
+            f"{singularity_image_dict[model_or_model_group]['name']}.sif"
+        )
+        image_url = f"{singularity_image_dict[model_or_model_group]['url']}"
+        image_md5 = f"{singularity_image_dict[model_or_model_group]['md5']}"
+    else:
+        model_group = model_or_model_group.split("/")[0]
+        image_name = f"{singularity_image_dict[model_group]['name']}.sif"
+        image_url = f"{singularity_image_dict[model_group]['url']}"
+        image_md5 = f"{singularity_image_dict[model_group]['md5']}"
+    if not Path(singularity_image_folder / image_name).exists():
+        download_url(
+            url=image_url,
+            root=singularity_image_folder,
+            filename=image_name,
+            md5=image_md5,
+        )
+    return image_name

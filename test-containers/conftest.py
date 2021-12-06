@@ -11,6 +11,13 @@ def test_docker_image():
     return test_docker_image
 
 
+@pytest.fixture
+def test_singularity_image():
+    from kipoi_containers.singularityhelper import test_singularity_image
+
+    return test_singularity_image
+
+
 def pytest_addoption(parser):
     """attaches optional cmd-line args to the pytest machinery"""
     parser.addoption(
