@@ -26,18 +26,13 @@ RELEASE_WORKFLOW = WORKFLOW_PREFIX / "release-workflow.yml"
 
 
 class ModelSyncer:
-    def __init__(self, github_obj):
+    def __init__(self, github_obj: Github) -> None:
         """
         This function initializes several class variables with the
-        logged in github instance an from kipoi-model-repo-hash
-        and model-group-to-docker.json.
-
-        Parameters
-        ----------
-        github_obj : Github instance
-            Logged in github instance that is used to get the models
-            repo, container repo and current commit hash of kipoi model
-            repo.
+        logged in github instance, kipoi_containers/kipoi-model-repo-hash,
+        MODEL_GROUP_TO_DOCKER_JSON, DOCKER_TO_MODEL_JSON,
+        MODEL_GROUP_TO_SINGULARITY_JSON, TEST_IMAGES_WORKFLOW,
+        RELEASE_WORKFLOW
         """
         self.github_obj = github_obj
         self.kipoi_container_repo = self.github_obj.get_user().get_repo(
@@ -64,7 +59,7 @@ class ModelSyncer:
         self.workflow_release_data = populate_yaml(RELEASE_WORKFLOW)
         self.list_of_updated_model_groups = []
 
-    def get_list_of_updated_model_groups(self):
+    def get_list_of_updated_model_groups(self) -> None:
         """
         Figures out which model groups have been updated or added between
         the commit hash stored in ./kipoi-model-repo-hash and current
@@ -118,15 +113,10 @@ class ModelSyncer:
 
         print(self.list_of_updated_model_groups)
 
-    def update_or_add_model_container(self, model_group):
+    def update_or_add_model_container(self, model_group: str) -> None:
         """
         Calls appropariate functions based on whether a model group has
         been updated or added.
-
-        Parameters
-        ----------
-        model_group : str
-            Model group to update or add
         """
         if model_group in self.model_group_to_docker_dict:
             name_of_docker_image = self.model_group_to_docker_dict[model_group]
@@ -164,7 +154,7 @@ class ModelSyncer:
             )
             singularity_handler.add(models_to_test)
 
-    def sync(self):
+    def sync(self) -> None:
         """
         Sync this repository with https://github.com/kipoi/models and update the
         commit hash in kipoi-model-repo-hash if everything is fine

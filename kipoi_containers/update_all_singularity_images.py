@@ -14,6 +14,17 @@ from kipoi_containers.helper import populate_json, write_json
 @click.command()
 @click.argument("docker_image", required=True, type=str)
 def run_update(docker_image: str) -> None:
+    """Update the singularity image corresponding to the docker image.
+    By default, it does not push the image to zenodo but creates a new
+    version of an existing deposition and updates the metadata and file
+    after deleting the existing file. Obviously, this does not update
+    content of model_group_to_singularity_dict. However, if push is
+    enabled in SingularityHandler.udpate, the draft entry will be
+    pushed to zenodo, the image specific entry in model_group_to_singularity_dict
+    will be updated with url and md5 values of the new deposition and
+    kipoi_containers/container-info/model-group-to-singularity.json will be
+    updated.
+    """
     click.echo(f"Testing {docker_image}")
     model_group_to_singularity_dict = populate_json(
         MODEL_GROUP_TO_SINGULARITY_JSON

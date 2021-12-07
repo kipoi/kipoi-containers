@@ -1,5 +1,6 @@
 from pathlib import Path
 import pytest
+from typing import List
 
 from kipoi_containers.dockerhelper import (
     build_docker_image,
@@ -10,32 +11,29 @@ from kipoi_containers.dockerhelper import (
 
 
 class DockerUpdater:
-    def __init__(self, model_group, name_of_docker_image):
+    def __init__(self, model_group: str, name_of_docker_image: str) -> None:
         """
-        This function instantiate the DockerUpdater class
+        This function instantiates the DockerUpdater class with model group and
+        a docker image to update
         """
         self.model_group = model_group
         self.name_of_docker_image = name_of_docker_image
 
-    def update(self, models_to_test):
+    def update(self, models_to_test: List) -> None:
         """
         This functions rebuilds the given docker image for the given modelgroup and
-        tests all the models with this new image. The steps are -
+        tests all models specified by <models_to_test> with this new image. If all
+        tests pass the new image is pushed to dockerhub followed by a cleanup.
+        The steps are -
         1. Rebuild the image
-        2. Rerun the tests for this image
-
-        Parameters
-        ----------
-        model_group : str
-            Model group which has been updated in the kipoi model repo
-        name_of_docker_image : str
-            Corresponding name of the docker image
+        2. Rerun the tests for this image specified to <models_to_test>
+        3. Push the docker image
+        4. Cleanup
 
         Raises
         ------
         ValueError
-            exitcode from the pytest instance that ran to ensure the new image
-            is working with all the models under the group named <model_group>
+            If the dockerfile path for the given model group does not exist
         """
         print(f"Updating {self.model_group} and {self.name_of_docker_image}")
         if self.model_group in [

@@ -2,6 +2,7 @@ import csv
 import json
 from pathlib import Path
 import subprocess
+from typing import Dict, List, TYPE_CHECKING
 
 import pandas as pd
 from ruamel.yaml.scalarstring import DoubleQuotedScalarString
@@ -15,22 +16,20 @@ from kipoi_containers.dockerhelper import (
 )
 from kipoi_containers.helper import populate_yaml, write_yaml
 
+if TYPE_CHECKING:
+    from github.Repository import Repository
+
 
 class DockerAdder:
-    def __init__(self, model_group, kipoi_model_repo, kipoi_container_repo):
+    def __init__(
+        self,
+        model_group: str,
+        kipoi_model_repo: "Repository",
+        kipoi_container_repo: "Repository",
+    ) -> None:
         """
-        This function instantiates DockerAdder class with the model_group to
+        This function instantiates DockerAdder class with model group to
         add, kipoi model repo and this repository
-
-        Parameters
-        ----------
-        model_group : str
-            Model group to add
-        kipoi_model_repo : github.Repository.Repository
-            github.Repository.Repository instance of
-            https://github.com/kipoi/models
-        kipoi_container_repo : github.Repository.Repository
-            github.Repository.Repository instance of this repository
         """
         self.kipoi_model_repo = kipoi_model_repo
         self.kipoi_container_repo = kipoi_container_repo
@@ -40,14 +39,15 @@ class DockerAdder:
 
     def update_content(
         self,
-        model_group_to_docker_dict,
-        docker_to_model_dict,
-        workflow_test_data,
-        workflow_release_data,
-    ):
+        model_group_to_docker_dict: Dict,
+        docker_to_model_dict: Dict,
+        workflow_test_data: Dict,
+        workflow_release_data: Dict,
+    ) -> None:
         """
-        Update docker-to-model.json and model-group-to-docker.json
-        with the newly added model and the corresponding docker image
+        Update various dictionaries from the json and github
+         workflow files with the newly added model and the
+         corresponding docker image
         """
         model_group_to_docker_dict.update(
             {f"{self.model_group}": f"{self.image_name}"}
@@ -89,8 +89,7 @@ class DockerAdder:
                 DoubleQuotedScalarString(self.image_name.split(":")[1])
             )
 
-    def get_list_of_models_from_repo(self):
-
+    def get_list_of_models_from_repo(self) -> List:
         """
         This model returns a list of models listed under a model group
         at https://github.com/kipoi/models
@@ -108,21 +107,15 @@ class DockerAdder:
                 )
                 return [f"{self.model_group}/{m}" for m in model_tsv["model"]]
 
-    def is_compatible_with_existing_image(self):
+    def is_compatible_with_existing_image(self) -> bool:
         """
         This function tests if the new model group is compatible
         with existng shared images -
         "kipoi/kipoi-docker:sharedpy3keras2" and
-        "kipoi/kipoi-docker:sharedpy3keras1.2",
-
-        Returns
-        -------
-        bool
-            If the new model group is found to be compatible with
-            one of the above mentioned shared image,  it updates
-            class variable image_name to the compatible image name
-            and returns True. It will return False otherwise.
-
+        "kipoi/kipoi-docker:sharedpy3keras1.2". If it is found
+        to be compatible, it updates class variable image_name
+        to the compatible image name and returns True. It will
+        return False otherwise.
         """
         for image_name in [
             "kipoi/kipoi-docker:sharedpy3keras2",
@@ -146,22 +139,23 @@ class DockerAdder:
 
     def add(
         self,
-        model_group_to_docker_dict,
-        docker_to_model_dict,
-        workflow_test_data,
-        workflow_release_data,
-    ):
+        model_group_to_docker_dict: Dict,
+        docker_to_model_dict: Dict,
+        workflow_test_data: Dict,
+        workflow_release_data: Dict,
+    ) -> None:
         """
         This function adds a newly added model group to this repo. The steps are -
         1. Test the model group with two available docker images for shared
            environments - kipoi/kipoi-docker:sharedpy3keras2 and
            kipoi/kipoi-docker:sharedpy3keras1.2. If the tests pass go to step
-           5. Otherwise folow step 2-4
+           6. Otherwise folow step 2-5
         2. Create the appropriate dockerfile using a generator
         3. Build the image
         4. Test the image with all models from this newly added model group
-        5. Update model group to image name map and image name to model name map
-        6. Update github workflow files with this newly added model group
+        5. Push the image and cleanup
+        6. Update model group to docker image dict and docker image to model name dict
+        7. Update github workflow files with this newly added model group
         """
         self.list_of_models = self.get_list_of_models_from_repo()
         if self.is_compatible_with_existing_image():

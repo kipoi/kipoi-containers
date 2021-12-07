@@ -4,17 +4,24 @@ import os
 import requests
 from pathlib import Path
 import json
+from typing import Dict, Union, TYPE_CHECKING
 
 from kipoi_utils.external.torchvision.dataset_utils import download_url
 from spython.main import Client
 
+if TYPE_CHECKING:
+    import zenodoclient
+
+
 ZENODO_BASE = "https://zenodo.org"
 ZENODO_DEPOSITION = f"{ZENODO_BASE}/api/deposit/depositions"
 
+PathType = Union[str, Path]
 
-def cleanup(singularity_file_path):
+
+def cleanup(singularity_file_path: PathType) -> None:
     """
-    Cleans up singularity containers that werecreated in build_singularity_image
+    Deletes the singularity image that was created by build_singularity_image
     """
     if isinstance(singularity_file_path, str):
         singularity_file_path = Path(singularity_file_path)
@@ -23,14 +30,14 @@ def cleanup(singularity_file_path):
 
 
 def build_singularity_image(
-    name_of_docker_image, singularity_image_name, singularity_image_folder
-):
+    name_of_docker_image: str,
+    singularity_image_name: str,
+    singularity_image_folder: PathType,
+) -> PathType:
     """
-    This function builds a singularity image from an existing singularity image
-    Parameters
-    ----------
-    singularity_image_name : str
-        Name of the singularity image to build
+    This function builds a singularity image from a dockerhub image
+    using singularity pull. The resulting .sif is stored in <singularity_image_folder> and
+    the filepath is returned.
     """
     if isinstance(singularity_image_folder, Path):
         singularity_image_folder = str(singularity_image_folder)
@@ -44,20 +51,13 @@ def build_singularity_image(
 
 
 def test_singularity_image(
-    singularity_image_folder, singularity_image_name, model
-):  # TODO: Investigate adding this to test_containers_from_command_line
-    """
-    Tests a container for a given singularity image and run
-    kipoi test <model_name> --source=kipoi inside
-    the container
+    singularity_image_folder: PathType, singularity_image_name: str, model: str
+) -> None:
+    """Tests a singularity image residing in singularity_image_folder
+    with kipoi test <model> --source=kipoi
 
-    Parameters
-    ----------
-    singularity_dict: dict
-        Dict containing url, name and md5 checksum of the singularity image
-    models : List
-        Name of the models to test
-    """
+    Raises:
+        ValueError: Raise valueerror if the test is not successful"""
     print(
         f"Testing {model} with {singularity_image_folder}{singularity_image_name}"
     )
@@ -81,26 +81,42 @@ def test_singularity_image(
         )
 
 
-def create_new_deposition(zenodo_client, deposition_id):
+def create_new_deposition(
+    zenodo_client: "zenodoclient.Client", deposition_id: str
+) -> str:
+    """Creates a new version of an existing depsosition on zenodo and returns the
+    corresponding id"""
     status_code, response = zenodo_client.post_content(
         f"{ZENODO_DEPOSITION}/{deposition_id}/actions/newversion"
     )
     return response["links"]["latest_draft"].split("/")[-1]
 
 
-def get_deposit(zenodo_client, deposition_id):
+def get_deposit(
+    zenodo_client: "zenodoclient.Client", deposition_id: str
+) -> Dict:
+    """Returns the response body of a get request for an existing deposition"""
     response = zenodo_client.get_content(
         f"{ZENODO_DEPOSITION}/{deposition_id}"
     )
     return response
 
 
-def upload_file(zenodo_client, url, singularity_image_folder, filename):
+def upload_file(
+    zenodo_client: "zenodoclient.Client",
+    url: str,
+    singularity_image_folder: PathType,
+    filename: str,
+) -> None:
+    """Upload singularity_image_folder/filename to a url"""
     path = singularity_image_folder / filename
     zenodo_client.put_content(url, data=path)
 
 
-def upload_metadata(zenodo_client, url, model_group):
+def upload_metadata(
+    zenodo_client: "zenodoclient.Client", url: str, model_group: str
+) -> None:
+    """Upload metadata for a model group to a given url"""
     data = {
         "metadata": {
             "title": f"{model_group} singularity container",
@@ -117,7 +133,11 @@ def upload_metadata(zenodo_client, url, model_group):
     zenodo_client.put_content(url, data=data)
 
 
-def push_deposition(zenodo_client, deposition_id):
+def push_deposition(
+    zenodo_client: "zenodoclient.Client", deposition_id: str
+) -> Dict:
+    """Pushes a deposition to zenodo. An additional get request is made to the newy pushed
+    deposition and a response body is returned"""
     status_code, response = zenodo_client.post_content(
         f"{ZENODO_DEPOSITION}/{deposition_id}/actions/publish"
     )
@@ -126,13 +146,19 @@ def push_deposition(zenodo_client, deposition_id):
 
 
 def update_existing_singularity_container(
-    zenodo_client,
-    singularity_dict,
-    singularity_image_folder,
-    model_group,
-    file_to_upload="",
-    push=False,
-):
+    zenodo_client: "zenodoclient.Client",
+    singularity_dict: Dict,
+    singularity_image_folder: PathType,
+    model_group: str,
+    file_to_upload: str = "",
+    push: bool = False,
+) -> None:
+    """This function creates a new draft version of an existing image's zenodo entry with updated
+    metadata and file after deleting the old file. If push is True, the draft version is finalized
+    and the url, name and md5 fields are updated and the new deposition id and file id is added to
+    singularity dict which contains information about the existing image. Otherwise, only
+    the new deposotion id and file id is added to the dictionary. This modified dictionary is
+    returned"""
     # Create a new version of an existing deposition
     deposition_id = singularity_dict["url"].split("/")[4]
     new_deposition_id = create_new_deposition(zenodo_client, deposition_id)
@@ -177,21 +203,20 @@ def update_existing_singularity_container(
 
 
 def push_new_singularity_image(
-    zenodo_client,
-    singularity_image_folder,
-    singularity_dict,
-    model_group,
-    file_to_upload="",
-    path="",
-    push=False,
-):
-    """
-    This function pushes a singularity image to zenodo
-    Parameters
-    ----------
-    tag : str
-       Tag of the singularity image to push
-    """
+    zenodo_client: "zenodoclient.Client",
+    singularity_image_folder: PathType,
+    singularity_dict: Dict,
+    model_group: str,
+    file_to_upload: str = "",
+    path: str = "",
+    push: bool = False,
+) -> None:
+    """This function creates a draft version of a new zenodo entry with the
+    metadata and singularity image. If push is True, the draft version is finalized
+    and the url, name and md5 fields are updated and the new deposition id and file id is added to
+    singularity dict which contains empty strings as url and md5. Otherwise, only
+    the new deposotion id and file id is added to the dictionary. This modified dictionary is
+    returned"""
     status_code, response = zenodo_client.post_content(f"{ZENODO_DEPOSITION}")
 
     deposition_id = response["id"]
@@ -211,9 +236,7 @@ def push_new_singularity_image(
     upload_metadata(zenodo_client, url, model_group)
     if push:
         push_deposition(zenodo_client, deposition_id)
-        response = get_deposit(
-            zenodo_client, deposition_id
-        )  # TODO: Is this important here?
+        response = get_deposit(zenodo_client, deposition_id)
         record_id = response["metadata"]["prereserve_doi"]["recid"]
         return {
             "new_deposition_id": deposition_id,
@@ -230,8 +253,12 @@ def push_new_singularity_image(
 
 
 def get_singularity_image(
-    singularity_image_folder, singularity_image_dict, model_or_model_group
-):
+    singularity_image_folder: PathType,
+    singularity_image_dict: Dict,
+    model_or_model_group: str,
+) -> PathType:
+    """This function downloads the singularity image corresponding to the given model or
+    model group from zenodo to singularity_image_folder and returns the name of the image"""
     if (
         model_or_model_group in singularity_image_dict
     ):  # Special case for MMSPlice/mtsplice, APARENT/veff
