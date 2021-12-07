@@ -11,17 +11,7 @@ def runner():
     yield runner
 
 
-@pytest.fixture
-def demo_dict():
-    return
-    {
-        "url": "https://dummy.url",
-        "name": "wrong_name",
-        "md5": "78758738",
-    }
-
-
-def test_cli_correct_use(runner, monkeypatch, tmp_path, demo_dict):
+def test_cli_correct_use(runner, monkeypatch, tmp_path):
     demo_dir = tmp_path / "demo"
     demo_dir.mkdir()
     scrap_singularity_json = demo_dir / "scrap.json"
