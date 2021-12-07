@@ -18,7 +18,8 @@ def cleanup(singularity_file_path):
     """
     if isinstance(singularity_file_path, str):
         singularity_file_path = Path(singularity_file_path)
-    singularity_file_path.unlink()
+    if singularity_file_path.exists():
+        singularity_file_path.unlink()
 
 
 def build_singularity_image(
