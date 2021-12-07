@@ -11,6 +11,15 @@ def runner():
     yield runner
 
 
+def test_cli_incorrect_use(runner):
+    result = runner.invoke(
+        update_all_singularity_images.run_update,
+        [],
+    )
+    assert "Error: Missing argument 'DOCKER_IMAGE'" in result.output
+    assert result.exit_code == 2
+
+
 def test_cli_correct_use(runner, monkeypatch, tmp_path):
     demo_dir = tmp_path / "demo"
     demo_dir.mkdir()
