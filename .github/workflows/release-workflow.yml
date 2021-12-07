@@ -125,4 +125,4 @@ jobs:
       if: ${{ success() }}
       run: |
         update_all_singularity kipoi/kipoi-docker:kipoi-base-env
-        update_all_singularity kipoi/kipoi-docker:${{ matrix.image }} 
+        update_all_singularity kipoi/kipoi-docker:sharedpy3keras2
