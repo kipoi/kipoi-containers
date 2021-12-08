@@ -1,6 +1,22 @@
 from pathlib import Path
 import json
 
+import pytest
+
+
+@pytest.fixture
+def test_docker_image():
+    from kipoi_containers.dockerhelper import test_docker_image
+
+    return test_docker_image
+
+
+@pytest.fixture
+def test_singularity_image():
+    from kipoi_containers.singularityhelper import test_singularity_image
+
+    return test_singularity_image
+
 
 def pytest_addoption(parser):
     """attaches optional cmd-line args to the pytest machinery"""
@@ -14,15 +30,6 @@ def pytest_addoption(parser):
 
 
 def pytest_generate_tests(metafunc):
-    with open(
-        Path.cwd() / "test-containers" / "model-group-to-image-name.json", "r"
-    ) as infile:
-        metafunc.cls.model_group_to_image_dict = json.load(infile)
-
-    with open(
-        Path.cwd() / "test-containers" / "image-name-to-model.json", "r"
-    ) as infile:
-        metafunc.cls.image_to_model_dict = json.load(infile)
     if metafunc.config.getoption("image"):
         image_from_cmd_line = metafunc.config.getoption("image")
         if image_from_cmd_line and hasattr(metafunc.cls, "image_name"):

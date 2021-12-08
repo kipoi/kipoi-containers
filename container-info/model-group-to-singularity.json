@@ -85,9 +85,9 @@
         "md5": "0e5354145f54c2c8c7efc3bb265aebac"
     },
     "MPRA-DragoNN": {
-        "url": "https://zenodo.org/record/5643980/files/kipoi-docker_mpra-dragonn.sif?download=1",
+        "url": "https://zenodo.org/record/5750928/files/kipoi-docker_mpra-dragonn.sif?download=1",
         "name": "kipoi-docker_mpra-dragonn",
-        "md5": "42c0745338b1f0af34cfaf71bca9d10c"
+        "md5": "dba444623fed01b1043f6fa788c6a75a"
     },
     "extended_coda": {
         "url": "https://zenodo.org/record/5643936/files/kipoi-docker_extended_coda.sif?download=1",
@@ -130,9 +130,9 @@
         "md5": "8743e6a324260b610c2b987f3a2efe88"
     },
     "KipoiSplice": {
-        "url": "https://zenodo.org/record/5643955/files/kipoi-docker_kipoisplice.sif?download=1",
+        "url": "https://zenodo.org/record/5750924/files/kipoi-docker_kipoisplice.sif?download=1",
         "name": "kipoi-docker_kipoisplice",
-        "md5": "5a35e24f2bedda1f71dd60d021147962"
+        "md5": "46310a9aeee07ea6466cbe18edfb13aa"
     },
     "deepTarget": {
         "url": "https://zenodo.org/record/5643929/files/kipoi-docker_deeptarget.sif?download=1",
@@ -150,9 +150,9 @@
         "md5": "5a24996da30d3d6d5db839dd2205ad87"
     },
     "SeqVec": {
-        "url": "https://zenodo.org/record/5643982/files/kipoi-docker_seqvec.sif?download=1",
+        "url": "https://zenodo.org/record/5750929/files/kipoi-docker_seqvec.sif?download=1",
         "name": "kipoi-docker_seqvec",
-        "md5": "030875681ffa6dbb5be4f713c258538f"
+        "md5": "fc4a817f7e0421ed4c7cb8abd2de4c63"
     },
     "Xpresso": {
         "url": "https://zenodo.org/record/5644007/files/kipoi-docker_sharedpy3keras2.sif?download=1",

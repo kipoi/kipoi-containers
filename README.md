@@ -1,124 +1,204 @@
 # kipoi-containers
-This is an attempt to reduce  and eventully eliminate complexities related to creating and invoking model specific conda environments. The docker images are hosted 
-[here](https://hub.docker.com/repository/docker/kipoi/kipoi-docker).
 
-# Building the docker images
+<a href=https://www.python.org/downloads>
+	<img alt='Python' src=https://img.shields.io/badge/Python-%20%3E=3.9-cyan
+ style="max-height:20px;width:auto;">
+</a>
+<a href=https://opensource.org/licenses/MIT>
+	<img alt='License: MIT' src=https://img.shields.io/badge/License-MIT-yellow.svg style="max-height:20px;width:auto;">
+</a>
 
-First, we need to build the base image which activates a conda environment made with python 3.6 with kipoi installed in it.
-```
-docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env .
-```
-Note: The model specific Dockefiles are sensitive to the name and tag of the base image right now. 
-After the base image is built, build any other image using the following template
-```
-docker build -f dockerfiles/Dockerfile.<model-group-name-in-lowercase> -t kipoi/kipoi-docker:<image-name> .
-```
-# Map between model group and docker images
+![alt text](misc/kipoicontainers.png?raw=true "kipoi-containers")
+This repository contains necessary infrastructure elements for adding and updating docker and singularity images for models and model groups in [Kipoi model zoo](https://kipoi.org/). These images are pre-activated with a compatible conda environment where all the model (group) specific dependencies have been installed.
 
-See [here](https://github.com/kipoi/kipoi-containers/blob/main/test-containers/model-group-to-image-name.json)
+## Motivation
 
-# Map between docker image and model(s)
-
-See [here](https://github.com/kipoi/kipoi-containers/blob/main/test-containers/image-name-to-model.json)
-
-
-# Running the images
-For an interactive experience, run the following -
-```
-docker run -it kipoi/kipoi-docker:kipoisplice
-```
-This will give you an interactive shell with the relevant conda environment kipoi-KipoiSplice.
-
-To run your custom kipoi cli calls directly,
-```
-docker run kipoi/kipoi-docker:kipoisplice kipoi test KipoiSplice/4 --source=kipoi
-```
-
-## Use datasets from local filesystem
-
-We will make use of the [-v option of docker cli](https://docs.docker.com/storage/volumes/#choose-the--v-or---mount-flag). 
-
-Example: 
+### Example usage of [kipoi](https://pypi.org/project/kipoi/)
 
 ```bash
-mkdir -p $PWD/kipoi-example 
-docker run -v $PWD/kipoi-example:/app/ kipoi/kipoi-docker:sharedpy3keras2 \
-kipoi get-example Basset -o /app/example 
-docker run -v $PWD/kipoi-example:/app/ kipoi/kipoi-docker:sharedpy3keras2 \
-kipoi predict Basenji \
---dataloader_args='{'intervals_file': '/app/example/intervals_file', 'fasta_file': '/app/example/fasta_file'}' \
--o '/app/Basenji.example_pred.tsv' 
+kipoi env create Basset
+source activate kipoi-Basset
+
+kipoi predict Basset \
+--dataloader_args='{"intervals_file": "example/intervals_file", "fasta_file": "example/fasta_file"}' \
+-o 'Basset.example_pred.tsv'
 ```
 
-If everything goes well, we will find the predictions stored in ```$PWD/kipoi-example/Basenji.example_pred.tsv```.
+### Main bottleneck
 
-Note: The docker images in this [repo](https://hub.docker.com/repository/docker/kipoi/kipoi-docker) has a folder named ```/app/```. 
-So, the above template will work for all the images.
+Kipoi uses conda for creating model specific environments.
 
-## Testing the containers
+- It is impossible to gurantee that ```kipoi env create Basset``` resolves in every operating system since conda is not operating system agnostic.
+- It is cumbersome, labor intensive and error prone to pin all model dependencies across 31 and counting model groups in kipoi.
+- There is no gurantee that even if the dependencies are getting resolved now, they will continue to be resolved in future since the universe of python dependencies are ever changing.
 
-### Manual and CI
+### Solution
 
-We use pytest and docker-py to test the containers.
-First in an isolated conda environment or pipenv do the following -
-```
-pip install -r requirements.txt
-```
+Software containers were invented to handle exactly these problems  by making a snapshot of a working system. We use both docker and singularity to make the containers as generalized as possible all the while remaining high performance computing cluster friendly.
 
-Currently, there are two ways to test the docker images along with the models.
-
-- Test model(s) at a time or model group(s) if it contains only one model.
-  - ```pytest test-containers/test_models_from_command_line.py --model=KipoiSplice/4,Basenji```
-  - ```pytest test-containers/test_models_from_command_line.py --model=HAL```
-
-For the corresponding CI (github actions) version, look [here](https://github.com/kipoi/kipoi-containers/blob/main/.github/workflows/test-images.yml).
-This workflow gets triggered with every commit to every branch and each pull request to master.
- 
- 
-- Test any docker image which tests all compatible models or with a specific model group
-  - ```pytest test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2```
-  - ```pytest test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2 --modelgroup=HAL```
-  
-[This workflow](https://github.com/kipoi/kipoi-containers/blob/main/.github/workflows/sync-with-model-repo.yml) keep this repo in sync with [kipoi model repo](https://github.com/kipoi/models). 
-This workflow gets triggered on the 1st of every month and can also be trigerred manually.
-  
-```.github/workflows/release-workflow.yml``` can be manually triggered if all the docker images need to be updated in dockerhub. One reason can be Kipoi package update on pypi. Your dockerhub username and access token must be saved as github encrypoted secrets named DOCKERUSERNAME and DOCKERPASSWORD respectively. For a quick howto look [here](https://docs.github.com/en/actions/reference/encrypted-secrets) 
-
-## Mapping between model and docker images
-
-To know which model group/model is represented by which docker image pleae take a look at https://github.com/kipoi/kipoi-containers/blob/main/test-containers/model-group-to-image-name.json.
-
-Due to conflicting package requirements, all models in group MMSplice could not be represented by a single docker image. MMSplice/mtsplice has its own docker image named kipoi/kipoi-docker:mmsplice-mtsplice and the rest can be tested with kipoi/kipoi-docker:mmsplice
-
-## Singularity support
-
-Native support for singularity has been added to modelupdater.updateoradd. This utilizes ```singularity pull``` from a dockerhub repo feature which converts the docker container to a singularity container.
-
-
-## Adding new containers
-
-If new models are added to kipoi repository it is prudent to add all the necessary files in this repo and build, test and push a container to kipoi-docker dockerhub repo. For this purpose, I have provided ```modelupdater/updateoradd.py```. Run it as - 
-
- ```bash
- pip install -r requirements.txt
- python -m  modelupdater.updateoradd
- ```
- 
- A Personal Access Token is required since we will read from and write to github repos using PyGithub. Please add it as an environment variable named ```GITHUB_PAT```. Docker username and access token is also required for pushing the container to [the docker hub](https://index.docker.io/v1/kipoi/kipoi-docker/). Please add them as environment variables named ```DOCKER_USERNAME``` and ```DOCKER_PASSWORD```. ZENODO access token must also be added as an environment variable named ```ZENODO_ACCESS_TOKEN```. Create it [here](https://zenodo.org/account/settings/applications/tokens/new/) and make sure to click deposit:actions, deposit:write and user:email. This script will update existing images and rerun the tests. If a new model group needs to be updated, add a new dockerfile for model group which has not been containerized yet, build the docker  image, run tests to ensure all corresponding models in the group are compatible with this image, update the json files, update github workflow files, repeat these steps for the singularity containers and finally update ```modelupdater/kipoi-model-repo-hash```.  If everything goes well, at this point feel free to push the image and create a PR on github.
-
-
-### Tests
-
-I have provided some unit tests for testing basic features of this framework. For running these tests, first pull the test images
+### Example usage of kipoi with singularity
 
 ```bash
-docker pull kipoi/kipoi-docker:deepmel 
+kipoi predict Basset \
+--dataloader_args='{"intervals_file": "example/intervals_file", "fasta_file": "example/fasta_file"}' \
+-o 'Basset.example_pred.tsv' \
+--singularity
+```
+
+**Note**: There is no need to create a separate environment as the container comes pre-installed with the model specific conda environment.
+
+### Example usage of kipoi with docker
+
+```bash
+docker run -v $PWD/app/ kipoi/kipoi-docker:sharedpy3keras2 
+kipoi predict Basset \
+--dataloader_args='{'intervals_file': '/app/intervals.bed',
+                    'fasta_file': '/app/ref.fa'}' \
+-o '/app/Basset.example_pred.tsv'
+```
+
+## Docker and singularity image hosting
+
+- Docker images are hosted in [dockerhub](https://hub.docker.com/repository/docker/kipoi/kipoi-docker).
+
+- Singularity images are hosted in [zenodo](https://zenodo.org/).
+
+- Model specific docker and singularity image information and example usage are located under `docker` and `singularity` tab in each model's webpage at [kipoi website](http://kipoi.org) such as [here](http://kipoi.org/models/DeepMEL/DeepMEL/).
+
+## Installation
+
+- python>=3.9
+
+- Install [docker](https://docs.docker.com/get-docker/)
+
+- Install [singularity](https://sylabs.io/guides/3.0/user-guide/installation.html)
+
+- Install kipoi_containers using ```pip install -e .```
+
+## Required environment variables
+
+1. `DOCKER_USERNAME`, `DOCKER_PASSWORD`  
+    - Only required for pushing the image to kipoi/kipoi-docker
+    - Get it [here](https://hub.docker.com/signup)
+
+2. `ZENODO_ACCESS_TOKEN`  
+    - Required for updating and pushing singularity images to zenodo using its rest api
+    - Get it [here](https://zenodo.org/account/settings/applications/tokens/new/). Make sure to check deposit:actions and deposit:write
+
+3. `GITHUB_PAT`
+    - Required for syncing with [Kipoi model zoo](https://kipoi.org/)
+    - Get it [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token). Make sure to add both read and write access
+
+## Map between models (groups) and docker and singularity images
+
+- Docker: [here](https://github.com/kipoi/models/blob/master/shared/containers/model-to-docker.json)
+
+  - This maps models (groups) to a docker images. Each value here refers to a dockerhub image which can be pulled using docker cli/api.
+
+- Singularity: [here](https://github.com/kipoi/models/blob/master/shared/containers/model-to-singularity.json)
+
+  - Each entry here has three keys  
+    - url: A globally accessible url for the image
+    - name: Name of the image without any extension
+    - md5: A md5 checksum used to ensure integrity during download
+
+## Sync with Kipoi model repo
+
+As models get added and updated in the [model repo](https://github.com/kipoi/models), the respective docker and singularity containers should also be added and updated  along with various json files in `kipoi_contaners/container-info` and github workflows in `.github/workflows`. Execute this as follows -
+
+```bash
+python kipoi_containers/updateoradd.py
+```
+
+If everything is succesfull `kipoi_containers/kipoi-model-repo-hash` will be updated to the most recent commit on the master branch of the [model repo](https://github.com/kipoi/models).
+
+**Note:** This **does not** update the jsons residing at the [model repo](https://github.com/kipoi/models/tree/master/shared/containers). For now, only the local jsons at `kipoi_contaners/container-info` gets updated. An automated feature to update the maps at the [model repo](https://github.com/kipoi/models/tree/master/shared/containers) followed by a pr will be added in future.
+
+## Tests
+
+### Testing the package
+
+```bash
 docker pull kipoi/kipoi-docker:mmsplice
+
+pytest test-docker test-singularity test-containers/test_update_all_singularity_images.py
 ```
 
-Then, install the requirements and run the tests -
+### Testing the containers manually
 
-```bash
-pip install -r requirements.txt
-python -m pytest -s test-modelupdater/test_updateoradd.py test-singularity-modification/test_zenodo.py
-```
+Currently, there are two ways to test the docker and singularity images along with the models.
+
+1. Test model(s) at a time or model group(s) if it contains only one model within their respective docker and singularity containers
+
+    ```bash
+    pytest test-containers/test_models_from_command_line.py --model=KipoiSplice/4,Basenji
+    ```
+
+2. Test any docker image which tests all compatible models or with a specific model group.
+
+- ```bash
+  pytest test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2
+  ```
+
+- ```bash
+  pytest test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2 --modelgroup=HAL
+  ```
+  
+## Github action workflows
+
+There are three different workflows at .github/workflow, each of which serves a different purpose. The necessary secrets and workflows are described below.
+
+### Github secrets
+
+  For a quick howto look [here](https://docs.github.com/en/actions/reference/encrypted-secrets)
+
+  1. `DOCKERUSERNAME` and `DOCKERPASSWORD`
+      - Correspond to values of env variables `DOCKER_USERNAME` and `DOCKER_PASSWORD` respectively
+  2. `ZENODOACCESSTOKEN`
+      - Corresponds to value of env variable `ZENODO_ACCESS_TOKEN`
+  3. `GITHUBPAT`
+      - Corresponds to value of env variable `GITHUB_PAT`
+
+### Workflows
+
+1. Continuous integration
+    - Which
+      - `.github/workflows/test-images.yml`
+    - When
+      - Push to any branch and pr to main branch in this repo
+    - Why
+      - `kipoi_containers` package is tested by this workflow
+    - How
+      - The package is built from scratch and tests specified in `Tests` section get executed. Additionally, one model from every model group gets tested within its docker and singularity containers.
+
+2. Sync with [Kipoi model repo](https://github.com/kipoi/models)
+    - Which
+      - `.github/workflows/sync-with-model-repo.yml`
+    - When
+      - On demand and on the 1st of every month. If everything is up-to-date the process exits with  a message.
+    - Why
+      - Keep the docker and singularity images up to date with the model definition in the [model repo](https://github.com/kipoi/models)
+
+    - How
+      - Update existing images on dockerhub and zenodo if the model definiton has been updated
+      - Add new images if new model has been added to the [model repo](https://github.com/kipoi/models)
+      - Update `kipoi_containers/container-info/model-group-to-singularity.json` if a singularity image has been updated in zenodo.
+      - Update jsons in `kipoi_containers/container-info/` in case a new model has been added
+      - Update workflows in `.github/workflow` in case a new model has been added
+      - Update `kipoi_containers/kipoi-model-repo-hash`
+      - Create a pr
+
+3. Build, test and push all docker and singularity images
+    - Which
+      - `.github/workflows/release-workflow.yml`
+    - When
+      - On demand
+    - Why
+      - Re-build, test and push the docker and singularity images. Some example scenarios -
+        - kipoi pypi package has been updated
+        - A new version has been released for `continuumio/miniconda3:latest`
+
+    - How
+      - Re-build, test and push the dockerhub images. Docker cli is used for this purpose.
+      - A new version of the singularity image will be built based on the new docker image. Cuurently, a new version of the existing deposition on zenodo will be created and this modified image will be uploaded there.
+      - Currently no change will be made to `kipoi_containers/container-info/model-group-to-singularity.json`

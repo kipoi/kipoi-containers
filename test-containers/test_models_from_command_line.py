@@ -1,56 +1,71 @@
+import os
+from pathlib import Path
+
 import docker
 
-
-def run_test(model_name, image_name):
-    if model_name == "Basenji":
-        test_cmd = f"kipoi test {model_name} --source=kipoi --batch_size=2"
-    else:
-        test_cmd = f"kipoi test {model_name} --source=kipoi"
-    client = docker.from_env()
-    try:
-        container_log = client.containers.run(
-            image=image_name, command=test_cmd
-        )
-    except docker.errors.ImageNotFound:
-        raise (f"Image {image_name} is not found")
-    except docker.errors.ContainerError as e:
-        raise (e)
-    except docker.errors.APIError as e:
-        raise (e)
-    client.images.prune(filters={"dangling": True})
-    client.volumes.prune()
-    client.containers.prune()
-    print(container_log.decode("utf-8"))
+from kipoi_containers.updateoradd import (
+    MODEL_GROUP_TO_SINGULARITY_JSON,
+)
+from kipoi_containers.updateoradd import MODEL_GROUP_TO_DOCKER_JSON
+from kipoi_containers.helper import populate_json
+from kipoi_containers.singularityhelper import get_singularity_image
 
 
-class TestServerCode(object):
+class TestModels:
     model_name = None
-    model_group_to_image_dict = {}
+    model_group_to_docker_dict = populate_json(MODEL_GROUP_TO_DOCKER_JSON)
+    model_group_to_singularity_dict = populate_json(
+        MODEL_GROUP_TO_SINGULARITY_JSON
+    )
     list_of_models = []
 
     def get_image_name(self, model):
         assert (
-            model in self.model_group_to_image_dict
-            or model.split("/")[0] in self.model_group_to_image_dict
+            model in self.model_group_to_docker_dict
+            or model.split("/")[0] in self.model_group_to_docker_dict
         )
-        if model in self.model_group_to_image_dict:  # For MMSplice/mtsplice
-            image_name = self.model_group_to_image_dict.get(model)
-        elif model.split("/")[0] in self.model_group_to_image_dict:
-            image_name = self.model_group_to_image_dict.get(
+        if model in self.model_group_to_docker_dict:  # For MMSplice/mtsplice
+            image_name = self.model_group_to_docker_dict.get(model)
+        elif model.split("/")[0] in self.model_group_to_docker_dict:
+            image_name = self.model_group_to_docker_dict.get(
                 model.split("/")[0]
             )
         return image_name
 
     def test_parameters(self):
         assert self.model_name is not None or self.list_of_models != []
-        assert self.model_group_to_image_dict != {}
+        assert self.model_group_to_docker_dict != {}
+        assert self.model_group_to_singularity_dict != {}
 
-    def test_models(self):
+    def test_models(self, test_docker_image, test_singularity_image):
+        singularity_pull_folder = os.environ.get(
+            "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
+        )
         if self.list_of_models:
             for model in self.list_of_models:
+                singularity_image = get_singularity_image(
+                    singularity_pull_folder,
+                    self.model_group_to_singularity_dict,
+                    model,
+                )
                 image_name = self.get_image_name(model=model)
-                run_test(model_name=model, image_name=image_name)
+                test_docker_image(image_name=image_name, model_name=model)
+                test_singularity_image(
+                    singularity_image_folder=singularity_pull_folder,
+                    singularity_image_name=singularity_image,
+                    model=model,
+                )
         elif self.model_name is not None:
             for model in self.model_name:
+                singularity_image = get_singularity_image(
+                    singularity_pull_folder,
+                    self.model_group_to_singularity_dict,
+                    model,
+                )
                 image_name = self.get_image_name(model=model)
-                run_test(model_name=model, image_name=image_name)
+                test_docker_image(image_name=image_name, model_name=model)
+                test_singularity_image(
+                    singularity_image_folder=singularity_pull_folder,
+                    singularity_image_name=singularity_image,
+                    model=model,
+                )
