@@ -1,6 +1,55 @@
 # kipoi-containers
 
+![](misc/kipoicontainers.png?raw=true "Title")
+
 This repository contains necessary infrastructure elements for adding and updating docker and singularity images for models and model groups in [Kipoi model zoo](https://kipoi.org/). These images are pre-activated with a compatible conda environment where all the model (group) specific dependencies have been installed.
+
+## Motivation
+
+### Example usage of [kipoi](https://pypi.org/project/kipoi/)
+
+```bash
+kipoi env create Basset
+source activate kipoi-Basset
+
+kipoi predict Basset \
+--dataloader_args='{"intervals_file": "example/intervals_file", "fasta_file": "example/fasta_file"}' \
+-o 'Basset.example_pred.tsv'
+```
+
+### Main bottleneck
+
+Kipoi uses conda for creating model specific environments.
+
+- It is impossible to gurantee that ```kipoi env create Basset``` resolves in every operating system since conda is not operating system agnostic.
+- It is cumbersome, labor intensive and error prone to pin all model dependencies across 31 and counting model groups in kipoi.
+- There is no gurantee that even if the dependencies are getting resolved now, they will continue to be resolved in future since the universe of python dependencies are ever changing.
+
+### Solution
+
+Software containers were invented to handle exactly these problems  by making a snapshot of a working system. We use both docker and singularity to make the containers as generalized as possible all the while remaining high performance computing cluster friendly.
+
+### Example usage of kipoi with singularity
+
+```bash
+kipoi predict Basset \
+--dataloader_args='{"intervals_file": "example/intervals_file", "fasta_file": "example/fasta_file"}' \
+-o 'Basset.example_pred.tsv' \
+--singularity
+```
+
+**Note**: There is no need to create a separate environment as the container comes pre-installed with the model specific conda environment.
+
+### Example usage of kipoi with docker
+
+```bash
+docker run -v $PWD/app/ kipoi/kipoi-docker:sharedpy3keras2 
+kipoi predict Basset \
+--dataloader_args='{'intervals_file': '/app/intervals.bed',
+                    'fasta_file': '/app/ref.fa'}' \
+-o '/app/Basset.example_pred.tsv'
+```
+
 
 ## Docker and singularity image hosting
 
@@ -103,8 +152,6 @@ There are three different workflows at .github/workflow, each of which serves a 
       - Corresponds to value of env variable `ZENODO_ACCESS_TOKEN`
   3. `GITHUBPAT`
       - Corresponds to value of env variable `GITHUB_PAT`
-
-
 
 ### Workflows
 
