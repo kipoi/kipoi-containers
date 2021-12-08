@@ -1,6 +1,6 @@
 # kipoi-containers
 
-![alt text](misc/kipoicontainers.png?raw=true "Title")
+![alt text](misc/kipoicontainers.png?raw=true "kipoi-containers")
 
 This repository contains necessary infrastructure elements for adding and updating docker and singularity images for models and model groups in [Kipoi model zoo](https://kipoi.org/). These images are pre-activated with a compatible conda environment where all the model (group) specific dependencies have been installed.
 
