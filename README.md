@@ -34,7 +34,7 @@ This repository contains necessary infrastructure elements for adding and updati
     - Required for syncing with [Kipoi model zoo](https://kipoi.org/)
     - Get it [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token). Make sure to add both read and write access
 
-## [Map between models (groups) and docker and singularity images](#dockermap)
+## Map between models (groups) and docker and singularity images
 
 - Docker: [here](https://github.com/kipoi/models/blob/master/shared/containers/model-to-docker.json)
 
@@ -47,15 +47,15 @@ This repository contains necessary infrastructure elements for adding and updati
     - name: Name of the image without any extension
     - md5: A md5 checksum used to ensure integrity during download
 
-## Sync with Kipoi model zoo
+## Sync with Kipoi model repo
 
-As models get added and updated in the [model zoo](https://github.com/kipoi/models), the respective docker and singularity containers should also be added and updated  along with various json files in `kipoi_contaners/container-info` and github workflows in `.github/workflows`. Execute this as follows -
+As models get added and updated in the [model repo](https://github.com/kipoi/models), the respective docker and singularity containers should also be added and updated  along with various json files in `kipoi_contaners/container-info` and github workflows in `.github/workflows`. Execute this as follows -
 
 ```bash
 python kipoi_containers/updateoradd.py
 ```
 
-If everything is succesfull `kipoi_containers/kipoi-model-repo-hash` will be updated to the most recent commit on the master branch of the [model zoo](https://github.com/kipoi/models).
+If everything is succesfull `kipoi_containers/kipoi-model-repo-hash` will be updated to the most recent commit on the master branch of the [model repo](https://github.com/kipoi/models).
 
 **Note:** This **does not** update the jsons residing at the [model repo](https://github.com/kipoi/models/tree/master/shared/containers). For now, only the local jsons at `kipoi_contaners/container-info` gets updated. An automated feature to update the maps at the [model repo](https://github.com/kipoi/models/tree/master/shared/containers) followed by a pr will be added in future.
 
@@ -89,30 +89,63 @@ Currently, there are two ways to test the docker and singularity images along wi
   pytest test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2 --modelgroup=HAL
   ```
   
-[This workflow](https://github.com/kipoi/kipoi-containers/blob/main/.github/workflows/sync-with-model-repo.yml) keep this repo in sync with [kipoi model repo](https://github.com/kipoi/models). 
-This workflow gets triggered on the 1st of every month and can also be trigerred manually.
-  
-```.github/workflows/release-workflow.yml``` can be manually triggered if all the docker images need to be updated in dockerhub. One reason can be Kipoi package update on pypi. Your dockerhub username and access token must be saved as github encrypoted secrets named DOCKERUSERNAME and DOCKERPASSWORD respectively. For a quick howto look [here](https://docs.github.com/en/actions/reference/encrypted-secrets) 
+## Github action workflows
 
-## Mapping between model and docker images
+There are three different workflows at .github/workflow, each of which serves a different purpose. The necessary secrets and workflows are described below.
 
-To know which model group/model is represented by which docker image pleae take a look at https://github.com/kipoi/kipoi-containers/blob/main/test-containers/model-group-to-docker.json.
+### Github secrets
 
-Due to conflicting package requirements, all models in group MMSplice could not be represented by a single docker image. MMSplice/mtsplice has its own docker image named kipoi/kipoi-docker:mmsplice-mtsplice and the rest can be tested with kipoi/kipoi-docker:mmsplice
+  For a quick howto look [here](https://docs.github.com/en/actions/reference/encrypted-secrets)
 
-## Singularity support
+  1. `DOCKERUSERNAME` and `DOCKERPASSWORD`
+      - Correspond to values of env variables `DOCKER_USERNAME` and `DOCKER_PASSWORD` respectively
+  2. `ZENODOACCESSTOKEN`
+      - Corresponds to value of env variable `ZENODO_ACCESS_TOKEN`
+  3. `GITHUBPAT`
+      - Corresponds to value of env variable `GITHUB_PAT`
 
-Native support for singularity has been added to kipoi_containers.updateoradd. This utilizes ```singularity pull``` from a dockerhub repo feature which converts the docker container to a singularity container.
 
 
-## Adding new containers
+### Workflows
 
-If new models are added to kipoi repository it is prudent to add all the necessary files in this repo and build, test and push a container to kipoi-docker dockerhub repo. For this purpose, I have provided ```kipoi_containers/updateoradd.py```. Run it as - 
+1. Continuous integration
+    - Which
+      - `.github/workflows/test-images.yml`
+    - When
+      - Push to any branch and pr to main branch in this repo
+    - Why
+      - `kipoi_containers` package is tested by this workflow
+    - How
+      - The package is built from scratch and tests specified in `Tests` section get executed. Additionally, one model from every model group gets tested within its docker and singularity containers.
 
- ```bash
- pip install -e .
- python kipoi_containers/updateoradd.py
- ```
- 
- A Personal Access Token is required since we will read from and write to github repos using PyGithub. Please add it as an environment variable named ```GITHUB_PAT```. Docker username and access token is also required for pushing the container to [the docker hub](https://index.docker.io/v1/kipoi/kipoi-docker/). Please add them as environment variables named ```DOCKER_USERNAME``` and ```DOCKER_PASSWORD```. ZENODO access token must also be added as an environment variable named ```ZENODO_ACCESS_TOKEN```. Create it [here](https://zenodo.org/account/settings/applications/tokens/new/) and make sure to click deposit:actions, deposit:write and user:email. This script will update existing images and rerun the tests. If a new model group needs to be updated, add a new dockerfile for model group which has not been containerized yet, build the docker  image, run tests to ensure all corresponding models in the group are compatible with this image, update the json files, update github workflow files, repeat these steps for the singularity containers and finally update ```kipoi_containers/kipoi-model-repo-hash```.  If everything goes well, at this point feel free to push the image and create a PR on github.
+2. Sync with [Kipoi model repo](https://github.com/kipoi/models)
+    - Which
+      - `.github/workflows/sync-with-model-repo.yml`
+    - When
+      - On demand and on the 1st of every month. If everything is up-to-date the process exits with  a message.
+    - Why
+      - Keep the docker and singularity images up to date with the model definition in the [model repo](https://github.com/kipoi/models)
 
+    - How
+      - Update existing images on dockerhub and zenodo if the model definiton has been updated
+      - Add new images if new model has been added to the [model repo](https://github.com/kipoi/models)
+      - Update `kipoi_containers/container-info/model-group-to-singularity.json` if a singularity image has been updated in zenodo.
+      - Update jsons in `kipoi_containers/container-info/` in case a new model has been added
+      - Update workflows in `.github/workflow` in case a new model has been added
+      - Update `kipoi_containers/kipoi-model-repo-hash`
+      - Create a pr
+
+3. Build, test and push all docker and singularity images
+    - Which
+      - `.github/workflows/release-workflow.yml`
+    - When
+      - On demand
+    - Why
+      - Re-build, test and push the docker and singularity images. Some example scenarios - 
+        - kipoi pypi package has been updated
+        - A new version has been released for `continuumio/miniconda3:latest`
+
+    - How
+      - Re-build, test and push the dockerhub images. Docker cli is used for this purpose.
+      - A new version of the singularity image will be built based on the new docker image. Cuurently, a new version of the existing deposition on zenodo will be created and this modified image will be uploaded there.
+      - Currently no change will be made to `kipoi_containers/container-info/model-group-to-singularity.json`
