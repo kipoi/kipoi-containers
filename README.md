@@ -1,6 +1,6 @@
 # kipoi-containers
 
-![](misc/kipoicontainers.png?raw=true "Title")
+![alt text](misc/kipoicontainers.png?raw=true "Title")
 
 This repository contains necessary infrastructure elements for adding and updating docker and singularity images for models and model groups in [Kipoi model zoo](https://kipoi.org/). These images are pre-activated with a compatible conda environment where all the model (group) specific dependencies have been installed.
 
@@ -50,7 +50,6 @@ kipoi predict Basset \
 -o '/app/Basset.example_pred.tsv'
 ```
 
-
 ## Docker and singularity image hosting
 
 - Docker images are hosted in [dockerhub](https://hub.docker.com/repository/docker/kipoi/kipoi-docker).
@@ -66,7 +65,7 @@ kipoi predict Basset \
 - Install [docker](https://docs.docker.com/get-docker/)
 
 - Install [singularity](https://sylabs.io/guides/3.0/user-guide/installation.html)
- 
+
 - Install kipoi_containers using ```pip install -e .```
 
 ## Required environment variables
@@ -188,7 +187,7 @@ There are three different workflows at .github/workflow, each of which serves a 
     - When
       - On demand
     - Why
-      - Re-build, test and push the docker and singularity images. Some example scenarios - 
+      - Re-build, test and push the docker and singularity images. Some example scenarios -
         - kipoi pypi package has been updated
         - A new version has been released for `continuumio/miniconda3:latest`
 
