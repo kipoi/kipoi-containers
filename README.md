@@ -1,12 +1,9 @@
 # kipoi-containers
 
-<a href=https://www.python.org/downloads>
-	<img alt='Python' src=https://img.shields.io/badge/Python-%20%3E=3.9-cyan
- style="max-height:20px;width:auto;">
-</a>
-<a href=https://opensource.org/licenses/MIT>
-	<img alt='License: MIT' src=https://img.shields.io/badge/License-MIT-yellow.svg style="max-height:20px;width:auto;">
-</a>
+[![Python 3.9](https://img.shields.io/badge/python-3.9-cyan.svg)](https://www.python.org/downloads/release/python-390/)
+![](https://github.com/kipoi/kipoi-containers/actions/workflows/test-images.yml/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/kipoi/kipoi-veff2/badge.svg)](https://coveralls.io/github/kipoi/kipoi-veff2)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ![alt text](misc/kipoicontainers.png?raw=true "kipoi-containers")
 This repository contains necessary infrastructure elements for adding and updating docker and singularity images for models and model groups in [Kipoi model zoo](https://kipoi.org/). These images are pre-activated with a compatible conda environment where all the model (group) specific dependencies have been installed.
@@ -75,7 +72,7 @@ kipoi predict Basset \
 
 - Install kipoi_containers using ```pip install -e .```
 
-## Required environment variables
+## Environment variables
 
 1. `DOCKER_USERNAME`, `DOCKER_PASSWORD`  
     - Only required for pushing the image to kipoi/kipoi-docker
@@ -88,6 +85,9 @@ kipoi predict Basset \
 3. `GITHUB_PAT`
     - Required for syncing with [Kipoi model zoo](https://kipoi.org/)
     - Get it [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token). Make sure to add both read and write access
+
+4. `SINGULARITY_PULL_FOLDER` (Optional)
+    - If specified, singularity images will be downloaded, built into and pushed from this folder. Otherwise, the current working directory is chosen as default.
 
 ## Map between models (groups) and docker and singularity images
 

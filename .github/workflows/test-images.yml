@@ -1,6 +1,3 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
 name: CI
 
 on:
@@ -75,9 +72,11 @@ jobs:
         pytest -s test-containers/test_models_from_command_line.py --model=${{ matrix.model }}
         docker system prune -a -f
 
-  testdocker:
+  testdockerandsingularity:
 
     runs-on: ubuntu-latest
+    env:
+      ZENODO_ACCESS_TOKEN: ${{ secrets.ZENODOACCESSTOKEN }}
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
@@ -89,30 +88,9 @@ jobs:
         sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config
         python -m pip install --upgrade pip
         pip install -e .
-    - name: Test updateoradd
+    - name: Test kipoi_containers and send coverage report to coveralls.io
       run: |-
+        pip install coveralls
         docker pull kipoi/kipoi-docker:mmsplice
-        pytest -s test-docker/test_docker_handler.py
-
-
-  testsingularity:
-
-    runs-on: ubuntu-latest
-    env:
-      ZENODO_ACCESS_TOKEN: ${{ secrets.ZENODOACCESSTOKEN }}
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-    - name: Install pip dependencies
-      run: |
-        sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config
-        python -m pip install --upgrade pip
-        pip install -e .
-    - name: Test singularity
-      run: |
-        pytest -s test-singularity
-        pytest -s test-containers/test_update_all_singularity_images.py
-
+        coverage run -m pytest -s test-docker/test_docker_handler.py test-singularity test-containers/test_update_all_singularity_images.py
+        coveralls --service=github
