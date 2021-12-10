@@ -2,7 +2,7 @@
 
 [![Python 3.9](https://img.shields.io/badge/python-3.9-cyan.svg)](https://www.python.org/downloads/release/python-390/)
 ![](https://github.com/kipoi/kipoi-containers/actions/workflows/test-images.yml/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/kipoi/kipoi-veff2/badge.svg)](https://coveralls.io/github/kipoi/kipoi-veff2)
+[![Coverage Status](https://coveralls.io/repos/github/kipoi/kipoi-containers/badge.svg)](https://coveralls.io/github/kipoi/kipoi-containers)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ![alt text](misc/kipoicontainers.png?raw=true "kipoi-containers")
