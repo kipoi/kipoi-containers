@@ -46,4 +46,4 @@ jobs:
       run: |
         python kipoi_containers/updateoradd.py
     - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v3.8.2
+      uses: peter-evans/create-pull-request@v3
