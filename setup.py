@@ -36,7 +36,7 @@ setup(
         boilerplate you need to create a Python package.",
     entry_points={
         "console_scripts": [
-            "update_all_singularity=kipoi_containers.update_all_singularity_containers:run_update",
+            "update_all_singularity=kipoi_containers.update_all_singularity_images:run_update",
         ],
     },
     install_requires=requirements,

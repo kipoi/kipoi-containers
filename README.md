@@ -70,7 +70,7 @@ kipoi predict Basset \
 
 - Install [singularity](https://sylabs.io/guides/3.0/user-guide/installation.html)
 
-- Install kipoi_containers using ```pip install -e .```
+- Install kipoi_containers using ```pip install .```
 
 ## Environment variables
 
