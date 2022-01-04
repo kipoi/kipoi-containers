@@ -1,10 +1,6 @@
 name: Build, test and push images on demand
-
-# Controls when the action will run. 
-on: 
+on:
   workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   buildtestandpush:
     # The type of runner that the job will run on
@@ -12,14 +8,13 @@ jobs:
       fail-fast: true
       matrix:
         image: ["sharedpy3keras1.2", "mpra-dragonn", "extended_coda", "mmsplice",
-        "mmsplice-mtsplice", "deepmel", "framepool", "kipoisplice", "deeptarget",
-        "attentivechrome", "bpnet-oskn", "seqvec", "deepflybrain", "aparent-site_probabilities", 
-        "aparent-veff"]
+          "mmsplice-mtsplice", "deepmel", "framepool", "kipoisplice", "deeptarget",
+          "attentivechrome", "bpnet-oskn", "seqvec", "deepflybrain", "aparent-site_probabilities",
+          "aparent-veff"]
     runs-on: ubuntu-latest
     env:
       SINGULARITY_PULL_FOLDER: "/home/runner/singularity/"
       ZENODO_ACCESS_TOKEN: ${{ secrets.ZENODOACCESSTOKEN }}
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
@@ -58,7 +53,6 @@ jobs:
       if: ${{ success() }}
       run: |
         update_all_singularity kipoi/kipoi-docker:${{ matrix.image }} 
-
   buildandtestsharedpy3keras2:
     # The type of runner that the job will run on
     strategy:
@@ -67,7 +61,6 @@ jobs:
         modelgroup: ["Basenji,Basset,HAL,DeepSEA,Optimus_5Prime,labranchor,CleTimer,SiSp,FactorNet,MaxEntScan,pwm_HOCOMOCO",
           "DeepBind", "lsgkm-SVM", "rbp_eclip", "Xpresso"]
     runs-on: ubuntu-latest
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
@@ -79,8 +72,6 @@ jobs:
         docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env . 
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2 -t kipoi/kipoi-docker:sharedpy3keras2 . 
         pytest -s test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2 --modelgroup=${{ matrix.modelgroup }}
-
-
   buildandpushkipoibaseenvandsharedpy3keras2:
     needs: [buildandtestsharedpy3keras2, buildtestandpush]
     runs-on: ubuntu-latest
@@ -123,6 +114,6 @@ jobs:
     - name: Update the singularity version of ${{ matrix.image }}
       shell: bash -l {0}
       if: ${{ success() }}
-      run: |
+      run: |-
         update_all_singularity kipoi/kipoi-docker:kipoi-base-env
         update_all_singularity kipoi/kipoi-docker:sharedpy3keras2
