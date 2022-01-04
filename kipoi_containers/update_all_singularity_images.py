@@ -25,7 +25,7 @@ def run_update(docker_image: str) -> None:
     kipoi_containers/container-info/model-group-to-singularity.json will be
     updated.
     """
-    click.echo(f"Testing {docker_image}")
+    click.echo(f"Updating {docker_image}")
     model_group_to_singularity_dict = populate_json(
         MODEL_GROUP_TO_SINGULARITY_JSON
     )
