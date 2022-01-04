@@ -45,18 +45,22 @@ def run_update(docker_image: str) -> None:
     )
     docker_to_model_dict = populate_json(DOCKER_TO_MODEL_JSON)
 
-    for model_or_model_group in model_or_model_group_list:
-        singularity_handler = singularityhandler.SingularityHandler(
-            model_group=model_or_model_group,
-            docker_image_name=docker_image,
-            singularity_image_folder=singularity_pull_folder,
-            model_group_to_singularity_dict=model_group_to_singularity_dict,
-        )
-        models_to_test = docker_to_model_dict[docker_image]
-        singularity_handler.update(models_to_test)
-        write_json(
-            model_group_to_singularity_dict, MODEL_GROUP_TO_SINGULARITY_JSON
-        )
+    singularity_handler = singularityhandler.SingularityHandler(
+        model_group=model_or_model_group_list[0],
+        docker_image_name=docker_image,
+        singularity_image_folder=singularity_pull_folder,
+        model_group_to_singularity_dict=model_group_to_singularity_dict,
+    )
+    models_to_test = docker_to_model_dict[docker_image]
+    singularity_handler.update(models_to_test)
+    if len(model_or_model_group_list) > 1:
+        for model_or_model_group in model_or_model_group_list[1:]:
+            model_group_to_singularity_dict[
+                model_or_model_group
+            ] = model_group_to_singularity_dict[model_or_model_group_list[0]]
+    write_json(
+        model_group_to_singularity_dict, MODEL_GROUP_TO_SINGULARITY_JSON
+    )
 
 
 if __name__ == "__main__":
