@@ -7,6 +7,7 @@ from kipoi_containers import singularityhandler
 from kipoi_containers.updateoradd import (
     MODEL_GROUP_TO_SINGULARITY_JSON,
     DOCKER_TO_MODEL_JSON,
+    MODEL_GROUP_TO_DOCKER_JSON,
 )
 from kipoi_containers.helper import populate_json, write_json
 
@@ -29,27 +30,34 @@ def run_update(docker_image: str) -> None:
     model_group_to_singularity_dict = populate_json(
         MODEL_GROUP_TO_SINGULARITY_JSON
     )
-    model_group_to_singularity_dict_ci = {
-        k.lower(): v for k, v in model_group_to_singularity_dict.items()
-    }
-    model_group = docker_image.split(":")[-1]
-    model_or_model_group = model_group.replace("-", "/")
+    model_group_to_docker_dict = populate_json(MODEL_GROUP_TO_DOCKER_JSON)
+    docker_to_model_group_dict_ci = {}
+    for model_group, kipoi_docker_image in model_group_to_docker_dict.items():
+        if kipoi_docker_image in docker_to_model_group_dict_ci:
+            docker_to_model_group_dict_ci[kipoi_docker_image].append(
+                model_group
+            )
+        else:
+            docker_to_model_group_dict_ci[kipoi_docker_image] = [model_group]
+    model_or_model_group_list = docker_to_model_group_dict_ci[docker_image]
     singularity_pull_folder = os.environ.get(
         "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
     )
+    docker_to_model_dict = populate_json(DOCKER_TO_MODEL_JSON)
+
     singularity_handler = singularityhandler.SingularityHandler(
-        model_group=model_or_model_group,
+        model_group=model_or_model_group_list[0],
         docker_image_name=docker_image,
         singularity_image_folder=singularity_pull_folder,
-        model_group_to_singularity_dict=model_group_to_singularity_dict_ci,
+        model_group_to_singularity_dict=model_group_to_singularity_dict,
     )
-    docker_to_model_dict = populate_json(DOCKER_TO_MODEL_JSON)
     models_to_test = docker_to_model_dict[docker_image]
     singularity_handler.update(models_to_test)
-    model_group_to_singularity_dict = {
-        k: model_group_to_singularity_dict_ci[k.lower()]
-        for k in model_group_to_singularity_dict.keys()
-    }
+    if len(model_or_model_group_list) > 1:
+        for model_or_model_group in model_or_model_group_list[1:]:
+            model_group_to_singularity_dict[
+                model_or_model_group
+            ] = model_group_to_singularity_dict[model_or_model_group_list[0]]
     write_json(
         model_group_to_singularity_dict, MODEL_GROUP_TO_SINGULARITY_JSON
     )

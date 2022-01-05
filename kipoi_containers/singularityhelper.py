@@ -59,7 +59,7 @@ def test_singularity_image(
     Raises:
         ValueError: Raise valueerror if the test is not successful"""
     print(
-        f"Testing {model} with {singularity_image_folder}{singularity_image_name}"
+        f"Testing {model} with {singularity_image_folder}/{singularity_image_name}"
     )
     if model == "Basenji":
         test_cmd = f"kipoi test {model} --source=kipoi --batch_size=2"
