@@ -2,13 +2,8 @@ name:  Sync with https://github.com/kipoi/models
 
 # Controls when the action will run. 
 on:
-  schedule:
-  # Triggers the workflow once a month
-  - cron: "0 9 1 * *"
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-  [repository_dispatch]:
+  repository_dispatch:
+    types: [sync]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
