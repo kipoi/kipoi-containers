@@ -22,7 +22,7 @@ def zenodo_client():
 @pytest.fixture(scope="module")
 def test_singularity_dict():
     return {
-        "url": f"{singularityhelper.ZENODO_BASE}/record/5725936/files/tiny-container_latest.sif?download=1",
+        "url": f"{singularityhelper.ZENODO_BASE}/record/5822698/files/tiny-container_latest.sif?download=1",
         "name": "tiny-container_latest",
         "md5": "0a85bfc85e749894210d1e53b4add11d",
     }
@@ -70,7 +70,7 @@ def test_get_available_sc_depositions(zenodo_client):
 
 def test_get_existing_sc_by_recordid(zenodo_client):
     response_json = zenodo_client.get_content(
-        f"{singularityhelper.ZENODO_DEPOSITION}/5643929"
+        f"{singularityhelper.ZENODO_DEPOSITION}/5821666"
     )
     assert (
         response_json["files"][0]["filename"] == "kipoi-docker_deeptarget.sif"
