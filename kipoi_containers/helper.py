@@ -52,20 +52,21 @@ def write_json_to_kipoi(
     """
     # TODO: Create a new branch
     main_branch = kipoi_model_repo.get_branch("master")
-    target_branch = "update-json"
-    kipoi_model_repo.create_git_ref(
-        ref=f"refs/heads/{target_branch}", sha=main_branch.commit.sha
+    existing_content = kipoi_model_repo.get_contents(
+        f"{CONTAINER_PREFIX}/{container_json}"
     )
-    exiting_content = kipoi_model_repo.get_contents(
-        CONTAINER_PREFIX / container_json
-    )
-    kipoi_model_repo.update_file(
-        exiting_content.path,
-        f"Updating {container_json}",
-        container_model_dict,
-        exiting_content.sha,
-        branch=target_branch,
-    )
+    if existing_content != container_model_dict:
+        target_branch = "update-json"
+        kipoi_model_repo.create_git_ref(
+            ref=f"refs/heads/{target_branch}", sha=main_branch.commit.sha
+        )
+        kipoi_model_repo.update_file(
+            existing_content.path,
+            f"Updating {container_json}",
+            container_model_dict,
+            existing_content.sha,
+            branch=target_branch,
+        )
 
 
 def total_number_of_unique_containers(
