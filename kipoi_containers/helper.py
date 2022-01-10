@@ -22,14 +22,15 @@ def populate_json(json_file: FileType) -> Dict:
 
 
 def populate_json_from_kipoi(
-    json_file: FileType, source: str = "kipoi"
+    json_file: FileType, kipoi_model_repo: "Repository"
 ) -> Dict:
     """
     Populate and returns a dict using the given json file from Kipoi
     """
-    src = kipoi.get_source(source)
-    json_file = src.local_path / CONTAINER_PREFIX / json_file
-    return populate_json(json_file)
+    json_content = kipoi_model_repo.get_contents(
+        f"{CONTAINER_PREFIX}/{json_file}"
+    ).decoded_content.decode()
+    return json_content
 
 
 def write_json(container_model_dict: Dict, container_json: FileType) -> None:
@@ -43,7 +44,7 @@ def write_json(container_model_dict: Dict, container_json: FileType) -> None:
 def write_json_to_kipoi(
     container_model_dict: Dict,
     container_json: FileType,
-    kipoi_model_repo: Repository,
+    kipoi_model_repo: "Repository",
 ) -> Dict:
     """
     Create a new branch in kipoi models repo. Write the given dict

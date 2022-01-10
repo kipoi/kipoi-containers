@@ -33,7 +33,7 @@ def run_update(docker_image: str) -> None:
     """
     click.echo(f"Updating {docker_image}")
     model_group_to_singularity_dict = populate_json_from_kipoi(
-        MODEL_GROUP_TO_SINGULARITY_JSON
+        MODEL_GROUP_TO_SINGULARITY_JSON  # TODO: Need to change it
     )
     model_group_to_docker_dict = populate_json(MODEL_GROUP_TO_DOCKER_JSON)
     docker_to_model_group_dict_ci = {}
