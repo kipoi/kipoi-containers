@@ -9,7 +9,9 @@ from kipoi_containers.dockerupdater import DockerUpdater
 from kipoi_containers.singularityhandler import SingularityHandler
 from kipoi_containers.helper import (
     populate_json,
+    populate_json_from_kipoi,
     write_json,
+    write_json_to_kipoi,
     populate_yaml,
     write_yaml,
 )
@@ -18,9 +20,7 @@ CONTAINER_PREFIX = Path.cwd() / "container-info"
 WORKFLOW_PREFIX = Path.cwd() / ".github/workflows"
 MODEL_GROUP_TO_DOCKER_JSON = CONTAINER_PREFIX / "model-group-to-docker.json"
 DOCKER_TO_MODEL_JSON = CONTAINER_PREFIX / "docker-to-model.json"
-MODEL_GROUP_TO_SINGULARITY_JSON = (
-    CONTAINER_PREFIX / "model-group-to-singularity.json"
-)
+MODEL_GROUP_TO_SINGULARITY_JSON = "model-group-to-singularity.json"
 TEST_IMAGES_WORKFLOW = WORKFLOW_PREFIX / "test-images.yml"
 RELEASE_WORKFLOW = WORKFLOW_PREFIX / "release-workflow.yml"
 
@@ -52,7 +52,7 @@ class ModelSyncer:
             MODEL_GROUP_TO_DOCKER_JSON
         )
         self.docker_to_model_dict = populate_json(DOCKER_TO_MODEL_JSON)
-        self.model_group_to_singularity_dict = populate_json(
+        self.model_group_to_singularity_dict = populate_json_from_kipoi(
             MODEL_GROUP_TO_SINGULARITY_JSON
         )
         self.workflow_test_data = populate_yaml(TEST_IMAGES_WORKFLOW)
@@ -167,9 +167,10 @@ class ModelSyncer:
             write_json(
                 self.model_group_to_docker_dict, MODEL_GROUP_TO_DOCKER_JSON
             )
-            write_json(
+            write_json_to_kipoi(
                 self.model_group_to_singularity_dict,
                 MODEL_GROUP_TO_SINGULARITY_JSON,
+                self.kipoi_model_repo,
             )
             write_yaml(self.workflow_test_data, TEST_IMAGES_WORKFLOW)
             write_yaml(self.workflow_release_data, RELEASE_WORKFLOW)

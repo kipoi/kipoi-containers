@@ -9,7 +9,12 @@ from kipoi_containers.updateoradd import (
     DOCKER_TO_MODEL_JSON,
     MODEL_GROUP_TO_DOCKER_JSON,
 )
-from kipoi_containers.helper import populate_json, write_json
+from kipoi_containers.helper import (
+    populate_json,
+    populate_json_from_kipoi,
+    write_json,
+    write_json_to_kipoi,
+)
 
 
 @click.command()
@@ -27,7 +32,7 @@ def run_update(docker_image: str) -> None:
     updated.
     """
     click.echo(f"Updating {docker_image}")
-    model_group_to_singularity_dict = populate_json(
+    model_group_to_singularity_dict = populate_json_from_kipoi(
         MODEL_GROUP_TO_SINGULARITY_JSON
     )
     model_group_to_docker_dict = populate_json(MODEL_GROUP_TO_DOCKER_JSON)
@@ -58,7 +63,7 @@ def run_update(docker_image: str) -> None:
             model_group_to_singularity_dict[
                 model_or_model_group
             ] = model_group_to_singularity_dict[model_or_model_group_list[0]]
-    write_json(
+    write_json_to_kipoi(
         model_group_to_singularity_dict, MODEL_GROUP_TO_SINGULARITY_JSON
     )
 
