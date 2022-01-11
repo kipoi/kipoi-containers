@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 from typing import Dict, List, Union, TYPE_CHECKING
 
+from github import GithubException
 from ruamel.yaml import round_trip_load, round_trip_dump
 import kipoi
 
@@ -54,19 +55,25 @@ def write_json_to_kipoi(
     main_branch = kipoi_model_repo.get_branch("master")
     existing_content = kipoi_model_repo.get_contents(
         f"{CONTAINER_PREFIX}/{container_json}"
-    )
+    ).decoded_content.decode()
     if existing_content != container_model_dict:
         target_branch = "update-json"
-        kipoi_model_repo.create_git_ref(
-            ref=f"refs/heads/{target_branch}", sha=main_branch.commit.sha
-        )
-        kipoi_model_repo.update_file(
-            existing_content.path,
-            f"Updating {container_json}",
-            container_model_dict,
-            existing_content.sha,
-            branch=target_branch,
-        )
+        try:
+            kipoi_model_repo.create_git_ref(
+                ref=f"refs/heads/{target_branch}", sha=main_branch.commit.sha
+            )
+        except GithubException as err:
+            print(err)
+        try:
+            kipoi_model_repo.update_file(
+                existing_content.path,
+                f"Updating {container_json}",
+                container_model_dict,
+                existing_content.sha,
+                branch=target_branch,
+            )
+        except GithubException as err:
+            print(err)
 
 
 def total_number_of_unique_containers(

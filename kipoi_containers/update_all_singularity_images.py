@@ -3,6 +3,7 @@ from pathlib import Path
 
 import click
 
+from github import Github
 from kipoi_containers import singularityhandler
 from kipoi_containers.updateoradd import (
     MODEL_GROUP_TO_SINGULARITY_JSON,
@@ -31,9 +32,11 @@ def run_update(docker_image: str) -> None:
     kipoi_containers/container-info/model-group-to-singularity.json will be
     updated.
     """
-    click.echo(f"Updating {docker_image}")
+    click.echo(f"Updating the singularity container for {docker_image}")
+    github_obj = Github(os.environ["GITHUB_PAT"])
+    kipoi_model_repo = github_obj.get_organization("kipoi").get_repo("models")
     model_group_to_singularity_dict = populate_json_from_kipoi(
-        MODEL_GROUP_TO_SINGULARITY_JSON  # TODO: Need to change it
+        MODEL_GROUP_TO_SINGULARITY_JSON, kipoi_model_repo
     )
     model_group_to_docker_dict = populate_json(MODEL_GROUP_TO_DOCKER_JSON)
     docker_to_model_group_dict_ci = {}
@@ -64,7 +67,9 @@ def run_update(docker_image: str) -> None:
                 model_or_model_group
             ] = model_group_to_singularity_dict[model_or_model_group_list[0]]
     write_json_to_kipoi(
-        model_group_to_singularity_dict, MODEL_GROUP_TO_SINGULARITY_JSON
+        model_group_to_singularity_dict,
+        MODEL_GROUP_TO_SINGULARITY_JSON,
+        kipoi_model_repo,
     )
 
 
