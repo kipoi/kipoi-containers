@@ -82,7 +82,7 @@ kipoi predict Basset \
     - Required for updating and pushing singularity images to zenodo using its rest api
     - Get it [here](https://zenodo.org/account/settings/applications/tokens/new/). Make sure to check deposit:actions and deposit:write
 
-3. `GITHUB_PAT`
+3. `GITHUB_TOKEN`
     - Required for syncing with [Kipoi model zoo](https://kipoi.org/)
     - Get it [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token). Make sure to add both read and write access
 
@@ -157,7 +157,7 @@ There are three different workflows at .github/workflow, each of which serves a 
   2. `ZENODOACCESSTOKEN`
       - Corresponds to value of env variable `ZENODO_ACCESS_TOKEN`
   3. `GITHUBPAT`
-      - Corresponds to value of env variable `GITHUB_PAT`
+      - Corresponds to value of env variable `GITHUB_TOKEN`
 
 ### Workflows
 

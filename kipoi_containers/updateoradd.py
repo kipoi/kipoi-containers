@@ -187,7 +187,7 @@ class ModelSyncer:
 if __name__ == "__main__":
     """
     Main function which logs in to github with a PAT that is stored in
-    an environmental variable called "GITHUB_PAT"
+    an environmental variable called "GITHUB_TOKEN"
     """
-    model_syncer = ModelSyncer(github_obj=Github(os.environ["GITHUB_PAT"]))
+    model_syncer = ModelSyncer(github_obj=Github(os.environ["GITHUB_TOKEN"]))
     model_syncer.sync()

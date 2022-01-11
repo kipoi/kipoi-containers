@@ -37,7 +37,7 @@ def test_zenodo_get_access(zenodo_client):
 
 
 def test_get_available_sc_depositions(zenodo_client):
-    github_obj = Github(os.environ["GITHUB_PAT"])
+    github_obj = Github(os.environ["GITHUB_TOKEN"])
     kipoi_model_repo = github_obj.get_organization("kipoi").get_repo("models")
     original_container_dict = helper.populate_json_from_kipoi(
         MODEL_GROUP_TO_SINGULARITY_JSON, kipoi_model_repo

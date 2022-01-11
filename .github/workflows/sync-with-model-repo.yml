@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
     runs-on: ubuntu-latest
     env:
-      GITHUB_PAT: ${{ secrets.GITHUBPAT }}
+      GITHUB_TOKEN: ${{ secrets.GITHUBPAT }}
       DOCKER_USERNAME: ${{ secrets.DOCKERUSERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKERPASSWORD }}
       ZENODO_ACCESS_TOKEN: ${{ secrets.ZENODOACCESSTOKEN }}

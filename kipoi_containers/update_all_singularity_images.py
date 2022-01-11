@@ -33,7 +33,7 @@ def run_update(docker_image: str) -> None:
     updated.
     """
     click.echo(f"Updating the singularity container for {docker_image}")
-    github_obj = Github(os.environ["GITHUB_PAT"])
+    github_obj = Github(os.environ["GITHUB_TOKEN"])
     try:
         kipoi_model_repo = github_obj.get_organization("kipoi").get_repo(
             "models"

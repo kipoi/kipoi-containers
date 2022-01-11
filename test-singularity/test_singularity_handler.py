@@ -14,7 +14,7 @@ from kipoi_containers.updateoradd import MODEL_GROUP_TO_SINGULARITY_JSON
 
 @pytest.fixture
 def model_group_to_singularity_dict():
-    github_obj = Github(os.environ["GITHUB_PAT"])
+    github_obj = Github(os.environ["GITHUB_TOKEN"])
     kipoi_model_repo = github_obj.get_organization("kipoi").get_repo("models")
     return helper.populate_json_from_kipoi(
         MODEL_GROUP_TO_SINGULARITY_JSON, kipoi_model_repo
@@ -66,7 +66,7 @@ def test_singularityhandler_update_container_info(
         singularity_image_folder=cwd,
     )
     singularity_json = MODEL_GROUP_TO_SINGULARITY_JSON
-    github_obj = Github(os.environ["GITHUB_PAT"])
+    github_obj = Github(os.environ["GITHUB_TOKEN"])
     kipoi_model_repo = github_obj.get_organization("kipoi").get_repo("models")
 
     original_container_dict = helper.populate_json_from_kipoi(
@@ -127,7 +127,7 @@ def test_singularityhandler_noupdate(
         mock_check_integrity,
     )
     singularity_json = MODEL_GROUP_TO_SINGULARITY_JSON
-    github_obj = Github(os.environ["GITHUB_PAT"])
+    github_obj = Github(os.environ["GITHUB_TOKEN"])
     kipoi_model_repo = github_obj.get_organization("kipoi").get_repo("models")
 
     original_container_dict = helper.populate_json_from_kipoi(
@@ -197,7 +197,7 @@ def test_singularityhandler_update(
         mock_check_integrity,
     )
     singularity_json = MODEL_GROUP_TO_SINGULARITY_JSON
-    github_obj = Github(os.environ["GITHUB_PAT"])
+    github_obj = Github(os.environ["GITHUB_TOKEN"])
     kipoi_model_repo = github_obj.get_organization("kipoi").get_repo("models")
 
     original_container_dict = helper.populate_json_from_kipoi(
@@ -272,7 +272,7 @@ def test_singularityhandler_add(
         mock_check_integrity,
     )
     singularity_json = MODEL_GROUP_TO_SINGULARITY_JSON
-    github_obj = Github(os.environ["GITHUB_PAT"])
+    github_obj = Github(os.environ["GITHUB_TOKEN"])
     kipoi_model_repo = github_obj.get_organization("kipoi").get_repo("models")
 
     original_container_dict = helper.populate_json_from_kipoi(
