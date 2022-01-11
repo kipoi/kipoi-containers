@@ -31,7 +31,7 @@ def populate_json_from_kipoi(
     json_content = kipoi_model_repo.get_contents(
         f"{CONTAINER_PREFIX}/{json_file}"
     ).decoded_content.decode()
-    return json_content
+    return json.loads(json_content)
 
 
 def write_json(container_model_dict: Dict, container_json: FileType) -> None:

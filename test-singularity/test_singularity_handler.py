@@ -6,6 +6,7 @@ import random
 
 import pytest
 
+from github import Github
 from kipoi_containers import helper, singularityhandler, singularityhelper
 from kipoi_containers import zenodoclient
 from kipoi_containers.updateoradd import MODEL_GROUP_TO_SINGULARITY_JSON
@@ -13,7 +14,11 @@ from kipoi_containers.updateoradd import MODEL_GROUP_TO_SINGULARITY_JSON
 
 @pytest.fixture
 def model_group_to_singularity_dict():
-    return helper.populate_json(MODEL_GROUP_TO_SINGULARITY_JSON)
+    github_obj = Github(os.environ["GITHUB_PAT"])
+    kipoi_model_repo = github_obj.get_organization("kipoi").get_repo("models")
+    return helper.populate_json_from_kipoi(
+        MODEL_GROUP_TO_SINGULARITY_JSON, kipoi_model_repo
+    )
 
 
 @pytest.fixture
@@ -60,9 +65,9 @@ def test_singularityhandler_update_container_info(
         model_group_to_singularity_dict=model_group_to_singularity_dict,
         singularity_image_folder=cwd,
     )
-    singularity_json = MODEL_GROUP_TO_SINGULARITY_JSON
+    # singularity_json = MODEL_GROUP_TO_SINGULARITY_JSON
 
-    original_container_dict = helper.populate_json(singularity_json)
+    original_container_dict = model_group_to_singularity_dict
 
     new_container_dict = {
         "url": "https://www.dummy.url",
