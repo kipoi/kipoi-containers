@@ -3,6 +3,7 @@ import requests
 import json
 from pathlib import Path
 
+from github import Github
 import pytest
 
 from kipoi_containers import (
@@ -36,10 +37,15 @@ def test_zenodo_get_access(zenodo_client):
 
 
 def test_get_available_sc_depositions(zenodo_client):
+    github_obj = Github(os.environ["GITHUB_PAT"])
+    kipoi_model_repo = github_obj.get_organization("kipoi").get_repo("models")
+    original_container_dict = helper.populate_json_from_kipoi(
+        MODEL_GROUP_TO_SINGULARITY_JSON, kipoi_model_repo
+    )
     singularity_handler = singularityhandler.SingularityHandler(
         "Basset",
         "Dummy",
-        helper.populate_json(MODEL_GROUP_TO_SINGULARITY_JSON),
+        original_container_dict,
     )
     available_singularity_containers = [
         container["name"]
