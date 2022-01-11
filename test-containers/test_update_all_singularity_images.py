@@ -82,10 +82,6 @@ def test_cli_correct_use(runner, monkeypatch):
         "kipoi_containers.update_all_singularity_images.singularityhandler.cleanup",
         mock_cleanup,
     )
-    # monkeypatch.setattr(
-    #     "kipoi_containers.update_all_singularity_images.MODEL_GROUP_TO_SINGULARITY_JSON",
-    #     scrap_singularity_json,
-    # )
     monkeypatch.setattr(
         "kipoi_containers.update_all_singularity_images.populate_json_from_kipoi",
         mock_populate_singularity_json,
