@@ -22,23 +22,30 @@ def test_cli_incorrect_use(runner):
 
 def test_cli_correct_use(runner, monkeypatch):
     def mock_populate_singularity_json(*args, **kwargs):
-        return {
-            "MMSplice/modularPredictions": {
-                "url": "https://zenodo.org/record/5643976/files/kipoi-docker_mmsplice.sif?download=1",
-                "name": "kipoi-docker_mmsplice",
-                "md5": "29438b52fafdde5f48658fdcd7a61c6c",
-            },
-            "MMSplice/mtsplice": {
-                "url": "https://zenodo.org/record/5643967/files/kipoi-docker_mmsplice-mtsplice.sif?download=1",
-                "name": "kipoi-docker_mmsplice-mtsplice",
-                "md5": "1b8dab773ad7b8d2299fb294b0e3216e",
-            },
-            "DeepMEL": {
-                "url": "https://zenodo.org/record/5643863/files/kipoi-docker_deepmel.sif?download=1",
-                "name": "kipoi-docker_deepmel",
-                "md5": "c1f7204b834bba9728c67e561952f8e8",
-            },
-        }
+        if args[0] == "model-to-docker.json":
+            return {
+                "MMSplice/modularPredictions": "kipoi/kipoi-docker:mmsplice",
+                "MMSplice/mtsplice": "kipoi/kipoi-docker:mmsplice-mtsplice",
+                "DeepMEL": "kipoi/kipoi-docker:deepmel",
+            }
+        elif args[0] == "model-to-singularity.json":
+            return {
+                "MMSplice/modularPredictions": {
+                    "url": "https://zenodo.org/record/5643976/files/kipoi-docker_mmsplice.sif?download=1",
+                    "name": "kipoi-docker_mmsplice",
+                    "md5": "29438b52fafdde5f48658fdcd7a61c6c",
+                },
+                "MMSplice/mtsplice": {
+                    "url": "https://zenodo.org/record/5643967/files/kipoi-docker_mmsplice-mtsplice.sif?download=1",
+                    "name": "kipoi-docker_mmsplice-mtsplice",
+                    "md5": "1b8dab773ad7b8d2299fb294b0e3216e",
+                },
+                "DeepMEL": {
+                    "url": "https://zenodo.org/record/5643863/files/kipoi-docker_deepmel.sif?download=1",
+                    "name": "kipoi-docker_deepmel",
+                    "md5": "c1f7204b834bba9728c67e561952f8e8",
+                },
+            }
 
     def mock_write_singularity_json(*args, **kwargs):
         return
@@ -94,4 +101,5 @@ def test_cli_correct_use(runner, monkeypatch):
         update_all_singularity_images.run_update,
         ["kipoi/kipoi-docker:mmsplice-mtsplice"],
     )
+    print(result.output)
     assert result.exit_code == 0
