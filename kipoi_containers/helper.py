@@ -54,15 +54,25 @@ def write_json_to_kipoi(
     main_branch = kipoi_model_repo.get_branch("master")
     existing_content = kipoi_model_repo.get_contents(
         f"{CONTAINER_PREFIX}/{container_json}"
-    ).decoded_content.decode()
-    if existing_content != container_model_dict:
+    )
+    existing_container_dict = json.loads(
+        existing_content.decoded_content.decode()
+    )
+    if existing_container_dict != container_model_dict:
         target_branch = "update-json"
-        try:
-            kipoi_model_repo.create_git_ref(
-                ref=f"refs/heads/{target_branch}", sha=main_branch.commit.sha
-            )
-        except GithubException as err:
-            print(err)
+        if not any(
+            [
+                b.name == target_branch
+                for b in list(kipoi_model_repo.get_branches())
+            ]
+        ):
+            try:
+                kipoi_model_repo.create_git_ref(
+                    ref=f"refs/heads/{target_branch}",
+                    sha=main_branch.commit.sha,
+                )
+            except GithubException as err:
+                print(err)
         try:
             kipoi_model_repo.update_file(
                 existing_content.path,
