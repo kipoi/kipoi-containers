@@ -75,11 +75,9 @@ def test_add(monkeypatch, parent_path):
         "kipoi_containers.dockeradder.push_docker_image",
         mock_push_docker_image,
     )
-    kipoi_model_repo = (
-        Github(os.environ["GITHUB_TOKEN"])
-        .get_organization("kipoi")
-        .get_repo("models"),
-    )
+    github_obj = Github(os.environ["GITHUB_TOKEN"])
+    kipoi_model_repo = github_obj.get_organization("kipoi").get_repo("models")
+
     model_group_to_docker_dict = populate_json_from_kipoi(
         MODEL_GROUP_TO_DOCKER_JSON, kipoi_model_repo
     )
