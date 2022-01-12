@@ -2,14 +2,20 @@ import docker
 import json
 from pathlib import Path
 import pytest
+import os
 import shutil
 
+from github import Github
 from ruamel.yaml import round_trip_load, round_trip_dump
 from ruamel.yaml.scalarstring import DoubleQuotedScalarString
 
 from kipoi_containers.dockerupdater import DockerUpdater
 from kipoi_containers.dockeradder import DockerAdder
-from kipoi_containers.helper import populate_json, populate_yaml
+from kipoi_containers.helper import (
+    populate_json,
+    populate_json_from_kipoi,
+    populate_yaml,
+)
 from kipoi_containers.updateoradd import (
     DOCKER_TO_MODEL_JSON,
     MODEL_GROUP_TO_DOCKER_JSON,
@@ -69,8 +75,14 @@ def test_add(monkeypatch, parent_path):
         "kipoi_containers.dockeradder.push_docker_image",
         mock_push_docker_image,
     )
-
-    model_group_to_docker_dict = populate_json(MODEL_GROUP_TO_DOCKER_JSON)
+    kipoi_model_repo = (
+        Github(os.environ["GITHUB_TOKEN"])
+        .get_organization("kipoi")
+        .get_repo("models"),
+    )
+    model_group_to_docker_dict = populate_json_from_kipoi(
+        MODEL_GROUP_TO_DOCKER_JSON, kipoi_model_repo
+    )
     docker_to_model_dict = populate_json(DOCKER_TO_MODEL_JSON)
     workflow_test_data = populate_yaml(TEST_IMAGES_WORKFLOW)
     workflow_release_data = populate_yaml(RELEASE_WORKFLOW)
@@ -140,8 +152,11 @@ def test_add_is_compatible_with_existing_image(monkeypatch):
         "kipoi_containers.dockeradder.push_docker_image",
         mock_push_docker_image,
     )
-
-    model_group_to_docker_dict = populate_json(MODEL_GROUP_TO_DOCKER_JSON)
+    github_obj = Github(os.environ["GITHUB_TOKEN"])
+    kipoi_model_repo = github_obj.get_organization("kipoi").get_repo("models")
+    model_group_to_docker_dict = populate_json_from_kipoi(
+        MODEL_GROUP_TO_DOCKER_JSON, kipoi_model_repo
+    )
     docker_to_model_dict = populate_json(DOCKER_TO_MODEL_JSON)
     workflow_test_data = populate_yaml(TEST_IMAGES_WORKFLOW)
     workflow_release_data = populate_yaml(RELEASE_WORKFLOW)

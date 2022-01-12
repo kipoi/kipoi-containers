@@ -14,7 +14,12 @@ from kipoi_containers.singularityhelper import get_singularity_image
 
 class TestModels:
     model_name = None
-    model_group_to_docker_dict = populate_json(MODEL_GROUP_TO_DOCKER_JSON)
+    model_group_to_docker_dict = populate_json_from_kipoi(
+        MODEL_GROUP_TO_DOCKER_JSON,
+        Github(os.environ["GITHUB_TOKEN"])
+        .get_organization("kipoi")
+        .get_repo("models"),
+    )
     model_group_to_singularity_dict = populate_json_from_kipoi(
         MODEL_GROUP_TO_SINGULARITY_JSON,
         Github(os.environ["GITHUB_TOKEN"])

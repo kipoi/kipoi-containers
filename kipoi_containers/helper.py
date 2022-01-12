@@ -51,7 +51,6 @@ def write_json_to_kipoi(
     Create a new branch in kipoi models repo. Write the given dict
     to the given json file in that branch.
     """
-    # TODO: Create a new branch
     main_branch = kipoi_model_repo.get_branch("master")
     existing_content = kipoi_model_repo.get_contents(
         f"{CONTAINER_PREFIX}/{container_json}"

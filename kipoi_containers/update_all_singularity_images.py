@@ -43,7 +43,9 @@ def run_update(docker_image: str) -> None:
     model_group_to_singularity_dict = populate_json_from_kipoi(
         MODEL_GROUP_TO_SINGULARITY_JSON, kipoi_model_repo
     )
-    model_group_to_docker_dict = populate_json(MODEL_GROUP_TO_DOCKER_JSON)
+    model_group_to_docker_dict = populate_json_from_kipoi(
+        MODEL_GROUP_TO_DOCKER_JSON, kipoi_model_repo
+    )
     docker_to_model_group_dict_ci = {}
     for model_group, kipoi_docker_image in model_group_to_docker_dict.items():
         if kipoi_docker_image in docker_to_model_group_dict_ci:
