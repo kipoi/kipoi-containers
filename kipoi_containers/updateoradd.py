@@ -9,18 +9,18 @@ from kipoi_containers.dockerupdater import DockerUpdater
 from kipoi_containers.singularityhandler import SingularityHandler
 from kipoi_containers.helper import (
     populate_json,
+    populate_json_from_kipoi,
     write_json,
+    write_json_to_kipoi,
     populate_yaml,
     write_yaml,
 )
 
 CONTAINER_PREFIX = Path.cwd() / "container-info"
 WORKFLOW_PREFIX = Path.cwd() / ".github/workflows"
-MODEL_GROUP_TO_DOCKER_JSON = CONTAINER_PREFIX / "model-group-to-docker.json"
+MODEL_GROUP_TO_DOCKER_JSON = "model-to-docker.json"
 DOCKER_TO_MODEL_JSON = CONTAINER_PREFIX / "docker-to-model.json"
-MODEL_GROUP_TO_SINGULARITY_JSON = (
-    CONTAINER_PREFIX / "model-group-to-singularity.json"
-)
+MODEL_GROUP_TO_SINGULARITY_JSON = "model-to-singularity.json"
 TEST_IMAGES_WORKFLOW = WORKFLOW_PREFIX / "test-images.yml"
 RELEASE_WORKFLOW = WORKFLOW_PREFIX / "release-workflow.yml"
 
@@ -48,12 +48,12 @@ class ModelSyncer:
             "kipoi_containers/kipoi-model-repo-hash", "r"
         ) as kipoimodelrepohash:
             self.source_commit_hash = kipoimodelrepohash.readline()
-        self.model_group_to_docker_dict = populate_json(
-            MODEL_GROUP_TO_DOCKER_JSON
+        self.model_group_to_docker_dict = populate_json_from_kipoi(
+            MODEL_GROUP_TO_DOCKER_JSON, self.kipoi_model_repo
         )
         self.docker_to_model_dict = populate_json(DOCKER_TO_MODEL_JSON)
-        self.model_group_to_singularity_dict = populate_json(
-            MODEL_GROUP_TO_SINGULARITY_JSON
+        self.model_group_to_singularity_dict = populate_json_from_kipoi(
+            MODEL_GROUP_TO_SINGULARITY_JSON, self.kipoi_model_repo
         )
         self.workflow_test_data = populate_yaml(TEST_IMAGES_WORKFLOW)
         self.workflow_release_data = populate_yaml(RELEASE_WORKFLOW)
@@ -164,12 +164,15 @@ class ModelSyncer:
             for model_group in self.list_of_updated_model_groups:
                 self.update_or_add_model_container(model_group=model_group)
             write_json(self.docker_to_model_dict, DOCKER_TO_MODEL_JSON)
-            write_json(
-                self.model_group_to_docker_dict, MODEL_GROUP_TO_DOCKER_JSON
+            write_json_to_kipoi(
+                self.model_group_to_docker_dict,
+                MODEL_GROUP_TO_DOCKER_JSON,
+                self.kipoi_model_repo,
             )
-            write_json(
+            write_json_to_kipoi(
                 self.model_group_to_singularity_dict,
                 MODEL_GROUP_TO_SINGULARITY_JSON,
+                self.kipoi_model_repo,
             )
             write_yaml(self.workflow_test_data, TEST_IMAGES_WORKFLOW)
             write_yaml(self.workflow_release_data, RELEASE_WORKFLOW)
@@ -186,7 +189,7 @@ class ModelSyncer:
 if __name__ == "__main__":
     """
     Main function which logs in to github with a PAT that is stored in
-    an environmental variable called "GITHUB_PAT"
+    an environmental variable called "GITHUB_TOKEN"
     """
-    model_syncer = ModelSyncer(github_obj=Github(os.environ["GITHUB_PAT"]))
+    model_syncer = ModelSyncer(github_obj=Github(os.environ["GITHUB_TOKEN"]))
     model_syncer.sync()

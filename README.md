@@ -82,7 +82,7 @@ kipoi predict Basset \
     - Required for updating and pushing singularity images to zenodo using its rest api
     - Get it [here](https://zenodo.org/account/settings/applications/tokens/new/). Make sure to check deposit:actions and deposit:write
 
-3. `GITHUB_PAT`
+3. `GITHUB_TOKEN`
     - Required for syncing with [Kipoi model zoo](https://kipoi.org/)
     - Get it [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token). Make sure to add both read and write access
 
@@ -112,7 +112,6 @@ python kipoi_containers/updateoradd.py
 
 If everything is succesfull `kipoi_containers/kipoi-model-repo-hash` will be updated to the most recent commit on the master branch of the [model repo](https://github.com/kipoi/models).
 
-**Note:** This **does not** update the jsons residing at the [model repo](https://github.com/kipoi/models/tree/master/shared/containers). For now, only the local jsons at `kipoi_contaners/container-info` gets updated. An automated feature to update the maps at the [model repo](https://github.com/kipoi/models/tree/master/shared/containers) followed by a pr will be added in future.
 
 ## Tests
 
@@ -157,7 +156,7 @@ There are three different workflows at .github/workflow, each of which serves a 
   2. `ZENODOACCESSTOKEN`
       - Corresponds to value of env variable `ZENODO_ACCESS_TOKEN`
   3. `GITHUBPAT`
-      - Corresponds to value of env variable `GITHUB_PAT`
+      - Corresponds to value of env variable `GITHUB_TOKEN`
 
 ### Workflows
 
@@ -182,11 +181,14 @@ There are three different workflows at .github/workflow, each of which serves a 
     - How
       - Update existing images on dockerhub and zenodo if the model definiton has been updated
       - Add new images if new model has been added to the [model repo](https://github.com/kipoi/models)
-      - Update `kipoi_containers/container-info/model-group-to-singularity.json` if a singularity image has been updated in zenodo.
-      - Update jsons in `kipoi_containers/container-info/` in case a new model has been added
+      - Create a new branch in [model repo](https://github.com/kipoi/models) named  `target-json` if it already does not exist
+      - Update `shared/containers/model-to-singularity.json` in branch `target-json` of [model repo](https://github.com/kipoi/models) if a 
+        singularity image has been updated in zenodo.
+      - Update jsons in `kipoi_containers/container-info/` and ```shared/containers/``` in branch `target-json` 
+        of [model repo](https://github.com/kipoi/models) in case a new model has been added
       - Update workflows in `.github/workflow` in case a new model has been added
       - Update `kipoi_containers/kipoi-model-repo-hash`
-      - Create a pr
+      - Create a pr in this repo. For now, a pr has to be manually created in the [model repo](https://github.com/kipoi/models).
 
 3. Build, test and push all docker and singularity images
     - Which
@@ -201,4 +203,4 @@ There are three different workflows at .github/workflow, each of which serves a 
     - How
       - Re-build, test and push the dockerhub images. Docker cli is used for this purpose.
       - A new version of the singularity image will be built based on the new docker image. Cuurently, a new version of the existing deposition on zenodo will be created and this modified image will be uploaded there.
-      - Currently no change will be made to `kipoi_containers/container-info/model-group-to-singularity.json`
+      - Currently no change will be made to `shared/containers/model-to-singularity.json` in branch `target-json` of [model repo](https://github.com/kipoi/models)

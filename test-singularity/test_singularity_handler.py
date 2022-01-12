@@ -6,6 +6,7 @@ import random
 
 import pytest
 
+from github import Github
 from kipoi_containers import helper, singularityhandler, singularityhelper
 from kipoi_containers import zenodoclient
 from kipoi_containers.updateoradd import MODEL_GROUP_TO_SINGULARITY_JSON
@@ -13,7 +14,11 @@ from kipoi_containers.updateoradd import MODEL_GROUP_TO_SINGULARITY_JSON
 
 @pytest.fixture
 def model_group_to_singularity_dict():
-    return helper.populate_json(MODEL_GROUP_TO_SINGULARITY_JSON)
+    github_obj = Github(os.environ["GITHUB_TOKEN"])
+    kipoi_model_repo = github_obj.get_organization("kipoi").get_repo("models")
+    return helper.populate_json_from_kipoi(
+        MODEL_GROUP_TO_SINGULARITY_JSON, kipoi_model_repo
+    )
 
 
 @pytest.fixture
@@ -61,8 +66,12 @@ def test_singularityhandler_update_container_info(
         singularity_image_folder=cwd,
     )
     singularity_json = MODEL_GROUP_TO_SINGULARITY_JSON
+    github_obj = Github(os.environ["GITHUB_TOKEN"])
+    kipoi_model_repo = github_obj.get_organization("kipoi").get_repo("models")
 
-    original_container_dict = helper.populate_json(singularity_json)
+    original_container_dict = helper.populate_json_from_kipoi(
+        singularity_json, kipoi_model_repo
+    )
 
     new_container_dict = {
         "url": "https://www.dummy.url",
@@ -118,14 +127,19 @@ def test_singularityhandler_noupdate(
         mock_check_integrity,
     )
     singularity_json = MODEL_GROUP_TO_SINGULARITY_JSON
-    original_container_dict = helper.populate_json(singularity_json)
+    github_obj = Github(os.environ["GITHUB_TOKEN"])
+    kipoi_model_repo = github_obj.get_organization("kipoi").get_repo("models")
+
+    original_container_dict = helper.populate_json_from_kipoi(
+        singularity_json, kipoi_model_repo
+    )
     singularity_handler.update(models_to_test)
     captured = capsys.readouterr()
     assert (
         captured.out.strip()
         == "No need to update the existing singularity container for DeepMEL"
     )
-    updated_container_dict = helper.populate_json(singularity_json)
+    updated_container_dict = original_container_dict
     assert original_container_dict == updated_container_dict
 
 
@@ -183,7 +197,12 @@ def test_singularityhandler_update(
         mock_check_integrity,
     )
     singularity_json = MODEL_GROUP_TO_SINGULARITY_JSON
-    original_container_dict = helper.populate_json(singularity_json)
+    github_obj = Github(os.environ["GITHUB_TOKEN"])
+    kipoi_model_repo = github_obj.get_organization("kipoi").get_repo("models")
+
+    original_container_dict = helper.populate_json_from_kipoi(
+        singularity_json, kipoi_model_repo
+    )
     singularity_handler.update(models_to_test)
     updated_container_dict = (
         singularity_handler.model_group_to_singularity_dict
@@ -253,7 +272,12 @@ def test_singularityhandler_add(
         mock_check_integrity,
     )
     singularity_json = MODEL_GROUP_TO_SINGULARITY_JSON
-    original_container_dict = helper.populate_json(singularity_json)
+    github_obj = Github(os.environ["GITHUB_TOKEN"])
+    kipoi_model_repo = github_obj.get_organization("kipoi").get_repo("models")
+
+    original_container_dict = helper.populate_json_from_kipoi(
+        singularity_json, kipoi_model_repo
+    )
     singularity_handler.add(models_to_test)
     updated_container_dict = (
         singularity_handler.model_group_to_singularity_dict
