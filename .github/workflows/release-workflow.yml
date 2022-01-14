@@ -61,13 +61,24 @@ jobs:
         modelgroup: ["Basenji,Basset,HAL,DeepSEA,Optimus_5Prime,labranchor,CleTimer,SiSp,FactorNet,MaxEntScan,pwm_HOCOMOCO",
           "DeepBind", "lsgkm-SVM", "rbp_eclip", "Xpresso"]
     runs-on: ubuntu-latest
+    env:
+      SINGULARITY_PULL_FOLDER: "/home/runner/singularity/"
+      ZENODO_ACCESS_TOKEN: ${{ secrets.ZENODOACCESSTOKEN }}
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
+    - name: Install conda environment py39
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        activate-environment: py39
+        environment-file: environment.ubuntu.singularity.yml
+        python-version: 3.9
+        auto-activate-base: false
     - name: Build and test sharedpy3keras2 with ${{ matrix.modelgroup }}
+      shell: bash -l {0}
       run: |
         docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env . 
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2 -t kipoi/kipoi-docker:sharedpy3keras2 . 
