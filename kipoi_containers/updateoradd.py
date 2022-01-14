@@ -152,7 +152,11 @@ class ModelSyncer:
                 docker_image_name=model_adder.image_name,
                 model_group_to_singularity_dict=self.model_group_to_singularity_dict,
             )
-            singularity_handler.add(models_to_test)
+            singularity_handler.add(
+                model_adder.list_of_models
+                if model_adder.list_of_models
+                else model_adder.model_group
+            )
 
     def sync(self) -> None:
         """
