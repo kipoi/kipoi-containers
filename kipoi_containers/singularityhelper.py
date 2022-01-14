@@ -109,7 +109,7 @@ def upload_file(
     filename: str,
 ) -> None:
     """Upload singularity_image_folder/filename to a url"""
-    path = singularity_image_folder / filename
+    path = Path(singularity_image_folder) / Path(filename)
     zenodo_client.put_content(url, data=path)
 
 
