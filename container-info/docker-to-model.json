@@ -2191,5 +2191,8 @@
     ],
     "kipoi/kipoi-docker:aparent-veff": [
         "APARENT/veff"
+    ],
+    "kipoi/kipoi-docker:deepstarr": [
+        "DeepSTARR"
     ]
 }

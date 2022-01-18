@@ -10,7 +10,7 @@ jobs:
         image: ["sharedpy3keras1.2", "mpra-dragonn", "extended_coda", "mmsplice",
           "mmsplice-mtsplice", "deepmel", "framepool", "kipoisplice", "deeptarget",
           "attentivechrome", "bpnet-oskn", "seqvec", "deepflybrain", "aparent-site_probabilities",
-          "aparent-veff"]
+          "aparent-veff", "deepstarr"]
     runs-on: ubuntu-latest
     env:
       SINGULARITY_PULL_FOLDER: "/home/runner/singularity/"

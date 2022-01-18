@@ -43,7 +43,7 @@ class SingularityHandler:
         self.model_group_to_singularity_dict[self.model_group] = {
             k: v
             for k, v in updated_singularity_dict.items()
-            if k in ["url", "md5", "name"]
+            if k in ["url", "name", "md5"]
         }
 
     def add(self, models_to_test: List, push: bool = False) -> None:
@@ -61,8 +61,8 @@ class SingularityHandler:
         )
         self.singularity_dict = {
             "url": "",
-            "md5": "",
             "name": self.singularity_image_name.replace(".sif", ""),
+            "md5": "",
         }
         build_singularity_image(
             name_of_docker_image=self.docker_image_name,
