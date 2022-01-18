@@ -62,7 +62,7 @@ class SingularityHandler:
         self.singularity_dict = {
             "url": "",
             "md5": "",
-            "name": self.singularity_image_name,
+            "name": self.singularity_image_name.replace(".sif", ""),
         }
         build_singularity_image(
             name_of_docker_image=self.docker_image_name,
@@ -75,6 +75,7 @@ class SingularityHandler:
                 singularity_image_name=self.singularity_image_name,
                 model=model,
             )
+
         new_singularity_dict = push_new_singularity_image(
             zenodo_client=self.zenodo_client,
             singularity_image_folder=self.singularity_image_folder,
