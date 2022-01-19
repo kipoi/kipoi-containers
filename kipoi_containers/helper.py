@@ -77,7 +77,7 @@ def write_json_to_kipoi(
             kipoi_model_repo.update_file(
                 existing_content.path,
                 f"Updating {container_json}",
-                container_model_dict,
+                json.dumps(container_model_dict, indent=4),
                 existing_content.sha,
                 branch=target_branch,
             )

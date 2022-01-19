@@ -1,0 +1,10 @@
+FROM kipoi/kipoi-docker:kipoi-base-env
+
+SHELL ["conda", "run", "-n", "kipoi-env", "/bin/bash", "-c"]
+
+RUN kipoi env create DeepSTARR --verbose
+
+RUN echo "source activate kipoi-DeepSTARR" > ~/.bashrc
+ENV PATH /opt/conda/envs/kipoi-DeepSTARR/bin:$PATH
+
+SHELL ["conda", "run", "-n", "kipoi-DeepSTARR", "/bin/bash", "-c"]
