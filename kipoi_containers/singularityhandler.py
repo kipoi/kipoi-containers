@@ -46,7 +46,7 @@ class SingularityHandler:
             if k in ["url", "name", "md5"]
         }
 
-    def add(self, models_to_test: List, push: bool = False) -> None:
+    def add(self, models_to_test: List, push: bool = True) -> None:
         """Adds a new singularity image. The steps are as follows -
         1. First, the new image is built and saved in
         singularity_image_folder from the docker image
@@ -85,7 +85,7 @@ class SingularityHandler:
         )
         self.update_container_info(new_singularity_dict)
 
-    def update(self, models_to_test: List, push: bool = False) -> None:
+    def update(self, models_to_test: List, push: bool = True) -> None:
         """Updates an existing singularity image. The steps are as follows -
         1. First, a singularity image is built and saved in
         singularity_image_folder from the docker image
