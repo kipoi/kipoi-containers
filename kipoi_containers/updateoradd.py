@@ -14,6 +14,7 @@ from kipoi_containers.helper import (
     write_json_to_kipoi,
     populate_yaml,
     write_yaml,
+    create_pr,
 )
 
 CONTAINER_PREFIX = Path.cwd() / "container-info"
@@ -168,18 +169,20 @@ class ModelSyncer:
             for model_group in self.list_of_updated_model_groups:
                 self.update_or_add_model_container(model_group=model_group)
             write_json(self.docker_to_model_dict, DOCKER_TO_MODEL_JSON)
-            write_json_to_kipoi(
+            update_docker_json = write_json_to_kipoi(
                 self.model_group_to_docker_dict,
                 MODEL_GROUP_TO_DOCKER_JSON,
                 self.kipoi_model_repo,
             )
-            write_json_to_kipoi(
+            update_singularity_json = write_json_to_kipoi(
                 self.model_group_to_singularity_dict,
                 MODEL_GROUP_TO_SINGULARITY_JSON,
                 self.kipoi_model_repo,
             )
             write_yaml(self.workflow_test_data, TEST_IMAGES_WORKFLOW)
             write_yaml(self.workflow_release_data, RELEASE_WORKFLOW)
+            if update_docker_json or update_singularity_json:
+                create_pr(self.kipoi_model_repo)
         else:
             print("No need to update the repo")
 
