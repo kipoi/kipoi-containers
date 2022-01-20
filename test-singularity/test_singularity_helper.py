@@ -93,6 +93,7 @@ def test_update_existing_singularity_container(
             singularity_image_folder=Path(__file__).parent.resolve(),
             model_group="Test",
             file_to_upload="busybox_1.34.1.sif",
+            push=False,
         )
     )
     for key in ["url", "md5", "name"]:
@@ -112,6 +113,7 @@ def test_push_new_singularity_image(zenodo_client, test_singularity_dict):
         singularity_dict=test_singularity_dict,
         model_group="Dummy",
         file_to_upload="busybox_1.34.1.sif",
+        push=False,
     )
     for key in ["url", "md5", "name"]:
         assert test_singularity_dict.get(key) == new_singularity_dict.get(key)

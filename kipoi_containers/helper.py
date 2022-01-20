@@ -46,10 +46,12 @@ def write_json_to_kipoi(
     container_model_dict: Dict,
     container_json: FileType,
     kipoi_model_repo: "Repository",
-) -> Dict:
+) -> bool:
     """
-    Create a new branch in kipoi models repo. Write the given dict
-    to the given json file in that branch.
+    Create a new branch in kipoi models repo called update-json
+    if not present. Write the given dict to the given json file
+     in that branch. It returns true if update-json branch has
+     been updated, returns false otherwise.
     """
     main_branch = kipoi_model_repo.get_branch("master")
     existing_content = kipoi_model_repo.get_contents(
@@ -83,6 +85,8 @@ def write_json_to_kipoi(
             )
         except GithubException as err:
             print(err)
+        return True
+    return False
 
 
 def total_number_of_unique_containers(
@@ -107,3 +111,17 @@ def write_yaml(data: Dict, yaml_file: FileType) -> None:
     """
     with open(yaml_file, "w") as f:
         round_trip_dump(data, f)
+
+
+def create_pr(kipoi_model_repo: "Repository") -> None:
+    "Create a pr from update-json to master in kipoi models repo"
+    body = "Automatic pr created from kipoi-containers"
+    try:
+        kipoi_model_repo.create_pull(
+            title="Update container jsons",
+            body=body,
+            head="update-json",
+            base="master",
+        )
+    except GithubException as err:
+        print(err)

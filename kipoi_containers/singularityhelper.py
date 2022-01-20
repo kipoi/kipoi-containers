@@ -151,7 +151,7 @@ def update_existing_singularity_container(
     singularity_image_folder: PathType,
     model_group: str,
     file_to_upload: str = "",
-    push: bool = False,
+    push: bool = True,
 ) -> None:
     """This function creates a new draft version of an existing image's zenodo entry with updated
     metadata and file after deleting the old file. If push is True, the draft version is finalized
@@ -209,7 +209,7 @@ def push_new_singularity_image(
     model_group: str,
     file_to_upload: str = "",
     path: str = "",
-    push: bool = False,
+    push: bool = True,
 ) -> None:
     """This function creates a draft version of a new zenodo entry with the
     metadata and singularity image. If push is True, the draft version is finalized

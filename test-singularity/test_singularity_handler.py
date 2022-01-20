@@ -133,7 +133,7 @@ def test_singularityhandler_noupdate(
     original_container_dict = helper.populate_json_from_kipoi(
         singularity_json, kipoi_model_repo
     )
-    singularity_handler.update(models_to_test)
+    singularity_handler.update(models_to_test, push=False)
     captured = capsys.readouterr()
     assert (
         captured.out.strip()
@@ -203,7 +203,7 @@ def test_singularityhandler_update(
     original_container_dict = helper.populate_json_from_kipoi(
         singularity_json, kipoi_model_repo
     )
-    singularity_handler.update(models_to_test)
+    singularity_handler.update(models_to_test, push=False)
     updated_container_dict = (
         singularity_handler.model_group_to_singularity_dict
     )
@@ -278,7 +278,7 @@ def test_singularityhandler_add(
     original_container_dict = helper.populate_json_from_kipoi(
         singularity_json, kipoi_model_repo
     )
-    singularity_handler.add(models_to_test)
+    singularity_handler.add(models_to_test, push=False)
     updated_container_dict = (
         singularity_handler.model_group_to_singularity_dict
     )
