@@ -31,7 +31,7 @@ jobs:
       with:
         activate-environment: py39
         environment-file: environment.ubuntu.singularity.yml
-        python-version: 3.9
+#         python-version: 3.9
         auto-activate-base: false
     - name: Install pip dependencies
       shell: bash -l {0}
