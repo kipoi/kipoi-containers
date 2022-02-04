@@ -34,12 +34,7 @@ def run_update(docker_image: str) -> None:
     """
     click.echo(f"Updating the singularity container for {docker_image}")
     github_obj = Github(os.environ["GITHUB_TOKEN"])
-    try:
-        kipoi_model_repo = github_obj.get_organization("kipoi").get_repo(
-            "models"
-        )
-    except GithubException as err:
-        print(err)
+    kipoi_model_repo = github_obj.get_organization("kipoi").get_repo("models")
     model_group_to_singularity_dict = populate_json_from_kipoi(
         MODEL_GROUP_TO_SINGULARITY_JSON, kipoi_model_repo
     )
