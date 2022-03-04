@@ -3,7 +3,6 @@ import json
 from pathlib import Path
 from typing import Dict, List, Union, TYPE_CHECKING
 
-from github import GithubException
 from ruamel.yaml import round_trip_load, round_trip_dump
 import kipoi
 
@@ -68,23 +67,17 @@ def write_json_to_kipoi(
                 for b in list(kipoi_model_repo.get_branches())
             ]
         ):
-            try:
-                kipoi_model_repo.create_git_ref(
-                    ref=f"refs/heads/{target_branch}",
-                    sha=main_branch.commit.sha,
-                )
-            except GithubException as err:
-                print(err)
-        try:
-            kipoi_model_repo.update_file(
-                existing_content.path,
-                f"Updating {container_json}",
-                json.dumps(container_model_dict, indent=4),
-                existing_content.sha,
-                branch=target_branch,
+            kipoi_model_repo.create_git_ref(
+                ref=f"refs/heads/{target_branch}",
+                sha=main_branch.commit.sha,
             )
-        except GithubException as err:
-            print(err)
+        kipoi_model_repo.update_file(
+            existing_content.path,
+            f"Updating {container_json}",
+            json.dumps(container_model_dict, indent=4),
+            existing_content.sha,
+            branch=target_branch,
+        )
         return True
     return False
 
@@ -116,12 +109,9 @@ def write_yaml(data: Dict, yaml_file: FileType) -> None:
 def create_pr(kipoi_model_repo: "Repository") -> None:
     "Create a pr from update-json to master in kipoi models repo"
     body = "Automatic pr created from kipoi-containers"
-    try:
-        kipoi_model_repo.create_pull(
-            title="Update container jsons",
-            body=body,
-            head="update-json",
-            base="master",
-        )
-    except GithubException as err:
-        print(err)
+    kipoi_model_repo.create_pull(
+        title="Update container jsons",
+        body=body,
+        head="update-json",
+        base="master",
+    )

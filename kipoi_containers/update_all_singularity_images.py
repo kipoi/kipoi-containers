@@ -3,7 +3,7 @@ from pathlib import Path
 
 import click
 
-from github import Github, GithubException
+from github import Github
 from kipoi_containers import singularityhandler
 from kipoi_containers.updateoradd import (
     MODEL_GROUP_TO_SINGULARITY_JSON,
