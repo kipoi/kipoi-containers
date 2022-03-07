@@ -71,13 +71,18 @@ def write_json_to_kipoi(
                 ref=f"refs/heads/{target_branch}",
                 sha=main_branch.commit.sha,
             )
-        kipoi_model_repo.update_file(
-            existing_content.path,
-            f"Updating {container_json}",
-            json.dumps(container_model_dict, indent=4),
-            existing_content.sha,
-            branch=target_branch,
-        )
+            kipoi_model_repo.update_file(
+                existing_content.path,
+                f"Updating {container_json}",
+                json.dumps(container_model_dict, indent=4),
+                existing_content.sha,
+                branch=target_branch,
+            )
+        else:
+            print(
+                "update-json branch already exists in kipoi model repo. Merge to master first."
+            )
+            return False
         return True
     return False
 
