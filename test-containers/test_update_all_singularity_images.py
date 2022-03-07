@@ -11,15 +11,6 @@ def runner():
     yield runner
 
 
-def test_cli_incorrect_use(runner):
-    result = runner.invoke(
-        update_all_singularity_images.run_update,
-        [],
-    )
-    assert "Error: Missing argument 'DOCKER_IMAGE'" in result.output
-    assert result.exit_code == 2
-
-
 def test_cli_correct_use(runner, monkeypatch):
     def mock_populate_singularity_json(*args, **kwargs):
         if args[0] == "model-to-docker.json":
@@ -97,9 +88,6 @@ def test_cli_correct_use(runner, monkeypatch):
         "kipoi_containers.update_all_singularity_images.write_json_to_kipoi",
         mock_write_singularity_json,
     )
-    result = runner.invoke(
-        update_all_singularity_images.run_update,
-        ["kipoi/kipoi-docker:mmsplice-mtsplice"],
-    )
+    result = runner.invoke(update_all_singularity_images.run_update)
     print(result.output)
     assert result.exit_code == 0
