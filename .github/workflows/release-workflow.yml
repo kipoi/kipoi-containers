@@ -48,7 +48,6 @@ jobs:
         docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
         docker push kipoi/kipoi-docker:${{ matrix.image }} 
         docker system prune -a -f
-
   buildandtestsharedpy3keras2:
     # The type of runner that the job will run on
     strategy:
@@ -86,7 +85,6 @@ jobs:
         docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env . 
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2 -t kipoi/kipoi-docker:sharedpy3keras2 . 
         pytest -s test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2 --modelgroup=${{ matrix.modelgroup }}
-  
   buildandpushkipoibaseenvandsharedpy3keras2:
     needs: [buildandtestsharedpy3keras2, buildtestandpush]
     runs-on: ubuntu-latest
@@ -126,9 +124,9 @@ jobs:
         docker push kipoi/kipoi-docker:kipoi-base-env
         docker push kipoi/kipoi-docker:sharedpy3keras2
         docker system prune -a -f
-  
   buildtestandpushsingularity:
-    needs: [buildandpushkipoibaseenvandsharedpy3keras2, buildandtestsharedpy3keras2, buildtestandpush]
+    needs: [buildandpushkipoibaseenvandsharedpy3keras2, buildandtestsharedpy3keras2,
+      buildtestandpush]
     runs-on: ubuntu-latest
     env:
       SINGULARITY_PULL_FOLDER: "/home/runner/singularity/"
