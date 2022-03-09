@@ -18,6 +18,14 @@ from kipoi_containers.helper import (
 )
 
 
+def get_sharedpy3keras_models(all_models):
+    model_list = []
+    for model in all_models:
+        if not any(model.split("/")[0] in s for s in model_list):
+            model_list.append(model)
+    return model_list
+
+
 @click.command()
 def run_update() -> None:
     """Update all singularity images. By default, it will push the image to
@@ -45,6 +53,7 @@ def run_update() -> None:
             )
         else:
             docker_to_model_group_dict_ci[kipoi_docker_image] = [model_group]
+
     for docker_image in docker_to_model_group_dict_ci.keys():
         model_or_model_group_list = docker_to_model_group_dict_ci[docker_image]
         singularity_pull_folder = os.environ.get(
@@ -58,7 +67,13 @@ def run_update() -> None:
             singularity_image_folder=singularity_pull_folder,
             model_group_to_singularity_dict=model_group_to_singularity_dict,
         )
-        models_to_test = docker_to_model_dict[docker_image]
+        if "shared" in docker_image:
+            models_to_test = get_sharedpy3keras_models(
+                docker_to_model_dict[docker_image]
+            )
+            # Otherwise it will take more than 6 hours - available time on actions ci
+        else:
+            models_to_test = docker_to_model_dict[docker_image]
         singularity_handler.update(models_to_test)
         if len(model_or_model_group_list) > 1:
             for model_or_model_group in model_or_model_group_list[1:]:
