@@ -9,5 +9,4 @@ dependencies:
   - pkgconfig
   - conda-forge::hdf5
   - pip:
-    - kipoi
-    
+    - git+https://github.com/kipoi/kipoi.git #TODO: Add back when kipoi when py3.10 version is available
