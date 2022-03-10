@@ -13,7 +13,7 @@ requirements = [
     "ruamel.yaml.clib",
     "pandas",
     "spython",
-    "kipoi",
+    "git+https://github.com/kipoi/kipoi.git",
     "pre-commit",
     "click",
 ]
