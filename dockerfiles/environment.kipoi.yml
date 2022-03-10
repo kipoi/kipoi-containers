@@ -4,7 +4,7 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - python=3.9
+  - python=3.10
   - pip
   - pkgconfig
   - conda-forge::hdf5

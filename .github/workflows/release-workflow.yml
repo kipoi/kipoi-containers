@@ -18,14 +18,14 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUBPAT }}
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 3.9
+    - name: Set up Python 3.10
       uses: actions/setup-python@v2
       with:
-        python-version: 3.9
-    - name: Install conda environment py39
+        python-version: 3.10
+    - name: Install conda environment py310
       uses: conda-incubator/setup-miniconda@v2
       with:
-        activate-environment: py39
+        activate-environment: py310
         environment-file: environment.ubuntu.singularity.yml
         auto-activate-base: false
     - name: Install dependencies
@@ -62,14 +62,14 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUBPAT }}
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 3.9
+    - name: Set up Python 3.10
       uses: actions/setup-python@v2
       with:
-        python-version: 3.9
-    - name: Install conda environment py39
+        python-version: 3.10
+    - name: Install conda environment py310
       uses: conda-incubator/setup-miniconda@v2
       with:
-        activate-environment: py39
+        activate-environment: py310
         environment-file: environment.ubuntu.singularity.yml
         auto-activate-base: false
     - name: Install dependencies
@@ -94,11 +94,11 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUBPAT }}
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 3.9
+    - name: Set up Python 3.10
       uses: actions/setup-python@v2
       with:
-        python-version: 3.9
-    - name: Install conda environment py39
+        python-version: 3.10
+    - name: Install conda environment py310
       uses: conda-incubator/setup-miniconda@v2
       with:
         activate-environment: py39
@@ -134,14 +134,14 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUBPAT }}
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 3.9
+    - name: Set up Python 3.10
       uses: actions/setup-python@v2
       with:
-        python-version: 3.9
-    - name: Install conda environment py39
+        python-version: 3.10
+    - name: Install conda environment py310
       uses: conda-incubator/setup-miniconda@v2
       with:
-        activate-environment: py39
+        activate-environment: py310
         environment-file: environment.ubuntu.singularity.yml
         auto-activate-base: false
     - name: Install dependencies

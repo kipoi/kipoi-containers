@@ -1,4 +1,4 @@
-name: py39
+name: py310
 channels:
   - bioconda
   - conda-forge
@@ -6,4 +6,4 @@ channels:
 dependencies:
   - pip
   - singularity>=3.5
-  - python=3.9
+  - python=3.10
