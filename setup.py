@@ -13,7 +13,6 @@ requirements = [
     "ruamel.yaml.clib",
     "pandas",
     "spython",
-    "git+https://github.com/kipoi/kipoi.git",
     "pre-commit",
     "click",
 ]
@@ -39,7 +38,10 @@ setup(
             "update_all_singularity=kipoi_containers.update_all_singularity_images:run_update",
         ],
     },
-    install_requires=requirements,
+    install_requires=[
+        requirements,
+        "kipoi @ https://github.com/kipoi/kipoi/archive/master.tar.gz",
+    ],
     license="MIT license",
     include_package_data=True,
     keywords="kipoi_containers",
