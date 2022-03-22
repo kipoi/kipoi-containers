@@ -101,7 +101,7 @@ jobs:
     - name: Install conda environment py310
       uses: conda-incubator/setup-miniconda@v2
       with:
-        activate-environment: py39
+        activate-environment: py310
         environment-file: environment.ubuntu.singularity.yml
         auto-activate-base: false
     - name: Install dependencies
