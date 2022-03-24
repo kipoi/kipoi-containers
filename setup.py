@@ -15,6 +15,7 @@ requirements = [
     "spython",
     "pre-commit",
     "click",
+    "kipoi",
 ]
 setup_requirements = []
 
@@ -38,10 +39,7 @@ setup(
             "update_all_singularity=kipoi_containers.update_all_singularity_images:run_update",
         ],
     },
-    install_requires=[
-        requirements,
-        "kipoi @ https://github.com/kipoi/kipoi/archive/master.tar.gz",
-    ],
+    install_requires=requirements,
     license="MIT license",
     include_package_data=True,
     keywords="kipoi_containers",

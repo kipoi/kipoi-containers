@@ -2,6 +2,8 @@ import json
 import os
 from pathlib import Path
 import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 from typing import Dict, Tuple, Union
 
 
@@ -15,11 +17,21 @@ class Client:
         self.params = {
             "access_token": os.environ.get("ZENODO_ACCESS_TOKEN", "")
         }
+        retry_strategy = Retry(
+            total=3,
+            backoff_factor=1,
+            status_forcelist=[429, 500, 502, 503, 504],
+            allowed_methods=["GET", "PUT", "DELETE"],
+        )
+        adapter = HTTPAdapter(max_retries=retry_strategy)
+        self.session = requests.Session()
+        self.session.mount("https://", adapter)
+        self.session.mount("http://", adapter)
 
     def get_content(self, url: str, **kwargs) -> Dict:
         """Performs GET request to an url and returns the
         response body"""
-        response = requests.get(url, params=self.params | kwargs)
+        response = self.session.get(url, params=self.params | kwargs)
         response.raise_for_status()
         return response.json()
 
@@ -28,11 +40,11 @@ class Client:
         or a dict and returns the response body"""
         if isinstance(data, Path):
             with open(data, "rb") as file_handle:
-                response = requests.put(
+                response = self.session.put(
                     url, data=file_handle, params=(self.params | kwargs)
                 )
         else:
-            response = requests.put(
+            response = self.session.put(
                 url,
                 data=json.dumps(data),
                 params=(self.params | kwargs),
@@ -51,7 +63,7 @@ class Client:
     def delete_content(self, url: str, **kwargs) -> None:
         # Assumption: There will always be one file associated with each version
         """Performs DELETE request to an url"""
-        response = requests.delete(
+        response = self.session.delete(
             url,
             params=(self.params | kwargs),
         )
