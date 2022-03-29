@@ -31,6 +31,7 @@ class TestContainers:
                 and len(self.modelgroup_name) == 1
             ):
                 self.modelgroup_name = self.modelgroup_name[0]
+
             for model in models:
                 if model.split("/")[0] in self.modelgroup_name:
                     test_docker_image(
@@ -38,8 +39,6 @@ class TestContainers:
                     )
                     if self.modelgroup_name != "DeepSEA":
                         break
-                    else:
-                        continue
         elif self.image_name not in [None, "kipoi-base-env"]:
             models = self.docker_to_model_dict.get(self.image_name)
             for model in models:
