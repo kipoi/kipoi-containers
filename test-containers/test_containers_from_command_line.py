@@ -24,11 +24,22 @@ class TestContainers:
             "kipoi-base-env",
         ]:
             models = self.docker_to_model_dict.get(self.image_name)
+            if not models:
+                raise ValueError("Each model group must have one model")
+            if (
+                isinstance(self.modelgroup_name, list)
+                and len(self.modelgroup_name) == 1
+            ):
+                self.modelgroup_name = self.modelgroup_name[0]
             for model in models:
                 if model.split("/")[0] in self.modelgroup_name:
                     test_docker_image(
                         model_name=model, image_name=self.image_name
                     )
+                    if self.modelgroup_name != "DeepSEA":
+                        break
+                    else:
+                        continue
         elif self.image_name not in [None, "kipoi-base-env"]:
             models = self.docker_to_model_dict.get(self.image_name)
             for model in models:
