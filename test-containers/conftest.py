@@ -40,7 +40,6 @@ def pytest_generate_tests(metafunc):
             metafunc.cls, "modelgroup_name"
         ):
             modelgroups_to_test = modelgroup_from_cmd_line[0].split(",")
-            print(modelgroups_to_test)
             metafunc.cls.modelgroup_name = modelgroups_to_test
     elif metafunc.config.getoption("model"):
         model_from_cmd_line = metafunc.config.getoption("model")
