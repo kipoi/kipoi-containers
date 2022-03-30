@@ -62,7 +62,7 @@ jobs:
       shell: bash -l {0}
       run: |
         mkdir -p /home/runner/singularity/
-        sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config
+        sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config squashfs-tools
         python -m pip install --upgrade pip
         pip install .
     - name: Test with pytest
@@ -84,7 +84,7 @@ jobs:
         python-version: '3.10'
     - name: Install dependencies
       run: |
-        sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config
+        sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config squashfs-tools
         python -m pip install --upgrade pip
         pip install .
     - name: Test kipoi_containers and send coverage report to coveralls.io
