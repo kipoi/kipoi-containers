@@ -54,7 +54,8 @@ jobs:
         ./mconfig -v -p /usr/local
         make -C ./builddir all && sudo make -C ./builddir install
         apptainer --version
-
+        apptainer pull docker://kipoi/kipoi-docker:attentivechrome
+        apptainer exec kipoi-docker_attentivechrome.sif kipoi test AttentiveChrome/E003 --source=kipoi
     # - name: Install dependencies
     #   shell: bash -l {0}
     #   run: |
