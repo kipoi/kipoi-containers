@@ -50,21 +50,26 @@ jobs:
     - name: Set up Python 3.10
       uses: actions/setup-python@v2
       with:
-        python-version: '3.10'
-    - name: Install
-      uses: conda-incubator/setup-miniconda@v2
+        python-version: '3.10'    
+    steps:
+    - uses: eWaterCycle/setup-singularity@v7
       with:
+        singularity-version: 3.8.7
+    - name: Run a singularity container
+      run: singularity run docker://alpine cat /etc/os-release
+    # - name: Install
+      # uses: conda-incubator/setup-miniconda@v2
+      # with:
         # activate-environment: py310
         # environment-file: environment.ubuntu.singularity.yml
-        miniconda-version: "latest"
+        # miniconda-version: "latest"
         # python-version: '3.10'
         # auto-activate-base: false
     - name: Install dependencies
       shell: bash -l {0}
       run: |
         mkdir -p /home/runner/singularity/
-        sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config zlib1g squashfs-tools
-        conda install -c conda-forge -y singularity
+        sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config
         python -m pip install --upgrade pip
         pip install .
     - name: Test with pytest
