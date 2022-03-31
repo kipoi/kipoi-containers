@@ -43,7 +43,7 @@ jobs:
           "DeepFlyBrain", "APARENT/site_probabilities", "APARENT/veff", "DeepSTARR"]
     runs-on: ubuntu-latest
     env:
-      SINGULARITY_PULL_FOLDER: "/home/runner/singularity/"
+      SINGULARITY_PULL_FOLDER: "/home/runner/work/singularity/"
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
     - uses: actions/checkout@v2
@@ -52,13 +52,17 @@ jobs:
       with:
         python-version: '3.10'    
     - name: Install mamba and singularity
-      uses: mamba-org/provision-with-micromamba@main     
+      uses: mamba-org/provision-with-micromamba@main
+      with:     
+        environment-file: False
+
     - name: Install dependencies
       shell: bash -l {0}
       run: |
-        mkdir -p /home/runner/singularity/
+        mkdir -p /home/runner/work/singularity/
         sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config
-        mamba install -c conda-forge -y singularity
+        mamba install -n base -c conda-forge -y singularity
+        conda activate base
         python -m pip install --upgrade pip
         pip install .
     - name: Test with pytest
