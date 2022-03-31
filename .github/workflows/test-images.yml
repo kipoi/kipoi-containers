@@ -63,7 +63,7 @@ jobs:
       shell: bash -l {0}
       run: |
         mkdir -p /home/runner/singularity/
-        sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config squashfs-tools
+        sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config zlib1g squashfs-tools
         conda install -c conda-forge -y singularity
         python -m pip install --upgrade pip
         pip install .
