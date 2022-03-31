@@ -1,9 +1,8 @@
 name: py310
 channels:
-  - bioconda
   - conda-forge
   - defaults
 dependencies:
   - pip
-  - singularity=3.8.7
+  - singularity
   - python=3.10
