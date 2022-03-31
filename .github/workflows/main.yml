@@ -36,6 +36,7 @@ jobs:
         model: ["AttentiveChrome/E003"]
     runs-on: ubuntu-latest
     env:
+      SINGULARITY_PULL_FOLDER: "/home/runner/work/singularity/"
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
     - uses: actions/checkout@v2
@@ -47,25 +48,25 @@ jobs:
       run: sudo apt-get -q update && sudo apt-get install -y build-essential squashfs-tools libseccomp-dev cryptsetup
     - name: Build and install Apptainer
       run: |
-        export VERSION=1.0.0 && \
-        wget https://github.com/apptainer/apptainer/releases/download/v${VERSION}/apptainer-${VERSION}.tar.gz && \
-        tar -xzf apptainer-${VERSION}.tar.gz && \
-        cd apptainer-${VERSION}
+        wget https://github.com/sylabs/singularity/releases/download/v3.9.7/singularity-ce-3.9.7.tar.gz && \
+        tar -xzf singularity-ce-3.9.7.tar.gz && \
+        cd singularity-ce-3.9.7
         ./mconfig -v -p /usr/local
         make -C ./builddir all && sudo make -C ./builddir install
-        apptainer --version
-        apptainer pull docker://kipoi/kipoi-docker:attentivechrome
-        apptainer exec kipoi-docker_attentivechrome.sif kipoi test AttentiveChrome/E003 --source=kipoi
-    # - name: Install dependencies
+        singularity pull docker://kipoi/kipoi-docker:attentivechrome
+        singularity exec kipoi-docker_attentivechrome.sif kipoi test AttentiveChrome/E003 --source=kipoi
+    # - name: Setup python
+    #   uses: actions/setup-python@v2
+    #   with:
+    #     python-version: '3.10'
+    # - name: Test with pytest
     #   shell: bash -l {0}
     #   run: |
-    #     mkdir -p /home/runner/work/singularity/
     #     python -m pip install --upgrade pip
     #     pip install .
-    - name: Test with pytest
-      shell: bash -l {0}
-      run: |
-        singularity exec kipoi-docker_attentivechrome.sif kipoi test AttentiveChrome/E003 --source=kipoi
+    #     mkdir -p /home/runner/work/singularity/
+
+        
   # testdockerandsingularity:
 
   #   runs-on: ubuntu-latest
