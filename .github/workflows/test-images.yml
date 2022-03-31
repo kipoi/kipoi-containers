@@ -56,7 +56,8 @@ jobs:
       with:
         # activate-environment: py310
         # environment-file: environment.ubuntu.singularity.yml
-        python-version: '3.10'
+        miniconda-version: "latest"
+        # python-version: '3.10'
         # auto-activate-base: false
     - name: Install dependencies
       shell: bash -l {0}
