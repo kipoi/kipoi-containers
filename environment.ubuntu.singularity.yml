@@ -1,8 +1,0 @@
-name: py310
-channels:
-  - conda-forge
-  - defaults
-dependencies:
-  - pip
-  - singularity
-  - python=3.10
