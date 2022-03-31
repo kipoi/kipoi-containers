@@ -44,31 +44,30 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: 1.17.7
-    - name: Fetch deps
-      run: sudo apt-get -q update && sudo apt-get install -y build-essential squashfs-tools libseccomp-dev cryptsetup
-    - name: Build and install Apptainer
+    - name: Install system dependencies
+      run: sudo apt-get -q update && sudo apt-get install -y build-essential squashfs-tools libseccomp-dev cryptsetup libhdf5-serial-dev
+    - name: Build and install Singularity
       run: |
         wget https://github.com/sylabs/singularity/releases/download/v3.9.7/singularity-ce-3.9.7.tar.gz && \
         tar -xzf singularity-ce-3.9.7.tar.gz && \
         cd singularity-ce-3.9.7
         ./mconfig -v -p /usr/local
         make -C ./builddir all && sudo make -C ./builddir install
-        singularity pull docker://kipoi/kipoi-docker:attentivechrome
-        singularity exec kipoi-docker_attentivechrome.sif kipoi test AttentiveChrome/E003 --source=kipoi
-    # - name: Setup python
-    #   uses: actions/setup-python@v2
-    #   with:
-    #     python-version: '3.10'
-    # - name: Test with pytest
-    #   shell: bash -l {0}
-    #   run: |
-    #     python -m pip install --upgrade pip
-    #     pip install .
-    #     mkdir -p /home/runner/work/singularity/
+    - name: Setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
+    - name: Test ${{ matrix.model }}
+      shell: bash -l {0}
+      run: |
+        python -m pip install --upgrade pip
+        pip install .
+        mkdir -p /home/runner/work/singularity/
+        pytest -s test-containers/test_models_from_command_line.py --model=${{ matrix.model }}
+        docker system prune -a -f
 
         
   # testdockerandsingularity:
-
   #   runs-on: ubuntu-latest
   #   env:
   #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -81,7 +80,7 @@ jobs:
   #       python-version: '3.10'
   #   - name: Install dependencies
   #     run: |
-  #       sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config squashfs-tools
+  #       sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config 
   #       python -m pip install --upgrade pip
   #       pip install .
   #   - name: Test kipoi_containers and send coverage report to coveralls.io
