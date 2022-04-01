@@ -1,6 +1,5 @@
 name: py310
 channels:
-  - bioconda
   - conda-forge
   - defaults
 dependencies:
