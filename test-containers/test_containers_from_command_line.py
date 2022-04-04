@@ -26,11 +26,6 @@ class TestContainers:
             models = self.docker_to_model_dict.get(self.image_name)
             if not models:
                 raise ValueError("Each model group must have one model")
-            if (
-                isinstance(self.modelgroup_name, list)
-                and len(self.modelgroup_name) == 1
-            ):
-                self.modelgroup_name = self.modelgrptoup_name[0]
 
             for model in models:
                 if model.split("/")[0] in self.modelgroup_name:
