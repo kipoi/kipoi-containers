@@ -68,7 +68,8 @@ kipoi predict Basset \
 
 - Install [docker](https://docs.docker.com/get-docker/)
 
-- Install [singularity](https://sylabs.io/guides/3.0/user-guide/installation.html)
+- Install singularity
+  - Singularity has been renamed to [Apptainer](https://apptainer.org/). However, it is also possible to use SingularityCE from [Sylabs](https://sylabs.io/). Current versions of kipoi containers are compatible with the latest version of Apptainer (1.0.1) and SingularityCE 3.9. Install Apptainer from [here](https://apptainer.org/docs/user/main/quick_start.html#quick-installation-steps) or SingularityCE from [here](https://sylabs.io/guides/3.9/admin-guide/installation.html).
 
 - Install kipoi_containers using ```pip install .```
 
@@ -174,7 +175,7 @@ There are three different workflows at .github/workflow, each of which serves a 
     - Which
       - `.github/workflows/sync-with-model-repo.yml`
     - When
-      - On demand and on the 1st of every month. If everything is up-to-date the process exits with  a message.
+      - On demand and when a pull request is merged to master branch of [model repo](https://github.com/kipoi/models) from [here](https://github.com/kipoi/models/blob/master/.circleci/config.yml#L243-#L253)
     - Why
       - Keep the docker and singularity images up to date with the model definition in the [model repo](https://github.com/kipoi/models)
 
@@ -188,13 +189,13 @@ There are three different workflows at .github/workflow, each of which serves a 
         of [model repo](https://github.com/kipoi/models) in case a new model has been added
       - Update workflows in `.github/workflow` in case a new model has been added
       - Update `kipoi_containers/kipoi-model-repo-hash`
-      - Create a pr in this repo. For now, a pr has to be manually created in the [model repo](https://github.com/kipoi/models).
+      - A pr is created automatically which then needs to be reviewed and merged.
 
 3. Build, test and push all docker and singularity images
     - Which
       - `.github/workflows/release-workflow.yml`
     - When
-      - On demand
+      - On demand and when a new package of kipoi is released to pypi from [here](https://github.com/kipoi/kipoi/blob/master/.circleci/config.yml#L380-#L418)
     - Why
       - Re-build, test and push the docker and singularity images. Some example scenarios -
         - kipoi pypi package has been updated
@@ -202,5 +203,5 @@ There are three different workflows at .github/workflow, each of which serves a 
 
     - How
       - Re-build, test and push the dockerhub images. Docker cli is used for this purpose.
-      - A new version of the singularity image will be built based on the new docker image. Cuurently, a new version of the existing deposition on zenodo will be created and this modified image will be uploaded there.
-      - Currently no change will be made to `shared/containers/model-to-singularity.json` in branch `target-json` of [model repo](https://github.com/kipoi/models)
+      - A new version of the singularity image will be built based on the new docker image. A new version of the existing deposition on zenodo will be created and this modified image will be uploaded there. Finally, this new deposition will be pushed an url will be returned.
+      - New url will be updated in `shared/containers/model-to-singularity.json` in branch `target-json` of [model repo](https://github.com/kipoi/models)
