@@ -15,15 +15,8 @@ from kipoi_containers.helper import (
     populate_json_from_kipoi,
     write_json,
     write_json_to_kipoi,
+    one_model_per_modelgroup,
 )
-
-
-def get_sharedpy3keras_models(all_models):
-    model_list = []
-    for model in all_models:
-        if not any(model.split("/")[0] in s for s in model_list):
-            model_list.append(model)
-    return model_list
 
 
 @click.command()
@@ -68,7 +61,7 @@ def run_update() -> None:
             model_group_to_singularity_dict=model_group_to_singularity_dict,
         )
         if "shared" in docker_image:
-            models_to_test = get_sharedpy3keras_models(
+            models_to_test = one_model_per_modelgroup(
                 docker_to_model_dict[docker_image]
             )
             # Otherwise it will take more than 6 hours - available time on actions ci

@@ -120,3 +120,11 @@ def create_pr(kipoi_model_repo: "Repository") -> None:
         head="update-json",
         base="master",
     )
+
+
+def one_model_per_modelgroup(all_models):
+    model_list = []
+    for model in all_models:
+        if not any(model.split("/")[0] in s for s in model_list):
+            model_list.append(model)
+    return model_list

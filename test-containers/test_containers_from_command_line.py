@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 from kipoi_containers.updateoradd import DOCKER_TO_MODEL_JSON
-from kipoi_containers.helper import populate_json
+from kipoi_containers.helper import populate_json, one_model_per_modelgroup
 
 
 class TestContainers:
@@ -30,7 +30,7 @@ class TestContainers:
                 isinstance(self.modelgroup_name, list)
                 and len(self.modelgroup_name) == 1
             ):
-                self.modelgroup_name = self.modelgroup_name[0]
+                self.modelgroup_name = self.modelgrptoup_name[0]
 
             for model in models:
                 if model.split("/")[0] in self.modelgroup_name:
@@ -40,7 +40,9 @@ class TestContainers:
                     if self.modelgroup_name != "DeepSEA":
                         break
         elif self.image_name not in [None, "kipoi-base-env"]:
-            models = self.docker_to_model_dict.get(self.image_name)
+            all_models = self.docker_to_model_dict.get(self.image_name)
+            if "shared" in self.image_name:
+                models = one_model_per_modelgroup(all_models)
             for model in models:
                 print(f"Testing {model} with {self.image_name}")
                 test_docker_image(model_name=model, image_name=self.image_name)
