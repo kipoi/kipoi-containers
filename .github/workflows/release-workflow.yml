@@ -2,9 +2,7 @@ name: Build, test and push images on demand
 on:
   repository_dispatch:
     types: [updateall]
-
   workflow_dispatch:
-  
 jobs:
   buildtestandpush:
     # The type of runner that the job will run on
