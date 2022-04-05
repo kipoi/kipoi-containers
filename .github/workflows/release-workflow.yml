@@ -155,6 +155,13 @@ jobs:
   buildtestandpushsingularity:
     needs: [buildandpushkipoibaseenvandsharedpy3keras2, buildandtestsharedpy3keras2,
       buildtestandpush]
+    strategy:
+      fail-fast: false
+      matrix:
+        image: ["sharedpy3keras1.2", "sharedpy3keras2", "mpra-dragonn", "extended_coda", "mmsplice",
+          "mmsplice-mtsplice", "deepmel", "framepool", "kipoisplice", "deeptarget",
+          "attentivechrome", "bpnet-oskn", "seqvec", "deepflybrain", "aparent-site_probabilities",
+          "aparent-veff", "deepstarr"]  
     runs-on: ubuntu-latest
     env:
       SINGULARITY_PULL_FOLDER: "/home/runner/singularity/"
@@ -191,4 +198,4 @@ jobs:
       shell: bash -l {0}
       if: ${{ success() }}
       run: |
-        update_all_singularity
+        update_all_singularity kipoi/kipoi-docker:${{ matrix.image }}
