@@ -1,0 +1,25 @@
+{
+    "cniVersion": "1.0.0",
+    "name": "fakeroot",
+    "plugins": [
+        {
+            "type": "ptp",
+            "ipMasq": true,
+            "ipam": {
+                "type": "host-local",
+                "subnet": "10.23.0.0/16",
+                "routes": [
+                    { "dst": "0.0.0.0/0" }
+                ]
+            }
+        },
+        {
+            "type": "firewall"
+        },
+        {
+            "type": "portmap",
+            "capabilities": {"portMappings": true},
+            "snat": true
+        }
+    ]
+}

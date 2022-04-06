@@ -1,0 +1,411 @@
+#!/bin/sh -
+# Copyright (c) Contributors to the Apptainer project, established as
+#   Apptainer a Series of LF Projects LLC.
+#   For website terms of use, trademark policy, privacy policy and other
+#   project policies see https://lfprojects.org/policies
+#
+# Apptainer core libs system configuration detection
+#
+set -e
+
+config_add_header
+
+config_add_def PACKAGE_NAME \"$package_name\"
+config_add_def PACKAGE_TARNAME \"$package_name\"
+config_add_def PACKAGE_VERSION \"$package_version\"
+config_add_def PACKAGE_STRING \"apptainer $package_version\"
+config_add_def PACKAGE_URL \"\"
+
+config_add_def BUILDDIR \"$builddir\"
+config_add_def SOURCEDIR \"$sourcedir\"
+config_add_def PREFIX \"$prefix\"
+config_add_def EXECPREFIX \"$exec_prefix\"
+config_add_def BINDIR \"$bindir\"
+config_add_def SBINDIR \"$sbindir\"
+config_add_def LIBEXECDIR \"$libexecdir\"
+config_add_def DATAROOTDIR \"$datarootdir\"
+config_add_def DATADIR \"$datadir\"
+config_add_def SYSCONFDIR \"$sysconfdir\"
+config_add_def SHAREDSTATEDIR \"$sharedstatedir\"
+config_add_def LOCALSTATEDIR \"$localstatedir\"
+config_add_def RUNSTATEDIR \"$runstatedir\"
+config_add_def INCLUDEDIR \"$includedir\"
+config_add_def OLDINCLUDEDIR \"$oldincludedir\"
+config_add_def DOCDIR  \"$docdir\"
+config_add_def INFODIR \"$infodir\"
+config_add_def HTMLDIR \"$htmldir\"
+config_add_def DVIDIR \"$dvidir\"
+config_add_def PDFDIR \"$pdfdir\"
+config_add_def PSDIR \"$psdir\"
+config_add_def LIBDIR \"$libdir\"
+config_add_def LOCALEDIR \"$localedir\"
+config_add_def MANDIR \"$mandir\"
+config_add_def APPTAINER_CONFDIR SYSCONFDIR \"/apptainer\"
+config_add_def APPTAINER_CONF_FILE APPTAINER_CONFDIR \"/apptainer.conf\"
+config_add_def CAPABILITY_FILE APPTAINER_CONFDIR \"/capability.json\"
+config_add_def ECL_FILE APPTAINER_CONFDIR \"/ecl.toml\"
+config_add_def NVIDIALIBS_FILE APPTAINER_CONFDIR \"/nvliblist.conf\"
+config_add_def SESSIONDIR LOCALSTATEDIR \"/apptainer/mnt/session\"
+config_add_def APPTAINER_SUID_INSTALL $with_suid
+config_add_def PLUGIN_ROOTDIR LIBEXECDIR \"/apptainer/plugin\"
+
+# engine configuration constants
+engine_config_env="ENGINE_CONFIG"
+engine_config_chunks_env="ENGINE_CONFIG_CHUNKS"
+max_engine_config_chunk="8"
+
+config_add_def ENGINE_CONFIG_ENV \"$engine_config_env\"
+config_add_def ENGINE_CONFIG_CHUNK_ENV \"$engine_config_chunks_env\"
+# add two bytes for '=' and the null character
+config_add_def ENGINE_CONFIG_ENV_PADDING ${#engine_config_env}+${#max_engine_config_chunk}+2
+config_add_def MAX_CHUNK_SIZE 131072-ENGINE_CONFIG_ENV_PADDING
+config_add_def MAX_ENGINE_CONFIG_CHUNK $max_engine_config_chunk
+config_add_def MAX_ENGINE_CONFIG_SIZE MAX_ENGINE_CONFIG_CHUNK*MAX_CHUNK_SIZE
+
+build_runtime=0
+if [ "$host" = "unix" ]; then
+	build_runtime=1
+fi
+
+########################
+# ns: CLONE_NEWPID
+########################
+printf " checking: namespace: CLONE_NEWPID... "
+if ! printf "#define _GNU_SOURCE\n#include <sched.h>\nint main() { unshare(CLONE_NEWPID); }" | \
+   $tgtcc -x c -o /dev/null - >/dev/null 2>&1; then
+	echo "no"
+else
+	echo "yes"
+	config_add_def NS_CLONE_NEWPID 1
+fi
+
+########################
+# ns: CLONE_FS
+########################
+printf " checking: namespace: CLONE_FS... "
+if ! printf "#define _GNU_SOURCE\n#include <sched.h>\nint main() { unshare(CLONE_FS); }" | \
+   $tgtcc -x c -o /dev/null - >/dev/null 2>&1; then
+	echo "no"
+else
+	echo "yes"
+	config_add_def NS_CLONE_FS 1
+fi
+
+########################
+# ns: CLONE_NEWNS
+########################
+printf " checking: namespace: CLONE_NEWNS... "
+if ! printf "#define _GNU_SOURCE\n#include <sched.h>\nint main() { unshare(CLONE_NEWNS); }" | \
+   $tgtcc -x c -o /dev/null - >/dev/null 2>&1; then
+	echo "no"
+	if [ "$build_runtime" -eq 1 ]; then
+		echo
+		echo "This host does not support the CLONE_NEWNS (mount) namespace flag! You"
+		echo "really really really don't want to run Apptainer containers without a"
+		echo "Separate mount name namespace!"
+		echo
+		exit 2
+	fi
+else
+	echo "yes"
+	config_add_def NS_CLONE_NEWNS 1
+fi
+
+########################
+# ns: CLONE_NEWUSER
+########################
+printf " checking: namespace: CLONE_NEWUSER... "
+if ! printf "#define _GNU_SOURCE\n#include <sched.h>\nint main() { unshare(CLONE_NEWUSER); }" | \
+   $tgtcc -x c -o /dev/null - >/dev/null 2>&1; then
+	echo "no"
+else
+	echo "yes"
+	config_add_def NS_CLONE_NEWUSER 1
+fi
+
+########################
+# ns: CLONE_NEWIPC
+########################
+printf " checking: namespace: CLONE_NEWIPC... "
+if ! printf "#define _GNU_SOURCE\n#include <sched.h>\nint main() { unshare(CLONE_NEWIPC); }" | \
+   $tgtcc -x c -o /dev/null - >/dev/null 2>&1; then
+	echo "no"
+else
+	echo "yes"
+	config_add_def NS_CLONE_NEWIPC 1
+fi
+
+########################
+# ns: CLONE_NEWNET
+########################
+printf " checking: namespace: CLONE_NEWNET... "
+if ! printf "#define _GNU_SOURCE\n#include <sched.h>\nint main() { unshare(CLONE_NEWNET); }" | \
+   $tgtcc -x c -o /dev/null - >/dev/null 2>&1; then
+	echo "no"
+else
+	echo "yes"
+	config_add_def NS_CLONE_NEWNET 1
+fi
+
+########################
+# ns: CLONE_NEWUTS
+########################
+printf " checking: namespace: CLONE_NEWUTS... "
+if ! printf "#define _GNU_SOURCE\n#include <sched.h>\nint main() { unshare(CLONE_NEWUTS); }" | \
+   $tgtcc -x c -o /dev/null - >/dev/null 2>&1; then
+	echo "no"
+else
+	echo "yes"
+	config_add_def NS_CLONE_NEWUTS 1
+fi
+
+########################
+# ns: CLONE_NEWCGROUP
+########################
+printf " checking: namespace: CLONE_NEWCGROUP... "
+if ! printf "#define _GNU_SOURCE\n#include <sched.h>\nint main() { unshare(CLONE_NEWCGROUP); }" | \
+   $tgtcc -x c -o /dev/null - >/dev/null 2>&1; then
+    echo "no"
+else
+    echo "yes"
+    config_add_def NS_CLONE_NEWCGROUP 1
+fi
+
+########################
+# feature: NO_NEW_PRIVS
+########################
+printf " checking: feature: NO_NEW_PRIVS... "
+testprog=$makeit_testprogdir/test_nnp
+cat > ${testprog}.c << "EOF"
+#include <sys/prctl.h>
+#ifndef PR_SET_NO_NEW_PRIVS
+# define PR_SET_NO_NEW_PRIVS 38
+# define PR_GET_NO_NEW_PRIVS 39
+#endif
+int main() {
+  if( prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) != 0 ) { return 1; }
+  if( prctl(PR_GET_NO_NEW_PRIVS, 0, 0, 0, 0) != 1 ) { return 1; }
+  return 0;
+}
+EOF
+if ! $tgtcc -x c -o $testprog ${testprog}.c >/dev/null 2>&1; then
+	echo "no"
+	if [ "$build_runtime" -eq 1 ]; then
+		echo "ERROR: Failed to compile NO_NEW_PRIVS test"
+		exit 2;
+	fi
+else
+    if ! $testprog; then
+        echo "ERROR: Kernel does not support NO_NEW_PRIVS. Updated Kernel is required."
+        exit 2;
+    else
+	echo "yes"
+	config_add_def APPTAINER_NO_NEW_PRIVS 1
+    fi
+fi
+
+########################
+# feature: MS_SLAVE
+########################
+printf " checking: feature: MS_SLAVE... "
+if ! printf "#include <sys/mount.h>\n#ifndef MS_SLAVE\n#error failed\n#endif\nint main() { }" | \
+   $tgtcc -x c -o /dev/null - >/dev/null 2>&1; then
+	echo "no"
+else
+	echo "yes"
+	config_add_def APPTAINER_MS_SLAVE 1
+fi
+
+########################
+# feature: MS_REC
+########################
+printf " checking: feature: MS_REC... "
+if ! printf "#include <sys/mount.h>\n#ifndef MS_REC\n#error failed\n#endif\nint main() { }" | \
+   $tgtcc -x c -o /dev/null - >/dev/null 2>&1; then
+	echo "no"
+	if [ "$build_runtime" -eq 1 ]; then
+		echo
+		echo "This host does not support the MS_REC mount option!"
+		echo
+		exit 2
+	fi
+else
+	echo "yes"
+fi
+
+########################
+# feature: MS_PRIVATE
+########################
+printf " checking: feature: MS_PRIVATE... "
+if ! printf "#include <sys/mount.h>\n#ifndef MS_PRIVATE\n#error failed\n#endif\nint main() { }" | \
+   $tgtcc -x c -o /dev/null - >/dev/null 2>&1; then
+	tgtstatic=0
+	echo "no"
+	if [ "$build_runtime" -eq 1 ]; then
+		echo
+		echo "This host does not support the MS_PRIVATE mount option!"
+		echo
+		exit 2
+	fi
+else
+	echo "yes"
+fi
+
+########################
+# user capabilities
+########################
+printf " checking: user capabilities... "
+testprog=$makeit_testprogdir/test_ucap
+cat > ${testprog}.c << "EOF"
+#include <sys/prctl.h>
+int main() {
+  if( prctl(PR_CAP_AMBIENT, PR_CAP_AMBIENT_IS_SET, 0, 0, 0) < 0 ) { return 1; }
+  return 0;
+}
+EOF
+if ! $tgtcc -x c -o $testprog ${testprog}.c >/dev/null 2>&1; then
+    echo "no"
+else
+    if ! $testprog; then
+        echo "no"
+    else
+        echo "yes"
+        config_add_def USER_CAPABILITIES 1
+    fi
+fi
+
+########################
+# linux/securebits.h
+########################
+printf " checking: header linux/securebits.h... "
+if ! printf "#include <linux/securebits.h>\nint main() { }" | \
+   $tgtcc -x c -o /dev/null - >/dev/null 2>&1; then
+	echo "no"
+else
+	echo "yes"
+	config_add_def APPTAINER_SECUREBITS 1
+fi
+
+########################
+# linux/capability.h
+########################
+printf " checking: header linux/capability.h... "
+if ! printf "#include <linux/capability.h>\nint main() { }" | \
+   $tgtcc -x c -o /dev/null - >/dev/null 2>&1; then
+	echo "no"
+	if [ "$build_runtime" -eq 1 ]; then
+		echo
+		echo "linux/capability.h header not found, requires kernel headers installation."
+		echo
+		exit 2
+	fi
+else
+	echo "yes"
+fi
+
+########################
+# libseccomp dev
+########################
+if [ "$with_seccomp_check" = "1" ];then
+    printf " checking: libseccomp+headers... "
+    seccomp_iflags=`pkg-config --cflags-only-I libseccomp 2>/dev/null || true`
+    if ! printf "#include <seccomp.h>\nint main() { seccomp_syscall_resolve_name(\"read\"); }" | \
+       $tgtcc $user_cflags $ldflags $seccomp_iflags -x c -o /dev/null - -lseccomp >/dev/null 2>&1; then
+	tgtstatic=0
+	echo "no"
+    else
+	echo "yes"
+	appsec=1
+    fi
+fi
+
+################################
+# Configurable external programs
+################################
+
+# Find external programs that Apptainer will call, and are configurable
+# in apptainer.conf. The build-time path will be set in the installed
+# apptainer.conf, and can be customized by the user.
+#
+# Note that Apptainer will fall back to looking on PATH if the conf file
+# path is empty.
+
+echo
+echo "Finding paths to external executables."
+echo "These paths are written into apptainer.conf and can be overridden there."
+echo
+
+# PATH including sbin locations for tools expected to be there
+SBIN_PATH=${PATH}:${sbindir}:${bindir}:/usr/local/sbin:/sbin:/usr/sbin
+
+if test "${host}" = "unix" ; then
+   printf " checking: cryptsetup... "
+   cryptsetup_path=`PATH=${SBIN_PATH} command -v cryptsetup || true`
+   if test -z "${cryptsetup_path}" ; then
+      echo "no"
+      echo
+      echo "unable to find the cryptsetup program, is the package cryptsetup-bin installed?"
+      echo
+   else
+      echo "yes (${cryptsetup_path})"
+   fi
+
+   printf " checking: go... "
+   go_path=`command -v go || true`
+   if test -z "${go_path}" ; then
+      echo "no"
+   else
+      echo "yes (${go_path})"
+   fi
+
+   printf " checking: ldconfig... "
+   # Look for ldconfig.real first, as we need the executable, not the
+   # wrapper script on Ubuntu.
+   ldconfig_path=`PATH=${SBIN_PATH} command -v ldconfig.real || true`
+   if test -z "${ldconfig_path}" ; then
+      ldconfig_path=`PATH=${SBIN_PATH} command -v ldconfig || true`
+      if test -z "${ldconfig_path}" ; then
+         echo "no"
+      else
+         echo "yes (${ldconfig_path})"
+      fi
+   else
+      echo "yes (${ldconfig_path})"
+   fi
+
+   printf " checking: mksquashfs... "
+   mksquashfs_path=`command -v mksquashfs || true`
+   if test -z "${mksquashfs_path}" ; then
+      echo "no"
+   else
+      echo "yes (${mksquashfs_path})"
+   fi
+
+   printf " checking: nvidia-container-cli... "
+   nvidia_container_cli_path=`command -v nvidia-container-cli || true`
+   if test -z "${nvidia_container_cli_path}" ; then
+      echo "no"
+   else
+      echo "yes (${nvidia_container_cli_path})"
+   fi
+
+   printf " checking: unsquashfs... "
+   unsquashfs_path=`command -v unsquashfs || true`
+   if test -z "${unsquashfs_path}" ; then
+      echo "no"
+   else
+      echo "yes (${unsquashfs_path})"
+   fi
+
+fi
+
+config_add_def CRYPTSETUP_PATH \"${cryptsetup_path}\"
+config_add_def GO_PATH \"${go_path}\"
+config_add_def LDCONFIG_PATH \"${ldconfig_path}\"
+config_add_def MKSQUASHFS_PATH \"${mksquashfs_path}\"
+config_add_def NVIDIA_CONTAINER_CLI_PATH \"${nvidia_container_cli_path}\"
+config_add_def UNSQUASHFS_PATH \"${unsquashfs_path}\"
+
+echo
+
+config_add_footer

@@ -1,0 +1,27 @@
+run:
+  timeout: 3m
+
+linters:
+  disable-all: true
+  enable-all: false
+  enable:
+    - contextcheck
+    - deadcode
+    - dupl
+    - gofumpt
+    - goimports
+    - gosimple
+    - govet
+    - ineffassign
+    - misspell
+    - nakedret
+    - revive
+    - staticcheck
+
+linters-settings:
+  misspell:
+    locale: US
+
+issues:
+  max-per-linter: 0
+  max-same-issues: 0

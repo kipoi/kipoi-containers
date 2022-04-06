@@ -1,0 +1,7 @@
+if test -z "$APPTAINER_INIT"; then
+    PATH="/canary/path:$PATH"
+    PS1="$PS1"
+    APPTAINER_INIT=1
+    export PATH PS1 APPTAINER_INIT
+fi
+

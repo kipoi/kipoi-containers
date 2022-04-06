@@ -1,0 +1,27 @@
+{
+    "cniVersion": "1.0.0",
+    "name": "bridge",
+    "plugins": [
+        {
+            "type": "bridge",
+            "bridge": "sbr0",
+            "isGateway": true,
+            "ipMasq": true,
+            "ipam": {
+                "type": "host-local",
+                "subnet": "10.22.0.0/16",
+                "routes": [
+                    { "dst": "0.0.0.0/0" }
+                ]
+            }
+        },
+        {
+            "type": "firewall"
+        },
+        {
+            "type": "portmap",
+            "capabilities": {"portMappings": true},
+            "snat": true
+        }
+    ]
+}

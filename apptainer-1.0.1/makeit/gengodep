@@ -1,0 +1,37 @@
+#!/bin/sh
+
+if [ "$1" != "-v3" ] ; then
+	cat 1>&2 <<-EOT
+
+========================================================================
+A non-backwards compatible change has been added to the build system and
+it's necessary to start fresh.
+
+Please remove the build directory ("builddir" by default) and run
+mconfig again.
+========================================================================
+
+	EOT
+	exit 1
+fi
+
+shift
+
+go=$1
+var=$2
+gotags=$3
+depfile=$4
+
+shift 4
+
+# this is needed so that the value we are getting from the makefile does
+# get propagated down to go list.
+export GOPROXY
+
+template='{{ with $d := . }}{{ if not $d.Standard }}{{ range $d.GoFiles }}{{ printf "%s/%s\n" $d.Dir . }}{{ end }}{{ range $d.CgoFiles }}{{ printf "%s/%s\n" $d.Dir . }}{{ end }}{{ end }}{{ end }}'
+
+godeps=`${go} list -deps -f "${template}" -tags "${gotags}" "$@" | sort -u`
+
+for m in ${godeps}; do
+    echo "$var += $m" >> ${depfile}
+done
