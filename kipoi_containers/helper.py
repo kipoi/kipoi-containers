@@ -29,7 +29,7 @@ def populate_json_from_kipoi(
     """
     if branch_exists(kipoi_model_repo):
         json_content = kipoi_model_repo.get_contents(
-            f"{CONTAINER_PREFIX}/{json_file}", refs="update-json"
+            f"{CONTAINER_PREFIX}/{json_file}", ref="update-json"
         ).decoded_content.decode()
     else:
         json_content = kipoi_model_repo.get_contents(
@@ -97,7 +97,7 @@ def write_json_to_kipoi(
             return True
     else:
         existing_content = kipoi_model_repo.get_contents(
-            f"{CONTAINER_PREFIX}/{container_json}", refs=target_branch
+            f"{CONTAINER_PREFIX}/{container_json}", ref=target_branch
         )
         existing_container_dict = json.loads(
             existing_content.decoded_content.decode()
