@@ -27,9 +27,15 @@ def populate_json_from_kipoi(
     """
     Populate and returns a dict using the given json file from Kipoi
     """
-    json_content = kipoi_model_repo.get_contents(
-        f"{CONTAINER_PREFIX}/{json_file}"
-    ).decoded_content.decode()
+    if branch_exists(kipoi_model_repo):
+        json_content = kipoi_model_repo.get_contents(
+            f"{CONTAINER_PREFIX}/{json_file}", ref="update-json"
+        ).decoded_content.decode()
+    else:
+        json_content = kipoi_model_repo.get_contents(
+            f"{CONTAINER_PREFIX}/{json_file}"
+        ).decoded_content.decode()
+
     return json.loads(json_content)
 
 
@@ -39,6 +45,21 @@ def write_json(container_model_dict: Dict, container_json: FileType) -> None:
     """
     with open(container_json, "w") as file_handle:
         json.dump(container_model_dict, file_handle, indent=4)
+
+
+def branch_exists(kipoi_model_repo: "Repository") -> bool:
+    """
+    Check if update-json branch exists in kipoi model repo
+
+    Returns:
+        bool: True if update-json branch exists, False otherwise
+    """
+    return any(
+        [
+            b.name == "update-json"
+            for b in list(kipoi_model_repo.get_branches())
+        ]
+    )
 
 
 def write_json_to_kipoi(
@@ -52,21 +73,16 @@ def write_json_to_kipoi(
      in that branch. It returns true if update-json branch has
      been updated, returns false otherwise.
     """
+    target_branch = "update-json"
     main_branch = kipoi_model_repo.get_branch("master")
-    existing_content = kipoi_model_repo.get_contents(
-        f"{CONTAINER_PREFIX}/{container_json}"
-    )
-    existing_container_dict = json.loads(
-        existing_content.decoded_content.decode()
-    )
-    if existing_container_dict != container_model_dict:
-        target_branch = "update-json"
-        if not any(
-            [
-                b.name == target_branch
-                for b in list(kipoi_model_repo.get_branches())
-            ]
-        ):
+    if not branch_exists(kipoi_model_repo):
+        existing_content = kipoi_model_repo.get_contents(
+            f"{CONTAINER_PREFIX}/{container_json}"
+        )
+        existing_container_dict = json.loads(
+            existing_content.decoded_content.decode()
+        )
+        if existing_container_dict != container_model_dict:
             kipoi_model_repo.create_git_ref(
                 ref=f"refs/heads/{target_branch}",
                 sha=main_branch.commit.sha,
@@ -78,12 +94,23 @@ def write_json_to_kipoi(
                 existing_content.sha,
                 branch=target_branch,
             )
-        else:
-            print(
-                "update-json branch already exists in kipoi model repo. Merge to master first."
+            return True
+    else:
+        existing_content = kipoi_model_repo.get_contents(
+            f"{CONTAINER_PREFIX}/{container_json}", ref=target_branch
+        )
+        existing_container_dict = json.loads(
+            existing_content.decoded_content.decode()
+        )
+        if existing_container_dict != container_model_dict:
+            kipoi_model_repo.update_file(
+                existing_content.path,
+                f"Updating {container_json}",
+                json.dumps(container_model_dict, indent=4),
+                existing_content.sha,
+                branch=target_branch,
             )
-            return False
-        return True
+            return True
     return False
 
 

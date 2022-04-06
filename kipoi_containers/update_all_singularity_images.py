@@ -64,13 +64,9 @@ def run_update(docker_image: str) -> None:
         singularity_image_folder=singularity_pull_folder,
         model_group_to_singularity_dict=model_group_to_singularity_dict,
     )
-    if "shared" in docker_image:
-        models_to_test = one_model_per_modelgroup(
-            docker_to_model_dict[docker_image]
-        )
-        # Otherwise it will take more than 6 hours - available time on actions ci
-    else:
-        models_to_test = docker_to_model_dict[docker_image]
+    models_to_test = one_model_per_modelgroup(
+        docker_to_model_dict[docker_image]
+    )
     singularity_handler.update(models_to_test)
     if len(model_or_model_group_list) > 1:
         for model_or_model_group in model_or_model_group_list[1:]:
