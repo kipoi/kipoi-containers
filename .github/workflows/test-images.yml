@@ -61,12 +61,12 @@ jobs:
     - name: Build and install Apptainer
       run: |
         export VERSION=1.0.1 && \
-        wget https://github.com/apptainer/apptainer/releases/download/v${VERSION}/apptainer-${VERSION}.tar.gz && \
-        tar -xzf apptainer-${VERSION}.tar.gz && \
+        wget https://github.com/apptainer/apptainer/releases/download/v${VERSION}/apptainer-${VERSION}.tar.gz /home/runner/work && \
+        cd /home/runner/work && tar -xzf apptainer-${VERSION}.tar.gz && \
         cd apptainer-${VERSION}
         ./mconfig -v -p /usr/local
         make -C ./builddir all && sudo make -C ./builddir install
-        cd ../ && rm apptainer-${VERSION}.tar.gz && rm -rf apptainer-${VERSION}
+        cd /home/runner/work && rm apptainer-${VERSION}.tar.gz && rm -rf apptainer-${VERSION}
     - name: Install kipoi_containers
       run: |
         mkdir -p /home/runner/singularity/
