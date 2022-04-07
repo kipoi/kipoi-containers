@@ -66,7 +66,7 @@ jobs:
         cd apptainer-${VERSION}
         ./mconfig -v -p /usr/local
         make -C ./builddir all && sudo make -C ./builddir install
-        rm apptainer-${VERSION}.tar.gz && rm -rf apptainer-${VERSION}.tar.gz
+        rm apptainer-${VERSION}.tar.gz && rm -rf apptainer-${VERSION}
     - name: Install kipoi_containers
       run: |
         mkdir -p /home/runner/singularity/
