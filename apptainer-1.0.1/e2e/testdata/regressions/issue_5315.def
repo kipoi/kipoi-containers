@@ -1,5 +1,0 @@
-bootstrap: oras
-from: ghcr.io/apptainer/alpine:3.15.0
-
-%test
-    echo "TEST OK"

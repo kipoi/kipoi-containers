@@ -1,6 +1,0 @@
-Active: DefaultRemote
-Remotes:
-  DefaultRemote:
-    URI: cloud.apptainer.org
-    System: true
-    Exclusive: false
