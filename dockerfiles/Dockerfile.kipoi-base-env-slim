@@ -14,11 +14,7 @@ RUN conda-pack -n kipoi-AttentiveChrome -o /tmp/kipoi-AttentiveChrome.tar && \
     rm /tmp/kipoi-AttentiveChrome.tar
 
 FROM continuumio/miniconda3:latest
-# RUN apt-get update -q && \
-#     apt-get install -q -y --no-install-recommends git wget ca-certificates \
-#     build-essential libz-dev libcurl3-dev libarchive-dev gcc && \
-#     rm -rf /var/lib/apt/lists/*
-# RUN apt-get update && apt-get install --no-install-recommends -y build-essential libz-dev libcurl3-dev libarchive-dev gcc ca-certificates
+
 COPY --from=build /kipoi-AttentiveChrome /opt/conda/envs/kipoi-AttentiveChrome
 
 SHELL ["/bin/bash", "-c"]
@@ -27,6 +23,4 @@ ENV PATH /opt/conda/envs/kipoi-AttentiveChrome/bin:$PATH
 
 SHELL ["conda", "run", "-n", "kipoi-AttentiveChrome", "/bin/bash", "-c"]
 
-# RUN echo "source activate kipoi-env" > ~/.bashrc
-# ENV PATH /opt/conda/envs/kipoi-env/bin:$PATH
 
