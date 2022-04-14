@@ -1,9 +1,8 @@
 FROM continuumio/miniconda3:latest as build
 
-RUN apt-get update && apt-get install --no-install-recommends -y build-essential libz-dev libcurl3-dev libarchive-dev gcc ca-certificates
+# RUN apt-get update && apt-get install --no-install-recommends -y build-essential libz-dev libcurl3-dev libarchive-dev gcc ca-certificates
 
-RUN conda install -c conda-forge conda-pack git && \
-    conda install -y conda-libmamba-solver && \
+RUN conda install -y -c conda-forge conda-pack git && conda-libmamba-solver && \
     conda install pip pkgconfig conda-forge::hdf5 && \
     pip install kipoi && \
     kipoi env create AttentiveChrome --source=kipoi && \
@@ -19,7 +18,7 @@ FROM continuumio/miniconda3:latest
 #     apt-get install -q -y --no-install-recommends git wget ca-certificates \
 #     build-essential libz-dev libcurl3-dev libarchive-dev gcc && \
 #     rm -rf /var/lib/apt/lists/*
-RUN apt-get update && apt-get install --no-install-recommends -y build-essential libz-dev libcurl3-dev libarchive-dev gcc ca-certificates
+# RUN apt-get update && apt-get install --no-install-recommends -y build-essential libz-dev libcurl3-dev libarchive-dev gcc ca-certificates
 COPY --from=build /kipoi-AttentiveChrome /opt/conda/envs/kipoi-AttentiveChrome
 
 SHELL ["/bin/bash", "-c"]
