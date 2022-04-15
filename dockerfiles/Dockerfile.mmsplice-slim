@@ -1,0 +1,28 @@
+FROM continuumio/miniconda3:latest as build
+
+RUN conda install -y -c conda-forge conda-pack git conda-libmamba-solver && \
+    conda install pip pkgconfig conda-forge::hdf5 && \
+    pip install kipoi && \
+    kipoi env create MMSplice/deltaLogitPSI --source=kipoi && \
+    conda clean -afy
+
+WORKDIR /kipoi-MMSplice__deltaLogitPSI
+RUN conda-pack -n kipoi-MMSplice__deltaLogitPSI -o /tmp/kipoi-MMSplice__deltaLogitPSI.tar && \
+    tar xf /tmp/kipoi-MMSplice__deltaLogitPSI.tar && \
+    rm /tmp/kipoi-MMSplice__deltaLogitPSI.tar
+
+FROM debian:bullseye-slim   
+
+RUN apt-get update && apt-get install --no-install-recommends -y ca-certificates git \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /app
+COPY --from=build /kipoi-MMSplice__deltaLogitPSI /opt/conda/envs/kipoi-MMSplice__deltaLogitPSI
+
+SHELL ["/bin/bash", "-c"]
+RUN echo "source /opt/conda/envs/kipoi-MMSplice__deltaLogitPSI/bin/activate" > ~/.bashrc
+ENV PATH /opt/conda/envs/kipoi-MMSplice__deltaLogitPSI/bin:$PATH
+
+SHELL ["conda", "run", "-n", "kipoi-MMSplice__deltaLogitPSI", "/bin/bash", "-c"]
+
+

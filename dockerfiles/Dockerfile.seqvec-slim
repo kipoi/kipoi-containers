@@ -1,0 +1,28 @@
+FROM continuumio/miniconda3:latest as build
+
+RUN conda install -y -c conda-forge conda-pack git conda-libmamba-solver && \
+    conda install pip pkgconfig conda-forge::hdf5 && \
+    pip install kipoi && \
+    kipoi env create SeqVec --source=kipoi && \
+    conda clean -afy
+
+WORKDIR /kipoi-SeqVec
+RUN conda-pack -n kipoi-SeqVec -o /tmp/kipoi-SeqVec.tar && \
+    tar xf /tmp/kipoi-SeqVec.tar && \
+    rm /tmp/kipoi-SeqVec.tar
+
+FROM debian:bullseye-slim   
+
+RUN apt-get update && apt-get install --no-install-recommends -y ca-certificates git \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /app
+COPY --from=build /kipoi-SeqVec /opt/conda/envs/kipoi-SeqVec
+
+SHELL ["/bin/bash", "-c"]
+RUN echo "source /opt/conda/envs/kipoi-SeqVec/bin/activate" > ~/.bashrc
+ENV PATH /opt/conda/envs/kipoi-SeqVec/bin:$PATH
+
+SHELL ["conda", "run", "-n", "kipoi-SeqVec", "/bin/bash", "-c"]
+
+

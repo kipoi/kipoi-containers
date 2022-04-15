@@ -1,0 +1,26 @@
+FROM continuumio/miniconda3:latest as build
+
+
+RUN mkdir -p /app
+
+ADD ./envfiles/sharedpy3keras1.2.yml /app/
+
+RUN conda install -y -c conda-forge conda-pack conda-libmamba-solver && \
+    conda env create -n kipoi-shared__envs__kipoi-py3-keras1.2 -f ./app/sharedpy3keras1.2.yml && \ 
+    conda clean -afy
+
+WORKDIR /kipoi-shared__envs__kipoi-py3-keras1.2
+RUN conda-pack -n kipoi-shared__envs__kipoi-py3-keras1.2 -o /tmp/kipoi-shared__envs__kipoi-py3-keras1.2.tar && \
+    tar xf /tmp/kipoi-shared__envs__kipoi-py3-keras1.2.tar && \
+    rm /tmp/kipoi-shared__envs__kipoi-py3-keras1.2.tar
+
+FROM continuumio/miniconda3:latest 
+
+RUN conda install -y -c conda-forge conda-libmamba-solver && \
+    conda clean -afy
+
+COPY --from=build /kipoi-shared__envs__kipoi-py3-keras1.2 /opt/conda/envs/kipoi-shared__envs__kipoi-py3-keras1.2
+
+RUN echo "source activate kipoi-shared__envs__kipoi-py3-keras1.2" > ~/.bashrc
+ENV PATH /opt/conda/envs/kipoi-shared__envs__kipoi-py3-keras1.2/bin:$PATH
+
