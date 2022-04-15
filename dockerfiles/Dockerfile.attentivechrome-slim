@@ -1,7 +1,5 @@
 FROM continuumio/miniconda3:latest as build
 
-# RUN apt-get update && apt-get install --no-install-recommends -y build-essential libz-dev libcurl3-dev libarchive-dev gcc ca-certificates
-
 RUN conda install -y -c conda-forge conda-pack git conda-libmamba-solver && \
     conda install pip pkgconfig conda-forge::hdf5 && \
     pip install kipoi && \
