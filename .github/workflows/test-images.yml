@@ -1,7 +1,7 @@
 name: CI
 on:
   push:
-    branches: ['**']
+    branches: ['!smaller-image']
   pull_request:
     branches: [main]
   schedule:
