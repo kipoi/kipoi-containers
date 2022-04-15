@@ -1,0 +1,30 @@
+FROM continuumio/miniconda3:latest as build
+
+# RUN apt-get update && apt-get install --no-install-recommends -y build-essential libz-dev libcurl3-dev libarchive-dev gcc ca-certificates
+
+RUN conda install -y -c conda-forge conda-pack git conda-libmamba-solver && \
+    conda install pip pkgconfig conda-forge::hdf5 && \
+    pip install kipoi && \
+    kipoi env create AttentiveChrome --source=kipoi && \
+    conda clean -afy
+
+WORKDIR /kipoi-AttentiveChrome
+RUN conda-pack -n kipoi-AttentiveChrome -o /tmp/kipoi-AttentiveChrome.tar && \
+    tar xf /tmp/kipoi-AttentiveChrome.tar && \
+    rm /tmp/kipoi-AttentiveChrome.tar
+
+FROM debian:bullseye-slim   
+
+RUN apt-get update && apt-get install --no-install-recommends -y ca-certificates git \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /app
+COPY --from=build /kipoi-AttentiveChrome /opt/conda/envs/kipoi-AttentiveChrome
+
+SHELL ["/bin/bash", "-c"]
+RUN echo "source /opt/conda/envs/kipoi-AttentiveChrome/bin/activate" > ~/.bashrc
+ENV PATH /opt/conda/envs/kipoi-AttentiveChrome/bin:$PATH
+
+SHELL ["conda", "run", "-n", "kipoi-AttentiveChrome", "/bin/bash", "-c"]
+
+
