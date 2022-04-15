@@ -1,26 +1,26 @@
 FROM continuumio/miniconda3:latest as build
 
-# RUN apt-get update && apt-get install --no-install-recommends -y build-essential libz-dev libcurl3-dev libarchive-dev gcc ca-certificates
 
-RUN conda install -y -c conda-forge conda-pack git conda-libmamba-solver && \
-    conda install pip pkgconfig conda-forge::hdf5 && \
-    pip install kipoi && \
-    kipoi env create AttentiveChrome --source=kipoi && \
+RUN mkdir -p /app
+
+ADD dockerfiles/environment.kipoi.yml /app/environment.kipoi.yml
+
+RUN conda install -y -c conda-forge conda-pack conda-libmamba-solver && \
+    conda env create -f /app/environment.kipoi.yml && \ 
     conda clean -afy
 
-WORKDIR /kipoi-AttentiveChrome
-RUN conda-pack -n kipoi-AttentiveChrome -o /tmp/kipoi-AttentiveChrome.tar && \
-    tar xf /tmp/kipoi-AttentiveChrome.tar && \
-    rm /tmp/kipoi-AttentiveChrome.tar
+WORKDIR /kipoi-env
+RUN conda-pack -n kipoi-env -o /tmp/kipoi-env.tar && \
+    tar xf /tmp/kipoi-env.tar && \
+    rm /tmp/kipoi-env.tar
 
-FROM continuumio/miniconda3:latest
+FROM continuumio/miniconda3:latest 
 
-COPY --from=build /kipoi-AttentiveChrome /opt/conda/envs/kipoi-AttentiveChrome
+RUN conda install -y -c conda-forge conda-libmamba-solver && \
+    conda clean -afy
 
-SHELL ["/bin/bash", "-c"]
-RUN echo "source /opt/conda/envs/kipoi-AttentiveChrome/bin/activate" > ~/.bashrc
-ENV PATH /opt/conda/envs/kipoi-AttentiveChrome/bin:$PATH
+COPY --from=build /kipoi-env /opt/conda/envs/kipoi-env
 
-SHELL ["conda", "run", "-n", "kipoi-AttentiveChrome", "/bin/bash", "-c"]
-
+RUN echo "source activate kipoi-env" > ~/.bashrc
+ENV PATH /opt/conda/envs/kipoi-env/bin:$PATH
 
