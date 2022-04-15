@@ -1,5 +1,5 @@
 {
-    "kipoi/kipoi-docker:sharedpy3keras1.2": [
+    "haimasree/kipoi-docker:sharedpy3keras1.2-slim": [
         "DeepCpG_DNA/Hou2016_HepG2_dna",
         "DeepCpG_DNA/Hou2016_HCC_dna",
         "DeepCpG_DNA/Smallwood2014_2i_dna",
@@ -88,7 +88,7 @@
         "epidermal_basset/ggr.basset.regr.pretrained.folds.testfold-8",
         "epidermal_basset/ggr.basset.regr.pretrained.folds.testfold-9"
     ],
-    "kipoi/kipoi-docker:sharedpy3keras2": [
+    "haimasree/kipoi-docker:sharedpy3keras2-slim": [
         "Basenji",
         "Basset",
         "HAL",
@@ -2088,38 +2088,38 @@
         "Xpresso/mouse_ESCs",
         "Xpresso/mouse_median"
     ],
-    "kipoi/kipoi-docker:mpra-dragonn": [
+    "haimasree/kipoi-docker:mpra-dragonn-slim": [
         "MPRA-DragoNN/DeepFactorizedModel",
         "MPRA-DragoNN/ConvModel"
     ],
-    "kipoi/kipoi-docker:extended_coda": [
+    "haimasree/kipoi-docker:extended_coda-slim": [
         "extended_coda"
     ],
-    "kipoi/kipoi-docker:mmsplice": [
+    "haimasree/kipoi-docker:mmsplice-slim": [
         "MMSplice/pathogenicity",
         "MMSplice/splicingEfficiency",
         "MMSplice/deltaLogitPSI",
         "MMSplice/modularPredictions"
     ],
-    "kipoi/kipoi-docker:mmsplice-mtsplice": [
+    "haimasree/kipoi-docker:mmsplice-mtsplice-slim": [
         "MMSplice/mtsplice"
     ],
-    "kipoi/kipoi-docker:deepmel": [
+    "haimasree/kipoi-docker:deepmel-slim": [
         "DeepMEL/DeepMEL",
         "DeepMEL/DeepMEL2",
         "DeepMEL/DeepMEL2_GABPA"
     ],
-    "kipoi/kipoi-docker:framepool": [
+    "haimasree/kipoi-docker:framepool-slim": [
         "Framepool"
     ],
-    "kipoi/kipoi-docker:kipoisplice": [
+    "haimasree/kipoi-docker:kipoisplice-slim": [
         "KipoiSplice/4cons",
         "KipoiSplice/4"
     ],
-    "kipoi/kipoi-docker:deeptarget": [
+    "haimasree/kipoi-docker:deeptarget-slim": [
         "deepTarget"
     ],
-    "kipoi/kipoi-docker:attentivechrome": [
+    "haimasree/kipoi-docker:attentivechrome-slim": [
         "AttentiveChrome/E003",
         "AttentiveChrome/E004",
         "AttentiveChrome/E005",
@@ -2176,23 +2176,23 @@
         "AttentiveChrome/E127",
         "AttentiveChrome/E128"
     ],
-    "kipoi/kipoi-docker:bpnet-oskn": [
+    "haimasree/kipoi-docker:bpnet-oskn-slim": [
         "BPNet-OSKN"
     ],
-    "kipoi/kipoi-docker:seqvec": [
+    "haimasree/kipoi-docker:seqvec-slim": [
         "SeqVec/structure",
         "SeqVec/embedding"
     ],
-    "kipoi/kipoi-docker:deepflybrain": [
+    "haimasree/kipoi-docker:deepflybrain-slim": [
         "DeepFlyBrain"
     ],
-    "kipoi/kipoi-docker:aparent-site_probabilities": [
+    "haimasree/kipoi-docker:aparent-site_probabilities-slim": [
         "APARENT/site_probabilities"
     ],
-    "kipoi/kipoi-docker:aparent-veff": [
+    "haimasree/kipoi-docker:aparent-veff-slim": [
         "APARENT/veff"
     ],
-    "kipoi/kipoi-docker:deepstarr": [
+    "haimasree/kipoi-docker:deepstarr-slim": [
         "DeepSTARR"
     ]
 }
