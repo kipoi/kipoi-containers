@@ -1,13 +1,14 @@
 FROM continuumio/miniconda3:latest as build
 
-RUN conda install -y -c conda-forge conda-pack git conda-libmamba-solver && \
-    conda install pip pkgconfig conda-forge::hdf5 && \
+RUN conda install -y -c conda-forge conda-pack conda-libmamba-solver && \
+    # conda install pip pkgconfig conda-forge::hdf5 && \
     pip install kipoi && \
-    kipoi env create MPRA-DragoNN --source=kipoi && \
-    conda clean -afy
+    kipoi env create MPRA-DragoNN --source=kipoi 
+    # && \
+    # conda clean -afy
 
 WORKDIR /kipoi-MPRA-DragoNN
-RUN conda-pack -n kipoi-MPRA-DragoNN -o /tmp/kipoi-MPRA-DragoNN.tar && \
+RUN conda-pack -n kipoi-MPRA-DragoNN -o /tmp/kipoi-MPRA-DragoNN.tar --ignore-missing-files && \
     tar xf /tmp/kipoi-MPRA-DragoNN.tar && \
     rm /tmp/kipoi-MPRA-DragoNN.tar
 

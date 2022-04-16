@@ -1,13 +1,14 @@
 FROM continuumio/miniconda3:latest as build
 
-RUN conda install -y -c conda-forge conda-pack git conda-libmamba-solver && \
-    conda install pip pkgconfig conda-forge::hdf5 && \
+RUN conda install -y -c conda-forge conda-pack conda-libmamba-solver && \
+    # conda install pip pkgconfig conda-forge::hdf5 && \
     pip install kipoi && \
-    kipoi env create APARENT/veff --source=kipoi && \
-    conda clean -afy
+    kipoi env create APARENT/veff --source=kipoi 
+    # && \
+    # conda clean -afy
 
 WORKDIR /kipoi-APARENT__veff
-RUN conda-pack -n kipoi-APARENT__veff -o /tmp/kipoi-APARENT__veff.tar && \
+RUN conda-pack -n kipoi-APARENT__veff -o /tmp/kipoi-APARENT__veff.tar --ignore-missing-files && \
     tar xf /tmp/kipoi-APARENT__veff.tar && \
     rm /tmp/kipoi-APARENT__veff.tar
 

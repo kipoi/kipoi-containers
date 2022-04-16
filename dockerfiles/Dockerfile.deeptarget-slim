@@ -1,13 +1,14 @@
 FROM continuumio/miniconda3:latest as build
 
-RUN conda install -y -c conda-forge conda-pack git conda-libmamba-solver && \
-    conda install pip pkgconfig conda-forge::hdf5 && \
+RUN conda install -y -c conda-forge conda-pack conda-libmamba-solver && \
+    # conda install pip pkgconfig conda-forge::hdf5 && \
     pip install kipoi && \
-    kipoi env create deepTarget --source=kipoi && \
-    conda clean -afy
+    kipoi env create deepTarget --source=kipoi 
+    # && \
+    # conda clean -afy
 
 WORKDIR /kipoi-deepTarget
-RUN conda-pack -n kipoi-deepTarget -o /tmp/kipoi-deepTarget.tar && \
+RUN conda-pack -n kipoi-deepTarget -o /tmp/kipoi-deepTarget.tar --ignore-missing-files && \
     tar xf /tmp/kipoi-deepTarget.tar && \
     rm /tmp/kipoi-deepTarget.tar
 
