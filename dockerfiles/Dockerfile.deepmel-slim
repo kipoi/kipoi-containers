@@ -1,14 +1,15 @@
 FROM continuumio/miniconda3:latest as build
 
+RUN apt-get update && apt-get install --no-install-recommends -y build-essential libz-dev libcurl3-dev libarchive-dev gcc \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 RUN conda install -y -c conda-forge conda-pack conda-libmamba-solver && \
-    # conda install pip pkgconfig conda-forge::hdf5 && \
     pip install kipoi && \
-    kipoi env create DeepMEL --source=kipoi 
-    # && \
-    # conda clean -afy
+    kipoi env create DeepMEL --source=kipoi && \
+    conda clean -afy
 
 WORKDIR /kipoi-DeepMEL
-RUN conda-pack -n kipoi-DeepMEL -o /tmp/kipoi-DeepMEL.tar --ignore-missing-files && \
+RUN conda-pack -n kipoi-DeepMEL -o /tmp/kipoi-DeepMEL.tar && \
     tar xf /tmp/kipoi-DeepMEL.tar && \
     rm /tmp/kipoi-DeepMEL.tar
 

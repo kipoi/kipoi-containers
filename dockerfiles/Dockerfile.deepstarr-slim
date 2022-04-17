@@ -1,14 +1,16 @@
 FROM continuumio/miniconda3:latest as build
 
+
+RUN apt-get update && apt-get install --no-install-recommends -y build-essential libz-dev libcurl3-dev libarchive-dev gcc \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 RUN conda install -y -c conda-forge conda-pack conda-libmamba-solver && \
-    # conda install pip pkgconfig conda-forge::hdf5 && \
     pip install kipoi && \
-    kipoi env create DeepSTARR --source=kipoi 
-    # && \
-    # conda clean -afy
+    kipoi env create DeepSTARR --source=kipoi && \
+    conda clean -afy
 
 WORKDIR /kipoi-DeepSTARR
-RUN conda-pack -n kipoi-DeepSTARR -o /tmp/kipoi-DeepSTARR.tar --ignore-missing-files && \
+RUN conda-pack -n kipoi-DeepSTARR -o /tmp/kipoi-DeepSTARR.tar && \
     tar xf /tmp/kipoi-DeepSTARR.tar && \
     rm /tmp/kipoi-DeepSTARR.tar
 
