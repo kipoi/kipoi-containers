@@ -3,12 +3,11 @@ FROM continuumio/miniconda3:latest as build
 RUN conda install -y -c conda-forge conda-pack conda-libmamba-solver && \
     # conda install pip pkgconfig conda-forge::hdf5 && \
     pip install kipoi && \
-    kipoi env create extended_coda --source=kipoi 
-    # && \
-    # conda clean -afy
+    kipoi env create extended_coda --source=kipoi && \
+    conda clean -afy
 
 WORKDIR /kipoi-extended_coda
-RUN conda-pack -n kipoi-extended_coda -o /tmp/kipoi-extended_coda.tar --ignore-missing-files && \
+RUN conda-pack -n kipoi-extended_coda -o /tmp/kipoi-extended_coda.tar && \
     tar xf /tmp/kipoi-extended_coda.tar && \
     rm /tmp/kipoi-extended_coda.tar
 
