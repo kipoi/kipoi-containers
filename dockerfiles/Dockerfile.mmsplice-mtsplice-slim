@@ -1,14 +1,15 @@
 FROM continuumio/miniconda3:latest as build
 
+RUN apt-get update && apt-get install --no-install-recommends -y build-essential libz-dev libcurl3-dev libarchive-dev gcc \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 RUN conda install -y -c conda-forge conda-pack conda-libmamba-solver && \
-    # conda install pip pkgconfig conda-forge::hdf5 && \
     pip install kipoi && \
-    kipoi env create MMSplice/mtsplice --source=kipoi 
-    # && \
-    # conda clean -afy
+    kipoi env create MMSplice/mtsplice --source=kipoi && \
+    conda clean -afy
 
 WORKDIR /kipoi-MMSplice__mtsplice
-RUN conda-pack -n kipoi-MMSplice__mtsplice -o /tmp/kipoi-MMSplice__mtsplice.tar --ignore-missing-files && \
+RUN conda-pack -n kipoi-MMSplice__mtsplice -o /tmp/kipoi-MMSplice__mtsplice.tar && \
     tar xf /tmp/kipoi-MMSplice__mtsplice.tar && \
     rm /tmp/kipoi-MMSplice__mtsplice.tar
 
