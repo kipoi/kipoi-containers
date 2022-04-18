@@ -3,16 +3,11 @@ FROM continuumio/miniconda3:latest as build
 RUN apt-get update && apt-get install --no-install-recommends -y build-essential libz-dev libcurl3-dev libarchive-dev gcc \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN conda install -y -c conda-forge conda-pack conda-libmamba-solver && \
+RUN conda install -y -c conda-forge conda-libmamba-solver && \
     conda install pip pkgconfig conda-forge::hdf5 && \
     pip install kipoi && \
     kipoi env create Framepool --source=kipoi && \
     conda clean -afy
-
-WORKDIR /kipoi-Framepool
-RUN conda-pack -n kipoi-Framepool -o /tmp/kipoi-Framepool.tar && \
-    tar xf /tmp/kipoi-Framepool.tar && \
-    rm /tmp/kipoi-Framepool.tar
 
 FROM debian:bullseye-slim   
 
@@ -20,12 +15,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y ca-certificates
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /app
-COPY --from=build /kipoi-Framepool /opt/conda/envs/kipoi-Framepool
+COPY --from=build /opt/conda/envs/kipoi-Framepool /opt/conda/envs/kipoi-Framepool
 
 SHELL ["/bin/bash", "-c"]
-RUN echo "source /opt/conda/envs/kipoi-Framepool/bin/activate" > ~/.bashrc
 ENV PATH /opt/conda/envs/kipoi-Framepool/bin:$PATH
-
-SHELL ["conda", "run", "-n", "kipoi-Framepool", "/bin/bash", "-c"]
-
 
