@@ -4,14 +4,10 @@ RUN apt-get update && apt-get install --no-install-recommends -y build-essential
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN conda install -y -c conda-forge conda-pack conda-libmamba-solver && \
+    conda install pip pkgconfig conda-forge::hdf5 && \
     pip install kipoi && \
     kipoi env create MMSplice/mtsplice --source=kipoi && \
     conda clean -afy
-
-WORKDIR /kipoi-MMSplice__mtsplice
-RUN conda-pack -n kipoi-MMSplice__mtsplice -o /tmp/kipoi-MMSplice__mtsplice.tar && \
-    tar xf /tmp/kipoi-MMSplice__mtsplice.tar && \
-    rm /tmp/kipoi-MMSplice__mtsplice.tar
 
 FROM debian:bullseye-slim   
 
@@ -19,12 +15,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y ca-certificates
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /app
-COPY --from=build /kipoi-MMSplice__mtsplice /opt/conda/envs/kipoi-MMSplice__mtsplice
+COPY --from=build /opt/conda/envs/kipoi-MMSplice__mtsplice /opt/conda/envs/kipoi-MMSplice__mtsplice
 
 SHELL ["/bin/bash", "-c"]
-RUN echo "source /opt/conda/envs/kipoi-MMSplice__mtsplice/bin/activate" > ~/.bashrc
 ENV PATH /opt/conda/envs/kipoi-MMSplice__mtsplice/bin:$PATH
-
-SHELL ["conda", "run", "-n", "kipoi-MMSplice__mtsplice", "/bin/bash", "-c"]
-
-

@@ -4,14 +4,10 @@ RUN apt-get update && apt-get install --no-install-recommends -y build-essential
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN conda install -y -c conda-forge conda-pack conda-libmamba-solver && \
+    conda install pip pkgconfig conda-forge::hdf5 && \
     pip install kipoi && \
     kipoi env create DeepMEL --source=kipoi && \
     conda clean -afy
-
-WORKDIR /kipoi-DeepMEL
-RUN conda-pack -n kipoi-DeepMEL -o /tmp/kipoi-DeepMEL.tar && \
-    tar xf /tmp/kipoi-DeepMEL.tar && \
-    rm /tmp/kipoi-DeepMEL.tar
 
 FROM debian:bullseye-slim   
 
@@ -19,12 +15,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y ca-certificates
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /app
-COPY --from=build /kipoi-DeepMEL /opt/conda/envs/kipoi-DeepMEL
+COPY --from=build /opt/conda/envs/kipoi-DeepMEL /opt/conda/envs/kipoi-DeepMEL
 
 SHELL ["/bin/bash", "-c"]
-RUN echo "source /opt/conda/envs/kipoi-DeepMEL/bin/activate" > ~/.bashrc
 ENV PATH /opt/conda/envs/kipoi-DeepMEL/bin:$PATH
-
-SHELL ["conda", "run", "-n", "kipoi-DeepMEL", "/bin/bash", "-c"]
-
-

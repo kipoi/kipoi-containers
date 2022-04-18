@@ -4,15 +4,10 @@ RUN apt-get update && apt-get install --no-install-recommends -y build-essential
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN conda install -y -c conda-forge conda-pack conda-libmamba-solver && \
-    # conda install pip pkgconfig conda-forge::hdf5 && \
+    conda install pip pkgconfig conda-forge::hdf5 && \
     pip install kipoi && \
     kipoi env create MPRA-DragoNN --source=kipoi && \
     conda clean -afy
-
-WORKDIR /kipoi-MPRA-DragoNN
-RUN conda-pack -n kipoi-MPRA-DragoNN -o /tmp/kipoi-MPRA-DragoNN.tar && \
-    tar xf /tmp/kipoi-MPRA-DragoNN.tar && \
-    rm /tmp/kipoi-MPRA-DragoNN.tar
 
 FROM debian:bullseye-slim   
 
@@ -20,12 +15,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y ca-certificates
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /app
-COPY --from=build /kipoi-MPRA-DragoNN /opt/conda/envs/kipoi-MPRA-DragoNN
+COPY --from=build /opt/conda/envs/kipoi-MPRA-DragoNN /opt/conda/envs/kipoi-MPRA-DragoNN
 
 SHELL ["/bin/bash", "-c"]
-RUN echo "source /opt/conda/envs/kipoi-MPRA-DragoNN/bin/activate" > ~/.bashrc
 ENV PATH /opt/conda/envs/kipoi-MPRA-DragoNN/bin:$PATH
-
-SHELL ["conda", "run", "-n", "kipoi-MPRA-DragoNN", "/bin/bash", "-c"]
-
-

@@ -1,19 +1,13 @@
 FROM continuumio/miniconda3:latest as build
 
-
 RUN apt-get update && apt-get install --no-install-recommends -y build-essential libz-dev libcurl3-dev libarchive-dev gcc \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN conda install -y -c conda-forge conda-pack conda-libmamba-solver && \
-    # conda install pip pkgconfig conda-forge::hdf5 && \
+    conda install pip pkgconfig conda-forge::hdf5 && \
     pip install kipoi && \
     kipoi env create BPNet-OSKN --source=kipoi && \
     conda clean -afy
-
-WORKDIR /kipoi-BPNet-OSKN
-RUN conda-pack -n kipoi-BPNet-OSKN -o /tmp/kipoi-BPNet-OSKN.tar && \
-    tar xf /tmp/kipoi-BPNet-OSKN.tar && \
-    rm /tmp/kipoi-BPNet-OSKN.tar
 
 FROM debian:bullseye-slim   
 
@@ -21,12 +15,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y ca-certificates
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /app
-COPY --from=build /kipoi-BPNet-OSKN /opt/conda/envs/kipoi-BPNet-OSKN
+COPY --from=build /opt/conda/envs/kipoi-BPNet-OSKN /opt/conda/envs/kipoi-BPNet-OSKN
 
 SHELL ["/bin/bash", "-c"]
-RUN echo "source /opt/conda/envs/kipoi-BPNet-OSKN/bin/activate" > ~/.bashrc
 ENV PATH /opt/conda/envs/kipoi-BPNet-OSKN/bin:$PATH
-
-SHELL ["conda", "run", "-n", "kipoi-BPNet-OSKN", "/bin/bash", "-c"]
-
 

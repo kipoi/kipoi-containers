@@ -1,16 +1,13 @@
 FROM continuumio/miniconda3:latest as build
 
-RUN conda install -y -c conda-forge conda-pack conda-libmamba-solver && \
-    # conda install pip pkgconfig conda-forge::hdf5 && \
-    pip install kipoi && \
-    kipoi env create APARENT/veff --source=kipoi 
-    # && \
-    # conda clean -afy
+RUN apt-get update && apt-get install --no-install-recommends -y build-essential libz-dev libcurl3-dev libarchive-dev gcc \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /kipoi-APARENT__veff
-RUN conda-pack -n kipoi-APARENT__veff -o /tmp/kipoi-APARENT__veff.tar --ignore-missing-files && \
-    tar xf /tmp/kipoi-APARENT__veff.tar && \
-    rm /tmp/kipoi-APARENT__veff.tar
+RUN conda install -y -c conda-forge conda-pack conda-libmamba-solver && \
+    conda install pip pkgconfig conda-forge::hdf5 && \
+    pip install kipoi && \
+    kipoi env create APARENT/veff --source=kipoi && \
+    conda clean -afy
 
 FROM debian:bullseye-slim   
 
@@ -18,12 +15,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y ca-certificates
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /app
-COPY --from=build /kipoi-APARENT__veff /opt/conda/envs/kipoi-APARENT__veff
+COPY --from=build /opt/conda/envs/kipoi-APARENT__veff /opt/conda/envs/kipoi-APARENT__veff
 
 SHELL ["/bin/bash", "-c"]
-RUN echo "source /opt/conda/envs/kipoi-APARENT__veff/bin/activate" > ~/.bashrc
 ENV PATH /opt/conda/envs/kipoi-APARENT__veff/bin:$PATH
-
-SHELL ["conda", "run", "-n", "kipoi-APARENT__veff", "/bin/bash", "-c"]
-
 
