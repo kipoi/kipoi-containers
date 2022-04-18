@@ -6,10 +6,6 @@ RUN conda install -y -c conda-forge conda-pack git conda-libmamba-solver && \
     kipoi env create modelname --source=kipoi && \
     conda clean -afy
 
-WORKDIR /kipoi-modelname
-RUN conda-pack -n kipoi-modelname -o /tmp/kipoi-modelname.tar && \
-    tar xf /tmp/kipoi-modelname.tar && \
-    rm /tmp/kipoi-modelname.tar
 
 FROM debian:bullseye-slim   
 
@@ -17,12 +13,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y ca-certificates
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /app
-COPY --from=build /kipoi-modelname /opt/conda/envs/kipoi-modelname
+COPY --from=build /opt/conda/envs/kipoi-modelname /opt/conda/envs/kipoi-modelname
 
 SHELL ["/bin/bash", "-c"]
-RUN echo "source /opt/conda/envs/kipoi-modelname/bin/activate" > ~/.bashrc
 ENV PATH /opt/conda/envs/kipoi-modelname/bin:$PATH
-
-SHELL ["conda", "run", "-n", "kipoi-modelname", "/bin/bash", "-c"]
-
 

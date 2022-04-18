@@ -5,15 +5,9 @@ RUN apt-get update && apt-get install --no-install-recommends -y build-essential
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN conda install -y -c conda-forge conda-pack conda-libmamba-solver && \
-    # conda install pip pkgconfig conda-forge::hdf5 && \
     pip install kipoi && \
     kipoi env create KipoiSplice --source=kipoi && \
     conda clean -afy
-
-WORKDIR /kipoi-KipoiSplice
-RUN conda-pack -n kipoi-KipoiSplice -o /tmp/kipoi-KipoiSplice.tar && \
-    tar xf /tmp/kipoi-KipoiSplice.tar && \
-    rm /tmp/kipoi-KipoiSplice.tar
 
 FROM debian:bullseye-slim   
 
@@ -21,7 +15,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y ca-certificates
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /app
-COPY --from=build /kipoi-KipoiSplice /opt/conda/envs/kipoi-KipoiSplice
+COPY --from=build /opt/conda/envs/kipoi-KipoiSplice /opt/conda/envs/kipoi-KipoiSplice
 
 SHELL ["/bin/bash", "-c"]
 RUN echo "source /opt/conda/envs/kipoi-KipoiSplice/bin/activate" > ~/.bashrc
