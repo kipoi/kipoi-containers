@@ -1,0 +1,13 @@
+name: base
+channels:
+- defaults
+- pytorch
+dependencies:
+- python=3.6.3
+- numpy=1.19.2
+- pytorch-cpu
+- torchvision-cpu
+# - cpuonly
+- pip=21.0.1
+- pip:
+  - kipoi

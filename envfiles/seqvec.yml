@@ -1,0 +1,13 @@
+name: base
+channels:
+- defaults
+- conda-forge
+dependencies:
+- python=3.6
+- allennlp=0.7.2
+- pip=9.0.3
+- scikit-learn==0.22.2.post1
+- overrides=3.1.0
+- pip:
+  - kipoi
+  - scikit-learn==0.22.2.post1

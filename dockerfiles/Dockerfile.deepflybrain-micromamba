@@ -1,6 +1,6 @@
 FROM mambaorg/micromamba:latest
 
-COPY --chown=$MAMBA_USER:$MAMBA_USER envfiles/AttentiveChrome-original.yml /tmp/env.yml
+COPY --chown=$MAMBA_USER:$MAMBA_USER envfiles/deepflybrain.yml /tmp/env.yml
 
 RUN micromamba install -y -f /tmp/env.yml --verbose && \
     micromamba install -y -n base -c conda-forge git && \
@@ -9,4 +9,3 @@ RUN micromamba install -y -f /tmp/env.yml --verbose && \
     find /opt/conda/ -follow -type f -name '*.js.map' -delete
 
 ARG MAMBA_DOCKERFILE_ACTIVATE=1
-
