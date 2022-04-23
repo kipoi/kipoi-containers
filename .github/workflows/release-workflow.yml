@@ -48,17 +48,18 @@ jobs:
         mkdir -p /home/runner/singularity/
         python -m pip install --upgrade pip
         pip install .
-    - name: Build and test ${{ matrix.image }}-micromamba
+    - name: Build and test ${{ matrix.image }}-slim
       shell: bash -l {0}
       run: |
-        docker build -f dockerfiles/Dockerfile.${{ matrix.image }}-micromamba -t haimasree/kipoi-docker:${{ matrix.image }}-micromamba . 
-        pytest -s test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:${{ matrix.image }}-micromamba
-    - name: Push ${{ matrix.image }}-micromamba
+        docker build -f dockerfiles/Dockerfile.kipoi-base-env-slim -t haimasree/kipoi-docker:kipoi-base-env-slim . 
+        docker build -f dockerfiles/Dockerfile.${{ matrix.image }}-slim -t haimasree/kipoi-docker:${{ matrix.image }}-slim . 
+        pytest -s test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:${{ matrix.image }}-slim
+    - name: Push ${{ matrix.image }}-slim
       shell: bash -l {0}
       if: ${{ success() }}
       run: |
         docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
-        docker push haimasree/kipoi-docker:${{ matrix.image }}-micromamba
+        docker push haimasree/kipoi-docker:${{ matrix.image }}-slim
         docker system prune -a -f
   buildandtestsharedpy3keras2:
     # The type of runner that the job will run on
@@ -100,11 +101,12 @@ jobs:
         sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config
         python -m pip install --upgrade pip
         pip install .
-    - name: Build and test sharedpy3keras2 with ${{ matrix.modelgroup }}-micromamba
+    - name: Build and test sharedpy3keras2 with ${{ matrix.modelgroup }}-slim
       shell: bash -l {0}
       run: |
-        docker build -f dockerfiles/Dockerfile.sharedpy3keras2-micromamba -t haimasree/kipoi-docker:sharedpy3keras2-micromamba . 
-        pytest -s test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:sharedpy3keras2-micromamba --modelgroup=${{ matrix.modelgroup }}
+        docker build -f dockerfiles/Dockerfile.kipoi-base-env-slim -t haimasree/kipoi-docker:kipoi-base-env-slim . 
+        docker build -f dockerfiles/Dockerfile.sharedpy3keras2-slim -t haimasree/kipoi-docker:sharedpy3keras2-slim . 
+        pytest -s test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:sharedpy3keras2-slim --modelgroup=${{ matrix.modelgroup }}
   buildandpushkipoibaseenvandsharedpy3keras2:
     needs: [buildandtestsharedpy3keras2, buildtestandpush]
     runs-on: ubuntu-latest
@@ -140,14 +142,16 @@ jobs:
         sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config
         python -m pip install --upgrade pip
         pip install .
-    - name: Build sharedpy3keras2
+    - name: Build sharedpy3keras2 and kipoi-base-env
       shell: bash -l {0}
       run: |
-        docker build -f dockerfiles/Dockerfile.sharedpy3keras2-micromamba -t haimasree/kipoi-docker:sharedpy3keras2-micromamba . 
-    - name: Push sharedpy3keras2-micromamba
+        docker build -f dockerfiles/Dockerfile.kipoi-base-env-slim -t haimasree/kipoi-docker:kipoi-base-env-slim . 
+        docker build -f dockerfiles/Dockerfile.sharedpy3keras2-slim -t haimasree/kipoi-docker:sharedpy3keras2-slim . 
+    - name: Push kipoi-base-env-slim and sharedpy3keras2-slim
       shell: bash -l {0}
       if: ${{ success() }}
       run: |
         docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
-        docker push haimasree/kipoi-docker:sharedpy3keras2-micromamba
+        docker push haimasree/kipoi-docker:kipoi-base-env-slim
+        docker push haimasree/kipoi-docker:sharedpy3keras2-slim
         docker system prune -a -f
