@@ -51,8 +51,8 @@ jobs:
     - name: Build and test ${{ matrix.image }}-slim
       shell: bash -l {0}
       run: |
-        docker build -f dockerfiles/Dockerfile.kipoi-base-env-slim -t haimasree/kipoi-docker:kipoi-base-env-slim . 
-        docker build -f dockerfiles/Dockerfile.${{ matrix.image }}-slim -t haimasree/kipoi-docker:${{ matrix.image }}-slim . 
+        docker build -f dockerfiles/Dockerfile.${{ matrix.image }}-slim -t haimasree/kipoi-docker:${{ matrix.image }}-slim .
+        singularity pull docker://haimasree/kipoi-docker:${{ matrix.image }}-slim
         pytest -s test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:${{ matrix.image }}-slim
     - name: Push ${{ matrix.image }}-slim
       shell: bash -l {0}
@@ -104,8 +104,8 @@ jobs:
     - name: Build and test sharedpy3keras2 with ${{ matrix.modelgroup }}-slim
       shell: bash -l {0}
       run: |
-        docker build -f dockerfiles/Dockerfile.kipoi-base-env-slim -t haimasree/kipoi-docker:kipoi-base-env-slim . 
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2-slim -t haimasree/kipoi-docker:sharedpy3keras2-slim . 
+        singularity pull docker://haimasree/kipoi-docker:sharedpy3keras2-slim
         pytest -s test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:sharedpy3keras2-slim --modelgroup=${{ matrix.modelgroup }}
   buildandpushkipoibaseenvandsharedpy3keras2:
     needs: [buildandtestsharedpy3keras2, buildtestandpush]
@@ -145,13 +145,11 @@ jobs:
     - name: Build sharedpy3keras2 and kipoi-base-env
       shell: bash -l {0}
       run: |
-        docker build -f dockerfiles/Dockerfile.kipoi-base-env-slim -t haimasree/kipoi-docker:kipoi-base-env-slim . 
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2-slim -t haimasree/kipoi-docker:sharedpy3keras2-slim . 
     - name: Push kipoi-base-env-slim and sharedpy3keras2-slim
       shell: bash -l {0}
       if: ${{ success() }}
       run: |
         docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
-        docker push haimasree/kipoi-docker:kipoi-base-env-slim
         docker push haimasree/kipoi-docker:sharedpy3keras2-slim
         docker system prune -a -f

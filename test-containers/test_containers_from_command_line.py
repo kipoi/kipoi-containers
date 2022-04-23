@@ -18,7 +18,7 @@ class TestContainers:
         )
         assert self.docker_to_model_dict != {}
 
-    def test_images(self, test_docker_image):
+    def test_images(self, test_docker_image, test_singularity_image):
         if self.modelgroup_name and self.image_name not in [
             None,
             "kipoi-base-env",
@@ -32,6 +32,18 @@ class TestContainers:
                     test_docker_image(
                         model_name=model, image_name=self.image_name
                     )
+                    singularity_image_name = (
+                        f"kipoi-docker_{self.image_name.split(':')[1]}.sif"
+                    )
+                    singularity_image_folder = os.environ.get(
+                        "SINGULARITY_PULL_FOLDER",
+                        Path(__file__).parent.resolve(),
+                    )
+                    test_singularity_image(
+                        singularity_image_folder=singularity_image_folder,
+                        singularity_image_name=singularity_image_name,
+                        model=model,
+                    )
                     # if self.modelgroup_name != "DeepSEA":
                     #     break
         elif self.image_name not in [None, "kipoi-base-env"]:
@@ -40,4 +52,15 @@ class TestContainers:
             #     models = one_model_per_modelgroup(models)
             for model in models:
                 print(f"Testing {model} with {self.image_name}")
-                test_docker_image(model_name=model, image_name=self.image_name)
+                # test_docker_image(model_name=model, image_name=self.image_name)
+                singularity_image_name = (
+                    f"kipoi-docker_{self.image_name.split(':')[1]}.sif"
+                )
+                singularity_image_folder = os.environ.get(
+                    "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
+                )
+                test_singularity_image(
+                    singularity_image_folder=singularity_image_folder,
+                    singularity_image_name=singularity_image_name,
+                    model=model,
+                )
