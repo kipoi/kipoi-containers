@@ -54,6 +54,7 @@ jobs:
         docker build -f dockerfiles/Dockerfile.${{ matrix.image }}-slim -t haimasree/kipoi-docker:${{ matrix.image }}-slim .
         singularity pull /home/runner/singularity/kipoi_docker:${{ matrix.image }}-slim.sif docker://haimasree/kipoi-docker:${{ matrix.image }}-slim
         pytest -s test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:${{ matrix.image }}-slim
+        rm /home/runner/singularity/kipoi_docker:${{ matrix.image }}-slim.sif
     - name: Push ${{ matrix.image }}-slim
       shell: bash -l {0}
       if: ${{ success() }}
