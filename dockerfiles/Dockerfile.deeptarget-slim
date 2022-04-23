@@ -4,7 +4,10 @@ RUN apt-get update && apt-get install --no-install-recommends -y build-essential
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN conda install -y -c conda-forge conda-libmamba-solver && \
-    conda env create --file envfiles/deepTarget.yml
+    conda install pip pkgconfig conda-forge::hdf5 && \
+    pip install kipoi && \
+    kipoi env create deepTarget --source=kipoi && \
+    conda clean -afy
 
 FROM debian:bullseye-slim   
 
