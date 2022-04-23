@@ -52,7 +52,7 @@ class TestContainers:
             #     models = one_model_per_modelgroup(models)
             for model in models:
                 print(f"Testing {model} with {self.image_name}")
-                # test_docker_image(model_name=model, image_name=self.image_name)
+                test_docker_image(model_name=model, image_name=self.image_name)
                 singularity_image_name = (
                     f"kipoi-docker_{self.image_name.split(':')[1]}.sif"
                 )
