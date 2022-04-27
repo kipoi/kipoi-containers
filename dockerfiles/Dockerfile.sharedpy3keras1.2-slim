@@ -13,6 +13,7 @@ RUN conda install -y -c conda-forge conda-libmamba-solver && \
 
 FROM continuumio/miniconda3:latest 
 
+RUN mkdir -p /app
 COPY --from=build /opt/conda/envs/kipoi-shared__envs__kipoi-py3-keras1.2 /opt/conda/envs/kipoi-shared__envs__kipoi-py3-keras1.2
 
 RUN echo "source activate kipoi-shared__envs__kipoi-py3-keras1.2" > ~/.bashrc
