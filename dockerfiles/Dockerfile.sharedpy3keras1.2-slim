@@ -1,0 +1,21 @@
+FROM continuumio/miniconda3:latest as build
+
+RUN apt-get update && apt-get install --no-install-recommends -y build-essential libz-dev libcurl3-dev libarchive-dev gcc \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /app
+
+ADD ./envfiles/sharedpy3keras12.yml /app/
+
+RUN conda install -y -c conda-forge conda-libmamba-solver && \
+    conda env create -n kipoi-shared__envs__kipoi-py3-keras1.2 -f ./app/sharedpy3keras12.yml && \ 
+    conda clean -afy
+
+FROM continuumio/miniconda3:latest 
+
+RUN mkdir -p /app
+COPY --from=build /opt/conda/envs/kipoi-shared__envs__kipoi-py3-keras1.2 /opt/conda/envs/kipoi-shared__envs__kipoi-py3-keras1.2
+
+RUN echo "source activate kipoi-shared__envs__kipoi-py3-keras1.2" > ~/.bashrc
+ENV PATH /opt/conda/envs/kipoi-shared__envs__kipoi-py3-keras1.2/bin:$PATH
+
