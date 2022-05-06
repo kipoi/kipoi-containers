@@ -1,152 +1,27 @@
 name: kipoi-shared__envs__kipoi-py3-keras1.2
 channels:
-  - conda-forge
-  - bioconda
-  - defaults
+- bioconda
+- conda-forge
+- defaults
 dependencies:
-  - _libgcc_mutex=0.1
-  - _tflow_select=2.3.0
-  - absl-py=0.11.0
-  - astor=0.8.1
-  - bcolz=1.2.1
-  - bedtools=2.29.2
-  - binutils_impl_linux-64=2.33.1
-  - binutils_linux-64=2.33.1
-  - blas=1.0
-  - blosc=1.20.1
-  - bokeh=2.2.3
-  - bzip2=1.0.8
-  - c-ares=1.17.1
-  - ca-certificates=2020.10.14
-  - certifi=2020.11.8
-  - click=7.1.2
-  - cloudpickle=1.6.0
-  - contextvars=2.4
-  - curl=7.71.1
-  - cython=0.29.23
-  - cytoolz=0.11.0
-  - dask=2.30.0
-  - dask-core=2.30.0
-  - distributed=2.30.1
-  - freetype=2.10.4
-  - fsspec=0.8.3
-  - gast=0.4.0
-  - gcc_impl_linux-64=7.3.0
-  - gcc_linux-64=7.3.0
-  - genomelake=0.1.4
-  - grpcio=1.31.0
-  - gxx_impl_linux-64=7.3.0
-  - gxx_linux-64=7.3.0
-  - h5py=2.10.0
-  - hdf5=1.10.4
-  - heapdict=1.0.1
-  - immutables=0.14
-  - importlib-metadata=2.0.0
-  - intel-openmp=2020.2
-  - jinja2=2.11.2
-  - jpeg=9b
-  - keras=1.2.2
-  - krb5=1.18.2
-  - lcms2=2.11
-  - ld_impl_linux-64=2.33.1
-  - libcurl=7.71.1
-  - libdeflate=1.0
-  - libedit=3.1.20191231
-  - libffi=3.3
-  - libgcc-ng=9.1.0
-  - libgfortran-ng=7.3.0
-  - libgpuarray=0.7.6
-  - libpng=1.6.37
-  - libprotobuf=3.13.0.1
-  - libssh2=1.9.0
-  - libstdcxx-ng=9.1.0
-  - libtiff=4.1.0
-  - locket=0.2.0
-  - lz4-c=1.9.2
-  - lzo=2.10
-  - mako=1.1.3
-  - markdown=3.3.3
-  - markupsafe=1.1.1
-  - mkl=2020.2
-  - mkl-service=2.3.0
-  - mkl_fft=1.2.0
-  - mkl_random=1.1.1
-  - mock=4.0.2
-  - msgpack-python=1.0.0
-  - ncurses=6.2
-  - numexpr=2.7.1
-  - numpy=1.19.2
-  - numpy-base=1.19.2
-  - olefile=0.46
-  - openssl=1.1.1h
-  - pandas=1.1.3
-  - partd=1.1.0
-  - pillow=8.0.1
-  - pip=20.2.4
-  - protobuf=3.13.0.1
-  - psutil=5.7.2
-  - pybedtools=0.8.1
-  - pybigwig=0.3.17
-  - pyfaidx=0.5.9.1
-  - pygpu=0.7.6
-  - pyparsing=2.4.7
-  - pysam=0.15.3
-  - pytables=3.6.1
-  - python=3.6.12
-  - python-dateutil=2.8.1
-  - python_abi=3.6
-  - pytz=2020.4
-  - pyyaml=5.3.1
-  - readline=8.0
-  - scipy=1.5.2
-  - setuptools=50.3.1
-  - six=1.15.0
-  - sortedcontainers=2.2.2
-  - sqlite=3.33.0
-  - tblib=1.7.0
-  - tensorboard=1.10.0
-  - tensorflow=1.10.0
-  - tensorflow-base=1.10.0
-  - termcolor=1.1.0
-  - theano=1.0.4
-  - tk=8.6.10
-  - toolz=0.11.1
-  - tornado=6.0.4
-  - typing_extensions=3.7.4.3
-  - werkzeug=1.0.1
-  - wheel=0.35.1
-  - xz=5.2.5
-  - yaml=0.2.5
-  - zict=2.0.0
-  - zipp=3.4.0
-  - zlib=1.2.11
-  - zstd=1.4.5
-  - pip:
-    - argcomplete==1.12.2
-    - argh==0.26.2
-    - arrow==0.17.0
-    - attrs==20.3.0
-    - binaryornot==0.4.4
-    - chardet==3.0.4
-    - colorlog==4.6.2
-    - cookiecutter==1.7.2
-    - deprecation==2.1.0
-    - future==0.18.2
-    - gffutils==0.10.1
-    - idna==2.10
-    - jinja2-time==0.2.0
-    - packaging==20.7
-    - poyo==0.5.0
-    - python-slugify==4.0.1
-    - related==0.7.2
-    - requests==2.25.0
-    - simplejson==3.17.2
-    - text-unidecode==1.3
-    - tinydb==4.3.0
-    - tqdm==4.54.0
-    - urllib3==1.26.4
-    - kipoi
-    - kipoi-conda
-    - kipoi-utils
-    - kipoiseq
+- cyvcf2=0.11.6
+- bedtools=2.30.0
+- pybedtools=0.8.1
+- pysam=0.15.3
+- python=3.7
+- genomelake==0.1.4
+- numpy
+- pandas
+- cython=0.29.28
+- pip=21.3.1
+- pip:
+  - pyvcf==0.4.3
+  - kipoi_veff
+  - kipoi_interpret
+  - kipoi
+  - kipoiseq
+  - tensorflow==1.15
+  - keras==1.2.2
+  - deepcpg==1.0.4
+  - h5py==3.6.0
 prefix: /opt/conda/envs/kipoi-shared__envs__kipoi-py3-keras1.2
