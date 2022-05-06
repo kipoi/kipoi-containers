@@ -47,34 +47,34 @@ class TestModels:
         assert self.model_group_to_singularity_dict != {}
 
     def test_models(self, test_docker_image, test_singularity_image):
-        singularity_pull_folder = os.environ.get(
-            "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
-        )
+        # singularity_pull_folder = os.environ.get(
+        #     "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
+        # )
         if self.list_of_models:
             for model in self.list_of_models:
-                singularity_image = get_singularity_image(
-                    singularity_pull_folder,
-                    self.model_group_to_singularity_dict,
-                    model,
-                )
                 image_name = self.get_image_name(model=model)
                 test_docker_image(image_name=image_name, model_name=model)
-                test_singularity_image(
-                    singularity_image_folder=singularity_pull_folder,
-                    singularity_image_name=singularity_image,
-                    model=model,
-                )
+                # singularity_image = get_singularity_image(
+                #     singularity_pull_folder,
+                #     self.model_group_to_singularity_dict,
+                #     model,
+                # )
+                # test_singularity_image(
+                #     singularity_image_folder=singularity_pull_folder,
+                #     singularity_image_name=singularity_image,
+                #     model=model,
+                # )
         elif self.model_name is not None:
             for model in self.model_name:
-                singularity_image = get_singularity_image(
-                    singularity_pull_folder,
-                    self.model_group_to_singularity_dict,
-                    model,
-                )
                 image_name = self.get_image_name(model=model)
                 test_docker_image(image_name=image_name, model_name=model)
-                test_singularity_image(
-                    singularity_image_folder=singularity_pull_folder,
-                    singularity_image_name=singularity_image,
-                    model=model,
-                )
+                # singularity_image = get_singularity_image(
+                #     singularity_pull_folder,
+                #     self.model_group_to_singularity_dict,
+                #     model,
+                # )
+                # test_singularity_image(
+                #     singularity_image_folder=singularity_pull_folder,
+                #     singularity_image_name=singularity_image,
+                #     model=model,
+                # )
