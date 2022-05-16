@@ -30,7 +30,7 @@ def test_pull_folder(monkeypatch, model_group_to_singularity_dict):
     monkeypatch.setenv("SINGULARITY_PULL_FOLDER", "/usr/src/imaginary-folder")
     singularity_handler = singularityhandler.SingularityHandler(
         model_group="Basset",
-        docker_image_name="kipoi://kipoi-docker:basset",
+        docker_image_name="kipoi://kipoi-docker:basset-slim",
         model_group_to_singularity_dict=model_group_to_singularity_dict,
     )
     assert Path(singularity_handler.singularity_image_folder) == Path(
@@ -41,7 +41,7 @@ def test_pull_folder(monkeypatch, model_group_to_singularity_dict):
 def test_singularityhandler_init(model_group_to_singularity_dict, cwd):
     singularity_handler = singularityhandler.SingularityHandler(
         model_group="Basset",
-        docker_image_name="kipoi://kipoi-docker:basset",
+        docker_image_name="kipoi://kipoi-docker:basset-slim",
         model_group_to_singularity_dict=model_group_to_singularity_dict,
         singularity_image_folder=cwd,
     )
@@ -61,7 +61,7 @@ def test_singularityhandler_update_container_info(
     model_group = "DummyModel"
     singularity_handler = singularityhandler.SingularityHandler(
         model_group=model_group,
-        docker_image_name="kipoi://kipoi-docker:dummymodel",
+        docker_image_name="kipoi://kipoi-docker:dummymodel-slim",
         model_group_to_singularity_dict=model_group_to_singularity_dict,
         singularity_image_folder=cwd,
     )
@@ -100,7 +100,7 @@ def test_singularityhandler_noupdate(
     capsys, monkeypatch, model_group_to_singularity_dict, cwd
 ):
     def mock_build_singularity_image(*args, **kwargs):
-        return cwd / "kipoi-docker_deepmel.sif"
+        return cwd / "kipoi-docker_deepmel-slim.sif"
 
     def mock_check_integrity(*args, **kwargs):
         return True
@@ -111,7 +111,7 @@ def test_singularityhandler_noupdate(
     models_to_test = []
     singularity_handler = singularityhandler.SingularityHandler(
         model_group="DeepMEL",
-        docker_image_name="kipoi/kipoi-docker:deepmel",
+        docker_image_name="kipoi/kipoi-docker:deepmel-slim",
         singularity_image_folder=cwd,
         model_group_to_singularity_dict=model_group_to_singularity_dict,
     )
@@ -147,7 +147,7 @@ def test_singularityhandler_update(
     monkeypatch, model_group_to_singularity_dict, cwd
 ):
     def mock_build_singularity_image(*args, **kwargs):
-        return cwd / "kipoi-docker_mpra-dragonn.sif"
+        return cwd / "kipoi-docker_mpra-dragonn-slim.sif"
 
     def mock_check_integrity(*args, **kwargs):
         return False
@@ -173,7 +173,7 @@ def test_singularityhandler_update(
     ]
     singularity_handler = singularityhandler.SingularityHandler(
         model_group="MPRA-DragoNN",
-        docker_image_name="kipoi/kipoi-docker:mpra-dragonn",
+        docker_image_name="kipoi/kipoi-docker:mpra-dragonn-slim",
         singularity_image_folder=cwd,
         model_group_to_singularity_dict=model_group_to_singularity_dict,
     )
@@ -223,7 +223,7 @@ def test_singularityhandler_add(
     monkeypatch, model_group_to_singularity_dict, cwd
 ):
     def mock_build_singularity_image(*args, **kwargs):
-        return cwd / "kipoi-docker_mpra-dragonn.sif"
+        return cwd / "kipoi-docker_mpra-dragonn-slim.sif"
 
     def mock_check_integrity(*args, **kwargs):
         return False

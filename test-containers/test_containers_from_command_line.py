@@ -19,6 +19,7 @@ class TestContainers:
         assert self.docker_to_model_dict != {}
 
     def test_images(self, test_docker_image):
+        slim_image = f"{self.image_name}-slim"
         if self.modelgroup_name and self.image_name not in [
             None,
             "kipoi-base-env",
@@ -26,12 +27,15 @@ class TestContainers:
             models = self.docker_to_model_dict.get(self.image_name)
             if not models:
                 raise ValueError("Each model group must have one model")
-
             for model in models:
                 if model.split("/")[0] in self.modelgroup_name:
+                    print(
+                        f"Testing {model} with {self.image_name} and {slim_image}"
+                    )
                     test_docker_image(
                         model_name=model, image_name=self.image_name
                     )
+                    test_docker_image(model_name=model, image_name=slim_image)
                     if self.modelgroup_name != "DeepSEA":
                         break
         elif self.image_name not in [None, "kipoi-base-env"]:
@@ -39,5 +43,8 @@ class TestContainers:
             if "shared" in self.image_name:
                 models = one_model_per_modelgroup(models)
             for model in models:
-                print(f"Testing {model} with {self.image_name}")
+                print(
+                    f"Testing {model} with {self.image_name} and {slim_image}"
+                )
                 test_docker_image(model_name=model, image_name=self.image_name)
+                test_docker_image(model_name=model, image_name=slim_image)

@@ -58,7 +58,9 @@ class TestModels:
                     model,
                 )
                 image_name = self.get_image_name(model=model)
+                slim_image = f"{image_name}-slim"
                 test_docker_image(image_name=image_name, model_name=model)
+                test_docker_image(image_name=slim_image, model_name=model)
                 test_singularity_image(
                     singularity_image_folder=singularity_pull_folder,
                     singularity_image_name=singularity_image,
@@ -72,7 +74,9 @@ class TestModels:
                     model,
                 )
                 image_name = self.get_image_name(model=model)
+                slim_image = f"{image_name}-slim"
                 test_docker_image(image_name=image_name, model_name=model)
+                test_docker_image(image_name=slim_image, model_name=model)
                 test_singularity_image(
                     singularity_image_folder=singularity_pull_folder,
                     singularity_image_name=singularity_image,
