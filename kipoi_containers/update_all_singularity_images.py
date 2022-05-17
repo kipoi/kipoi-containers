@@ -48,11 +48,18 @@ def run_update(docker_image: str) -> None:
             docker_to_model_group_dict_ci[kipoi_docker_image].append(
                 model_group
             )
+            docker_to_model_group_dict_ci[f"{kipoi_docker_image}-slim"].append(
+                model_group
+            )
         else:
             docker_to_model_group_dict_ci[kipoi_docker_image] = [model_group]
+            docker_to_model_group_dict_ci[f"{kipoi_docker_image}-slim"] = [
+                model_group
+            ]
 
     # for docker_image in docker_to_model_group_dict_ci.keys():
     model_or_model_group_list = docker_to_model_group_dict_ci[docker_image]
+
     singularity_pull_folder = os.environ.get(
         "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
     )

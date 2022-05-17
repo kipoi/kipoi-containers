@@ -105,7 +105,7 @@ def test_add(monkeypatch, parent_path):
     assert dockerfile_path.exists()
     dockerfile_path.unlink()
 
-    slim_dockerfile_path = f"{dockerfile_path}-slim"
+    slim_dockerfile_path = Path(f"{dockerfile_path}-slim")
     assert slim_dockerfile_path.exists()
     slim_dockerfile_path.unlink()
 
