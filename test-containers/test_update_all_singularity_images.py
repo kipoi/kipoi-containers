@@ -24,9 +24,9 @@ def test_cli_correct_use(runner, monkeypatch):
     def mock_populate_singularity_json(*args, **kwargs):
         if args[0] == "model-to-docker.json":
             return {
-                "MMSplice/modularPredictions": "kipoi/kipoi-docker:mmsplice-slim",
-                "MMSplice/mtsplice": "kipoi/kipoi-docker:mmsplice-mtsplice-slim",
-                "DeepMEL": "kipoi/kipoi-docker:deepmel-slim",
+                "MMSplice/modularPredictions": "kipoi/kipoi-docker:mmsplice",
+                "MMSplice/mtsplice": "kipoi/kipoi-docker:mmsplice-mtsplice",
+                "DeepMEL": "kipoi/kipoi-docker:deepmel",
             }
         elif args[0] == "model-to-singularity.json":
             return {

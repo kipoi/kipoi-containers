@@ -25,7 +25,7 @@ class TestContainers:
         ]:
             if "slim" in self.image_name:
                 models = self.docker_to_model_dict.get(
-                    self.image_name.replace("slim", "")
+                    self.image_name.replace("-slim", "")
                 )
             else:
                 models = self.docker_to_model_dict.get(self.image_name)
@@ -42,7 +42,7 @@ class TestContainers:
         elif self.image_name not in [None, "kipoi-base-env"]:
             if "slim" in self.image_name:
                 models = self.docker_to_model_dict.get(
-                    self.image_name.replace("slim", "")
+                    self.image_name.replace("-slim", "")
                 )
             else:
                 models = self.docker_to_model_dict.get(self.image_name)

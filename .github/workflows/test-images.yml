@@ -97,5 +97,6 @@ jobs:
       run: |-
         pip install coveralls
         docker pull kipoi/kipoi-docker:mmsplice
+        docker pull kipoi/kipoi-docker:mmsplice-slim
         coverage run -m pytest -s test-docker/test_docker_handler.py test-singularity test-containers/test_update_all_singularity_images.py
         coveralls --service=github
