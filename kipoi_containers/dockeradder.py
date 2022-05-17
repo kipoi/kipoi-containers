@@ -176,9 +176,8 @@ class DockerAdder:
         else:
             dockerfile_generator_path = "dockerfiles/dockerfile-generator.sh"
             slim_dockerfile_generator_path = (
-                f"{dockerfile_generator_path}-slim"
+                "dockerfiles/dockerfile-generator-slim.sh"
             )
-
             # Create new dockerfiles
             subprocess.call(
                 [
