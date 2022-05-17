@@ -51,13 +51,25 @@ jobs:
       run: |
         docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env . 
         docker build -f dockerfiles/Dockerfile.${{ matrix.image }} -t kipoi/kipoi-docker:${{ matrix.image }} . 
-        pytest -s test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:${{ matrix.image }} 
+        pytest -s test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:${{ matrix.image }}
     - name: Push ${{ matrix.image }}
       shell: bash -l {0}
       if: ${{ success() }}
       run: |
         docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
         docker push kipoi/kipoi-docker:${{ matrix.image }} 
+        docker system prune -a -f
+    - name: Build and test ${{ matrix.image }}-slim
+      shell: bash -l {0}
+      run: |
+        docker build -f dockerfiles/Dockerfile.${{ matrix.image }}-slim -t kipoi/kipoi-docker:${{ matrix.image }}-slim . 
+        pytest -s test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:${{ matrix.image }}-slim
+    - name: Push ${{ matrix.image }}-slim
+      shell: bash -l {0}
+      if: ${{ success() }}
+      run: |
+        docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
+        docker push kipoi/kipoi-docker:${{ matrix.image }}-slim
         docker system prune -a -f
   buildandtestsharedpy3keras2:
     # The type of runner that the job will run on
@@ -105,8 +117,13 @@ jobs:
         docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env . 
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2 -t kipoi/kipoi-docker:sharedpy3keras2 . 
         pytest -s test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2 --modelgroup=${{ matrix.modelgroup }}
+    - name: Build and test sharedpy3keras2-slim with ${{ matrix.modelgroup }}
+      shell: bash -l {0}
+      run: |
+        docker build -f dockerfiles/Dockerfile.sharedpy3keras2-slim -t kipoi/kipoi-docker:sharedpy3keras2-slim . 
+        pytest -s test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2-slim --modelgroup=${{ matrix.modelgroup }}
   buildandpushkipoibaseenvandsharedpy3keras2:
-    needs: [buildandtestsharedpy3keras2, buildtestandpush]
+    needs: [buildandtestsharedpy3keras2, buildandtestsharedpy3keras2-slim, buildtestandpush]
     runs-on: ubuntu-latest
     env:
       SINGULARITY_PULL_FOLDER: "/home/runner/singularity/"
@@ -140,21 +157,23 @@ jobs:
         sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config
         python -m pip install --upgrade pip
         pip install .
-    - name: Build sharedpy3keras2 and kipoi-base-env
+    - name: Build sharedpy3keras2, sharedpy3keras2-slim and kipoi-base-env
       shell: bash -l {0}
       run: |
         docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env . 
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2 -t kipoi/kipoi-docker:sharedpy3keras2 . 
-    - name: Push kipoi-base-env and sharedpy3keras2
+        docker build -f dockerfiles/Dockerfile.sharedpy3keras2-slim -t kipoi/kipoi-docker:sharedpy3keras2-slim . 
+    - name: Push kipoi-base-env, sharedpy3keras2 and sharedpy3keras2-slim
       shell: bash -l {0}
       if: ${{ success() }}
       run: |
         docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
         docker push kipoi/kipoi-docker:kipoi-base-env
         docker push kipoi/kipoi-docker:sharedpy3keras2
+        docker push kipoi/kipoi-docker:sharedpy3keras2-slim
         docker system prune -a -f
   buildtestandpushsingularity:
-    needs: [buildandpushkipoibaseenvandsharedpy3keras2, buildandtestsharedpy3keras2,
+    needs: [buildandpushkipoibaseenvandsharedpy3keras2, buildandtestsharedpy3keras2, buildandtestsharedpy3keras2-slim
       buildtestandpush]
     strategy:
       fail-fast: false
@@ -195,8 +214,8 @@ jobs:
         mkdir -p /home/runner/singularity/
         python -m pip install --upgrade pip
         pip install . 
-    - name: Update the singularity version of all docker images
+    - name: Update the singularity image of kipoi/kipoi-docker:${{ matrix.image }}-slim
       shell: bash -l {0}
       if: ${{ success() }}
       run: |
-        update_all_singularity kipoi/kipoi-docker:${{ matrix.image }}
+        update_all_singularity kipoi/kipoi-docker:${{ matrix.image }}-slim
