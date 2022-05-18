@@ -47,7 +47,7 @@ kipoi predict Basset \
 ### Example usage of kipoi with docker
 
 ```bash
-docker run -v $PWD/app/ kipoi/kipoi-docker:sharedpy3keras2 
+docker run -v $PWD/app/ kipoi/kipoi-docker:sharedpy3keras2tf2 
 kipoi predict Basset \
 --dataloader_args='{'intervals_file': '/app/intervals.bed',
                     'fasta_file': '/app/ref.fa'}' \
@@ -137,11 +137,11 @@ Currently, there are two ways to test the docker and singularity images along wi
 2. Test any docker image which tests all compatible models or with a specific model group.
 
 - ```bash
-  pytest test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2
+  pytest test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2tf1
   ```
 
 - ```bash
-  pytest test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2 --modelgroup=HAL
+  pytest test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2tf2 --modelgroup=HAL
   ```
   
 ## Github action workflows
