@@ -52,6 +52,8 @@ class TestModels:
         )
         if self.list_of_models:
             for model in self.list_of_models:
+                image_name = self.get_image_name(model=model)
+                test_docker_image(image_name=image_name, model_name=model)
                 singularity_image = get_singularity_image(
                     singularity_pull_folder,
                     self.model_group_to_singularity_dict,
@@ -68,6 +70,8 @@ class TestModels:
                 )
         elif self.model_name is not None:
             for model in self.model_name:
+                image_name = self.get_image_name(model=model)
+                test_docker_image(image_name=image_name, model_name=model)
                 singularity_image = get_singularity_image(
                     singularity_pull_folder,
                     self.model_group_to_singularity_dict,

@@ -2,7 +2,7 @@ FROM kipoi/kipoi-docker:kipoi-base-env
 
 COPY ./envfiles/sharedpy3keras2.yml ./app
 
-RUN conda env create -n kipoi-shared__envs__kipoi-py3-keras2 -f ./app/sharedpy3keras2.yml
+RUN conda env create -n kipoi-shared__envs__kipoi-py3-keras2 -f ./app/sharedpy3keras2.yml && conda clean -afy
 
 RUN echo "source activate kipoi-shared__envs__kipoi-py3-keras2" > ~/.bashrc
 ENV PATH /opt/conda/envs/kipoi-shared__envs__kipoi-py3-keras2/bin:$PATH
