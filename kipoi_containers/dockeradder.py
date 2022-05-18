@@ -111,14 +111,16 @@ class DockerAdder:
         """
         This function tests if the new model group is compatible
         with existng shared images -
-        "kipoi/kipoi-docker:sharedpy3keras2" and
-        "kipoi/kipoi-docker:sharedpy3keras1.2". If it is found
+        "kipoi/kipoi-docker:sharedpy3keras2tf1",
+        "kipoi/kipoi-docker:sharedpy3keras2tf2"
+        and "kipoi/kipoi-docker:sharedpy3keras1.2". If it is found
         to be compatible, it updates class variable image_name
         to the compatible image name and returns True. It will
         return False otherwise.
         """
         for image_name in [
-            "kipoi/kipoi-docker:sharedpy3keras2",
+            "kipoi/kipoi-docker:sharedpy3keras2tf1",
+            "kipoi/kipoi-docker:sharedpy3keras2tf2",
             "kipoi/kipoi-docker:sharedpy3keras1.2",
         ]:
             if self.list_of_models:
@@ -146,8 +148,9 @@ class DockerAdder:
     ) -> None:
         """
         This function adds a newly added model group to this repo. The steps are -
-        1. Test the model group with two available docker images for shared
-           environments - kipoi/kipoi-docker:sharedpy3keras2 and
+        1. Test the model group with three available docker images for shared
+           environments - kipoi/kipoi-docker:sharedpy3keras2tf1,
+           kipoi/kipoi-docker:sharedpy3keras2tf2 and
            kipoi/kipoi-docker:sharedpy3keras1.2. If the tests pass go to step
            6. Otherwise folow step 2-5
         2. Create the appropriate dockerfile using a generator
