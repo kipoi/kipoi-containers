@@ -1,4 +1,4 @@
-name: kipoi-shared__envs__kipoi-py3-keras2
+name: kipoi-shared__envs__kipoi-py3-keras2-tf1
 channels:
   - pytorch
   - bioconda
@@ -38,4 +38,4 @@ dependencies:
     - pyvcf==0.4.3
     - scikit-learn==0.19.2
     - tensorflow==1.15.0    
-prefix: /opt/conda/envs/kipoi-shared__envs__kipoi-py3-keras2
+prefix: /opt/conda/envs/kipoi-shared__envs__kipoi-py3-keras2-tf1

@@ -127,7 +127,7 @@ def test_add(monkeypatch, parent_path):
 
 def test_add_is_compatible_with_existing_image(monkeypatch):
     model_group_to_add = "Basset"
-    docker_image = "kipoi/kipoi-docker:sharedpy3keras2"
+    docker_image = "kipoi/kipoi-docker:sharedpy3keras2tf2"
 
     def mock_get_list_of_models_from_repo(*args, **kwargs):
         return []

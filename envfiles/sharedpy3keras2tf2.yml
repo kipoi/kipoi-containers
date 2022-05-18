@@ -1,0 +1,34 @@
+name: kipoi-shared__envs__kipoi-py3-keras2-tf2
+channels:
+  - pytorch
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - bedtools=2.30.0
+  - cython=0.29.24
+  - cyvcf2=0.30.11
+  - h5py=2.10.0
+  - maxentpy=0.0.1
+  - numpy=1.21.1
+  - pandas=1.4.2
+  - pip=21.2.4
+  - pybedtools=0.8.2
+  - pybigwig=0.3.18
+  - pysam=0.16.0.1
+  - python=3.8
+  - pytorch=1.4.0
+  - scikit-learn=1.0.2
+  - scipy=1.7.0
+  - pip:
+    - keras
+    - tensorflow
+    - kipoi
+    - kipoi-conda
+    - kipoi-interpret
+    - kipoi-utils
+    - kipoi-veff
+    - kipoiseq
+    - pyfaidx==0.6.4
+    - pyvcf==0.4.3
+prefix: /opt/conda/envs/kipoi-shared__envs__kipoi-py3-keras2-tf2
