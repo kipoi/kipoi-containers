@@ -76,8 +76,14 @@ class DockerAdder:
         else:
             update_test_list.append(DoubleQuotedScalarString(self.model_group))
 
-        if "sharedpy3keras2" in self.image_name:
-            workflow_release_data["jobs"]["buildandtestsharedpy3keras2"][
+        if "sharedpy3keras2tf1" in self.image_name:
+            workflow_release_data["jobs"]["buildandtestsharedpy3keras2tf1"][
+                "strategy"
+            ]["matrix"]["modelgroup"].append(
+                DoubleQuotedScalarString(self.model_group)
+            )
+        elif "sharedpy3keras2tf2" in self.image_name:
+            workflow_release_data["jobs"]["buildandtestsharedpy3keras2tf2"][
                 "strategy"
             ]["matrix"]["modelgroup"].append(
                 DoubleQuotedScalarString(self.model_group)
