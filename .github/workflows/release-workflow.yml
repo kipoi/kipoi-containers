@@ -25,15 +25,13 @@ jobs:
       with:
         python-version: '3.10'
     - name: Setup Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.17.8
+      uses: actions/setup-go@v3
     - name: Fetch system level dependencies
       run: sudo apt-get -q update && sudo apt-get install -y build-essential squashfs-tools
         libseccomp-dev cryptsetup libhdf5-serial-dev pkg-config
     - name: Build and install Apptainer
       run: |
-        export VERSION=1.0.1 && \
+        export VERSION=2 && \
         wget https://github.com/apptainer/apptainer/releases/download/v${VERSION}/apptainer-${VERSION}.tar.gz && \
         tar -xzf apptainer-${VERSION}.tar.gz && \
         cd apptainer-${VERSION}
@@ -51,13 +49,19 @@ jobs:
       run: |
         docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env . 
         docker build -f dockerfiles/Dockerfile.${{ matrix.image }} -t kipoi/kipoi-docker:${{ matrix.image }} . 
-        pytest -s test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:${{ matrix.image }} 
-    - name: Push ${{ matrix.image }}
+        pytest -s test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:${{ matrix.image }}
+    - name: Build and test ${{ matrix.image }}-slim
+      shell: bash -l {0}
+      run: |
+        docker build -f dockerfiles/Dockerfile.${{ matrix.image }}-slim -t kipoi/kipoi-docker:${{ matrix.image }}-slim . 
+        pytest -s test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:${{ matrix.image }}-slim
+    - name: Push ${{ matrix.image }} and ${{ matrix.image }}-slim
       shell: bash -l {0}
       if: ${{ success() }}
       run: |
         docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
         docker push kipoi/kipoi-docker:${{ matrix.image }} 
+        docker push kipoi/kipoi-docker:${{ matrix.image }}-slim
         docker system prune -a -f
   buildandtestsharedpy3keras2tf1:
     # The type of runner that the job will run on
@@ -78,15 +82,13 @@ jobs:
       with:
         python-version: '3.10'
     - name: Setup Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.17.8
+      uses: actions/setup-go@v3
     - name: Fetch system level dependencies
       run: sudo apt-get -q update && sudo apt-get install -y build-essential squashfs-tools
         libseccomp-dev cryptsetup libhdf5-serial-dev pkg-config
     - name: Build and install Apptainer
       run: |
-        export VERSION=1.0.1 && \
+        export VERSION=1.0.2 && \
         wget https://github.com/apptainer/apptainer/releases/download/v${VERSION}/apptainer-${VERSION}.tar.gz && \
         tar -xzf apptainer-${VERSION}.tar.gz && \
         cd apptainer-${VERSION}
@@ -105,6 +107,12 @@ jobs:
         docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env . 
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf1 -t kipoi/kipoi-docker:sharedpy3keras2tf1 . 
         pytest -s test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2tf1 --modelgroup=${{ matrix.modelgroup }}
+    - name: Build and test sharedpy3keras2tf1-slim with ${{ matrix.modelgroup }}
+      shell: bash -l {0}
+      run: |
+        docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf1-slim -t kipoi/kipoi-docker:sharedpy3keras2tf1-slim . 
+        pytest -s test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2tf1-slim --modelgroup=${{ matrix.modelgroup }}
+
   buildandtestsharedpy3keras2tf2:
     # The type of runner that the job will run on
     strategy:
@@ -124,15 +132,13 @@ jobs:
       with:
         python-version: '3.10'
     - name: Setup Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.17.8
+      uses: actions/setup-go@v3
     - name: Fetch system level dependencies
       run: sudo apt-get -q update && sudo apt-get install -y build-essential squashfs-tools
         libseccomp-dev cryptsetup libhdf5-serial-dev pkg-config
     - name: Build and install Apptainer
       run: |
-        export VERSION=1.0.1 && \
+        export VERSION=1.0.2 && \
         wget https://github.com/apptainer/apptainer/releases/download/v${VERSION}/apptainer-${VERSION}.tar.gz && \
         tar -xzf apptainer-${VERSION}.tar.gz && \
         cd apptainer-${VERSION}
@@ -151,6 +157,11 @@ jobs:
         docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env . 
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf2 -t kipoi/kipoi-docker:sharedpy3keras2tf2 . 
         pytest -s test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2tf2 --modelgroup=${{ matrix.modelgroup }}
+    - name: Build and test sharedpy3keras2tf2-slim with ${{ matrix.modelgroup }}
+      shell: bash -l {0}
+      run: |
+        docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf2-slim -t kipoi/kipoi-docker:sharedpy3keras2tf2-slim . 
+        pytest -s test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2tf2-slim --modelgroup=${{ matrix.modelgroup }}
   buildandpushkipoibaseenvandsharedpy3keras2:
     needs: [buildandtestsharedpy3keras2tf1, buildandtestsharedpy3keras2tf2, buildtestandpush]
     runs-on: ubuntu-latest
@@ -165,15 +176,13 @@ jobs:
       with:
         python-version: '3.10'
     - name: Setup Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.17.8
+      uses: actions/setup-go@v3
     - name: Fetch system level dependencies
       run: sudo apt-get -q update && sudo apt-get install -y build-essential squashfs-tools
         libseccomp-dev cryptsetup libhdf5-serial-dev pkg-config
     - name: Build and install Apptainer
       run: |
-        export VERSION=1.0.1 && \
+        export VERSION=1.0.2 && \
         wget https://github.com/apptainer/apptainer/releases/download/v${VERSION}/apptainer-${VERSION}.tar.gz && \
         tar -xzf apptainer-${VERSION}.tar.gz && \
         cd apptainer-${VERSION}
@@ -186,20 +195,34 @@ jobs:
         sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config
         python -m pip install --upgrade pip
         pip install .
-    - name: Build sharedpy3keras2tf1, sharedpy3keras2tf2 and kipoi-base-env
+    - name: Build sharedpy3keras2tf1, sharedpy3keras2tf1-slim and kipoi-base-env
       shell: bash -l {0}
       run: |
         docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env . 
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf1 -t kipoi/kipoi-docker:sharedpy3keras2tf1 . 
-        docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf2 -t kipoi/kipoi-docker:sharedpy3keras2tf2 . 
-    - name: Push kipoi-base-env, sharedpy3keras2tf1 and sharedpy3keras2tf2
+        docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf1-slim -t kipoi/kipoi-docker:sharedpy3keras2tf1-slim . 
+    - name: Push sharedpy3keras2tf1, sharedpy3keras2tf1-slim and kipoi-base-env
       shell: bash -l {0}
       if: ${{ success() }}
       run: |
         docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
         docker push kipoi/kipoi-docker:kipoi-base-env
         docker push kipoi/kipoi-docker:sharedpy3keras2tf1
+        docker push kipoi/kipoi-docker:sharedpy3keras2tf1-slim
+        docker system prune -a -f
+    - name: Build sharedpy3keras2tf2, sharedpy3keras2tf2-slim and kipoi-base-env
+      shell: bash -l {0}
+      run: |
+        docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env . 
+        docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf2 -t kipoi/kipoi-docker:sharedpy3keras2tf2 . 
+        docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf2-slim -t kipoi/kipoi-docker:sharedpy3keras2tf2-slim . 
+    - name: Push sharedpy3keras2tf2 and sharedpy3keras2tf2-slim
+      shell: bash -l {0}
+      if: ${{ success() }}
+      run: |
+        docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
         docker push kipoi/kipoi-docker:sharedpy3keras2tf2
+        docker push kipoi/kipoi-docker:sharedpy3keras2tf2-slim
         docker system prune -a -f
   buildtestandpushsingularity:
     needs: [buildandpushkipoibaseenvandsharedpy3keras2, buildandtestsharedpy3keras2tf1, buildandtestsharedpy3keras2tf2,
@@ -223,15 +246,13 @@ jobs:
       with:
         python-version: '3.10'
     - name: Setup Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.17.8
+      uses: actions/setup-go@v3
     - name: Fetch system level dependencies
       run: sudo apt-get -q update && sudo apt-get install -y build-essential squashfs-tools
         libseccomp-dev cryptsetup libhdf5-serial-dev pkg-config
     - name: Build and install Apptainer
       run: |
-        export VERSION=1.0.1 && \
+        export VERSION=1.0.2 && \
         wget https://github.com/apptainer/apptainer/releases/download/v${VERSION}/apptainer-${VERSION}.tar.gz && \
         tar -xzf apptainer-${VERSION}.tar.gz && \
         cd apptainer-${VERSION}
@@ -243,8 +264,8 @@ jobs:
         mkdir -p /home/runner/singularity/
         python -m pip install --upgrade pip
         pip install . 
-    - name: Update the singularity version of all docker images
+    - name: Update the singularity image of kipoi/kipoi-docker:${{ matrix.image }}-slim
       shell: bash -l {0}
       if: ${{ success() }}
       run: |
-        update_all_singularity kipoi/kipoi-docker:${{ matrix.image }}
+        update_all_singularity kipoi/kipoi-docker:${{ matrix.image }}-slim

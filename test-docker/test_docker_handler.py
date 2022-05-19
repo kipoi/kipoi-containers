@@ -33,6 +33,7 @@ def parent_path():
     "model_group_to_update,image_to_update",
     [
         ("MMSplice/deltaLogitPSI", "kipoi/kipoi-docker:mmsplice"),
+        ("MMSplice/deltaLogitPSI", "kipoi/kipoi-docker:mmsplice-slim"),
     ],
 )
 def test_update(model_group_to_update, image_to_update, monkeypatch):
@@ -97,12 +98,16 @@ def test_add(monkeypatch, parent_path):
         workflow_release_data,
     )
 
-    # Revert the change
+    # Revert the changes
     dockerfile_path = (
         parent_path / f"../dockerfiles/Dockerfile.{model_group_to_add.lower()}"
     )
     assert dockerfile_path.exists()
     dockerfile_path.unlink()
+
+    slim_dockerfile_path = Path(f"{dockerfile_path}-slim")
+    assert slim_dockerfile_path.exists()
+    slim_dockerfile_path.unlink()
 
     assert (
         model_group_to_docker_dict["CleTimer"] == "kipoi/kipoi-docker:cletimer"
@@ -168,6 +173,8 @@ def test_add_is_compatible_with_existing_image(monkeypatch):
         kipoi_container_repo=None,
     )
     model_adder.image_name = docker_image
+    model_adder.slim_image = f"{docker_image}-slim"
+
     model_adder.add(
         model_group_to_docker_dict,
         docker_to_model_dict,
@@ -175,12 +182,18 @@ def test_add_is_compatible_with_existing_image(monkeypatch):
         workflow_release_data,
     )
 
-    # Revert the change
+    # Revert the changes
     dockerfile_path = (
         Path(__file__).resolve().parent
         / f"../dockerfiles/Dockerfile.{model_group_to_add.lower()}"
     )
     assert not dockerfile_path.exists()
+
+    slim_dockerfile_path = (
+        Path(__file__).resolve().parent
+        / f"../dockerfiles/Dockerfile.{model_group_to_add.lower()}-slim"
+    )
+    assert not slim_dockerfile_path.exists()
 
     assert model_group_to_add in docker_to_model_dict[docker_image]
 

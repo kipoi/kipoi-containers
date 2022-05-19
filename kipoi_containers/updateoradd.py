@@ -121,10 +121,11 @@ class ModelSyncer:
         """
         if model_group in self.model_group_to_docker_dict:
             name_of_docker_image = self.model_group_to_docker_dict[model_group]
+            slim_docker_image = f"{name_of_docker_image}-slim"
             models_to_test = self.docker_to_model_dict[name_of_docker_image]
             singularity_handler = SingularityHandler(
                 model_group=model_group,
-                docker_image_name=name_of_docker_image,
+                docker_image_name=slim_docker_image,
                 model_group_to_singularity_dict=self.model_group_to_singularity_dict,
             )
             if "shared" not in name_of_docker_image:
@@ -133,9 +134,16 @@ class ModelSyncer:
                     name_of_docker_image=name_of_docker_image,
                 )
                 docker_updater.update(models_to_test)
+                slim_docker_updater = DockerUpdater(
+                    model_group=model_group,
+                    name_of_docker_image=slim_docker_image,
+                )
+                slim_docker_updater.update(models_to_test)
                 singularity_handler.update(models_to_test)
             else:
-                print(f"We will not be updating {name_of_docker_image}")
+                print(
+                    f"We will not be updating {name_of_docker_image} an {slim_docker_image}"
+                )
         else:
             model_adder = DockerAdder(
                 model_group=model_group,
@@ -150,7 +158,7 @@ class ModelSyncer:
             )
             singularity_handler = SingularityHandler(
                 model_group=model_group,
-                docker_image_name=model_adder.image_name,
+                docker_image_name=f"{model_adder.image_name}-slim",
                 model_group_to_singularity_dict=self.model_group_to_singularity_dict,
             )
             singularity_handler.add(

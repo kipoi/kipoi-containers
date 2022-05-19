@@ -69,7 +69,7 @@ kipoi predict Basset \
 - Install [docker](https://docs.docker.com/get-docker/)
 
 - Install singularity
-  - Singularity has been renamed to [Apptainer](https://apptainer.org/). However, it is also possible to use SingularityCE from [Sylabs](https://sylabs.io/). Current versions of kipoi containers are compatible with the latest version of Apptainer (1.0.1) and SingularityCE 3.9. Install Apptainer from [here](https://apptainer.org/docs/user/main/quick_start.html#quick-installation-steps) or SingularityCE from [here](https://sylabs.io/guides/3.9/admin-guide/installation.html).
+  - Singularity has been renamed to [Apptainer](https://apptainer.org/). However, it is also possible to use SingularityCE from [Sylabs](https://sylabs.io/). Current versions of kipoi containers are compatible with the latest version of Apptainer (1.0.2) and SingularityCE 3.9. Install Apptainer from [here](https://apptainer.org/docs/user/main/quick_start.html#quick-installation-steps) or SingularityCE from [here](https://sylabs.io/guides/3.9/admin-guide/installation.html).
 
 - Install kipoi_containers using ```pip install .```
 

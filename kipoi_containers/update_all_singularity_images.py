@@ -48,11 +48,18 @@ def run_update(docker_image: str) -> None:
             docker_to_model_group_dict_ci[kipoi_docker_image].append(
                 model_group
             )
+            docker_to_model_group_dict_ci[f"{kipoi_docker_image}-slim"].append(
+                model_group
+            )
         else:
             docker_to_model_group_dict_ci[kipoi_docker_image] = [model_group]
+            docker_to_model_group_dict_ci[f"{kipoi_docker_image}-slim"] = [
+                model_group
+            ]
 
     # for docker_image in docker_to_model_group_dict_ci.keys():
     model_or_model_group_list = docker_to_model_group_dict_ci[docker_image]
+
     singularity_pull_folder = os.environ.get(
         "SINGULARITY_PULL_FOLDER", Path(__file__).parent.resolve()
     )
@@ -64,9 +71,14 @@ def run_update(docker_image: str) -> None:
         singularity_image_folder=singularity_pull_folder,
         model_group_to_singularity_dict=model_group_to_singularity_dict,
     )
-    models_to_test = one_model_per_modelgroup(
-        docker_to_model_dict[docker_image]
-    )
+    if "slim" in docker_image:
+        models_to_test = one_model_per_modelgroup(
+            docker_to_model_dict[docker_image.replace("-slim", "")]
+        )
+    else:
+        models_to_test = one_model_per_modelgroup(
+            docker_to_model_dict[docker_image]
+        )
     singularity_handler.update(models_to_test)
     if len(model_or_model_group_list) > 1:
         for model_or_model_group in model_or_model_group_list[1:]:

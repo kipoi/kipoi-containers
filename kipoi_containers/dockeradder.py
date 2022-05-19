@@ -35,6 +35,7 @@ class DockerAdder:
         self.kipoi_container_repo = kipoi_container_repo
         self.model_group = model_group
         self.image_name = f"kipoi/kipoi-docker:{self.model_group.lower()}"
+        self.slim_image = f"{self.image_name}-slim"
         self.list_of_models = []
 
     def update_content(
@@ -117,31 +118,33 @@ class DockerAdder:
         """
         This function tests if the new model group is compatible
         with existng shared images -
-        "kipoi/kipoi-docker:sharedpy3keras2tf1",
-        "kipoi/kipoi-docker:sharedpy3keras2tf2"
-        and "kipoi/kipoi-docker:sharedpy3keras1.2". If it is found
+        "kipoi/kipoi-docker:sharedpy3keras2tf1-slim",
+        "kipoi/kipoi-docker:sharedpy3keras2tf2-slim"
+        and "kipoi/kipoi-docker:sharedpy3keras1.2-slim". If it is found
         to be compatible, it updates class variable image_name
         to the compatible image name and returns True. It will
         return False otherwise.
         """
-        for image_name in [
-            "kipoi/kipoi-docker:sharedpy3keras2tf1",
-            "kipoi/kipoi-docker:sharedpy3keras2tf2",
-            "kipoi/kipoi-docker:sharedpy3keras1.2",
+        for slim_image in [
+            "kipoi/kipoi-docker:sharedpy3keras2tf1-slim",
+            "kipoi/kipoi-docker:sharedpy3keras2tf2-slim",
+            "kipoi/kipoi-docker:sharedpy3keras1.2-slim",
         ]:
             if self.list_of_models:
                 for model_name in self.list_of_models:
                     # Run the newly created container
                     if test_docker_image_without_exception(
-                        image_name=image_name, model_name=model_name
+                        image_name=slim_image, model_name=model_name
                     ):
-                        self.image_name = image_name
+                        self.slim_image = slim_image
+                        self.image_name = slim_image.replace("-slim", "")
                         return True
             else:
                 if test_docker_image_without_exception(
-                    image_name=image_name, model_name=self.model_group
+                    image_name=slim_image, model_name=self.model_group
                 ):
-                    self.image_name = image_name
+                    self.slim_image = slim_image
+                    self.image_name = slim_image.replace("-slim", "")
                     return True
         return False
 
@@ -176,7 +179,10 @@ class DockerAdder:
             )
         else:
             dockerfile_generator_path = "dockerfiles/dockerfile-generator.sh"
-            # Create a new dockerfile
+            slim_dockerfile_generator_path = (
+                "dockerfiles/dockerfile-generator-slim.sh"
+            )
+            # Create new dockerfiles
             subprocess.call(
                 [
                     "bash",
@@ -184,16 +190,27 @@ class DockerAdder:
                     f"{self.model_group}",
                 ],
             )
+            subprocess.call(
+                [
+                    "bash",
+                    slim_dockerfile_generator_path,
+                    f"{self.model_group}",
+                ],
+            )
 
-            # Build a docker image
+            # Build docker images
             dockerfile_path = (
                 f"dockerfiles/Dockerfile.{self.model_group.lower()}"
             )
+            slim_dockerfile_path = f"{dockerfile_path}-slim"
             build_docker_image(
                 dockerfile_path=dockerfile_path,
                 name_of_docker_image=self.image_name,
             )
-
+            build_docker_image(
+                dockerfile_path=slim_dockerfile_path,
+                name_of_docker_image=self.slim_image,
+            )
             # Test the newly created container
             if self.list_of_models:
                 for model_name in self.list_of_models:
@@ -201,13 +218,21 @@ class DockerAdder:
                     test_docker_image(
                         image_name=self.image_name, model_name=model_name
                     )
+                    test_docker_image(
+                        image_name=self.slim_image, model_name=model_name
+                    )
             else:
                 test_docker_image(
                     image_name=self.image_name, model_name=self.model_group
                 )
+                test_docker_image(
+                    image_name=self.slim_image, model_name=self.model_group
+                )
 
             # Push the container
             push_docker_image(tag=self.image_name.split(":")[1])
+            push_docker_image(tag=self.slim_image.split(":")[1])
+
             cleanup(images=True)
 
             self.update_content(
