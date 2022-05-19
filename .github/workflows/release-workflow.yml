@@ -25,9 +25,7 @@ jobs:
       with:
         python-version: '3.10'
     - name: Setup Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.17.8
+      uses: actions/setup-go@v3
     - name: Fetch system level dependencies
       run: sudo apt-get -q update && sudo apt-get install -y build-essential squashfs-tools
         libseccomp-dev cryptsetup libhdf5-serial-dev pkg-config
@@ -84,9 +82,7 @@ jobs:
       with:
         python-version: '3.10'
     - name: Setup Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.17.8
+      uses: actions/setup-go@v3
     - name: Fetch system level dependencies
       run: sudo apt-get -q update && sudo apt-get install -y build-essential squashfs-tools
         libseccomp-dev cryptsetup libhdf5-serial-dev pkg-config
@@ -136,9 +132,7 @@ jobs:
       with:
         python-version: '3.10'
     - name: Setup Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.17.8
+      uses: actions/setup-go@v3
     - name: Fetch system level dependencies
       run: sudo apt-get -q update && sudo apt-get install -y build-essential squashfs-tools
         libseccomp-dev cryptsetup libhdf5-serial-dev pkg-config
@@ -182,9 +176,7 @@ jobs:
       with:
         python-version: '3.10'
     - name: Setup Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.17.8
+      uses: actions/setup-go@v3
     - name: Fetch system level dependencies
       run: sudo apt-get -q update && sudo apt-get install -y build-essential squashfs-tools
         libseccomp-dev cryptsetup libhdf5-serial-dev pkg-config
@@ -254,9 +246,7 @@ jobs:
       with:
         python-version: '3.10'
     - name: Setup Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.17.8
+      uses: actions/setup-go@v3
     - name: Fetch system level dependencies
       run: sudo apt-get -q update && sudo apt-get install -y build-essential squashfs-tools
         libseccomp-dev cryptsetup libhdf5-serial-dev pkg-config
