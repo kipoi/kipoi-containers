@@ -95,11 +95,6 @@ class DockerAdder:
             ]["image"].append(
                 DoubleQuotedScalarString(self.image_name.split(":")[1])
             )
-            workflow_release_data["jobs"]["buildtestandpush"]["strategy"][
-                "matrix"
-            ]["image"].append(
-                DoubleQuotedScalarString(self.slim_image.split(":")[1])
-            )
 
     def get_list_of_models_from_repo(self) -> List:
         """

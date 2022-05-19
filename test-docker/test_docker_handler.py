@@ -125,14 +125,8 @@ def test_add(monkeypatch, parent_path):
     assert (
         workflow_release_data["jobs"]["buildtestandpush"]["strategy"][
             "matrix"
-        ]["image"][-2]
-        == "cletimer"
-    )
-    assert (
-        workflow_release_data["jobs"]["buildtestandpush"]["strategy"][
-            "matrix"
         ]["image"][-1]
-        == "cletimer-slim"
+        == "cletimer"
     )
 
 
