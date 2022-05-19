@@ -218,7 +218,7 @@ jobs:
         docker push kipoi/kipoi-docker:sharedpy3keras2tf1
         docker push kipoi/kipoi-docker:sharedpy3keras2tf1-slim
         docker system prune -a -f
-  - name: Build sharedpy3keras2tf2, sharedpy3keras2tf2-slim and kipoi-base-env
+    - name: Build sharedpy3keras2tf2, sharedpy3keras2tf2-slim and kipoi-base-env
       shell: bash -l {0}
       run: |
         docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env . 
