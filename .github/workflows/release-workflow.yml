@@ -68,8 +68,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        modelgroup: ["Basenji,CleTimer,FactorNet",
-          "DeepBind", "lsgkm-SVM", "rbp_eclip"]
+        modelgroup: ["Basenji,CleTimer,FactorNet", "DeepBind", "lsgkm-SVM", "rbp_eclip"]
     runs-on: ubuntu-latest
     env:
       SINGULARITY_PULL_FOLDER: "/home/runner/singularity/"
@@ -112,7 +111,6 @@ jobs:
       run: |
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf1-slim -t kipoi/kipoi-docker:sharedpy3keras2tf1-slim . 
         pytest -s test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2tf1-slim --modelgroup=${{ matrix.modelgroup }}
-
   buildandtestsharedpy3keras2tf2:
     # The type of runner that the job will run on
     strategy:
@@ -225,15 +223,15 @@ jobs:
         docker push kipoi/kipoi-docker:sharedpy3keras2tf2-slim
         docker system prune -a -f
   buildtestandpushsingularity:
-    needs: [buildandpushkipoibaseenvandsharedpy3keras2, buildandtestsharedpy3keras2tf1, buildandtestsharedpy3keras2tf2,
-      buildtestandpush]
+    needs: [buildandpushkipoibaseenvandsharedpy3keras2, buildandtestsharedpy3keras2tf1,
+      buildandtestsharedpy3keras2tf2, buildtestandpush]
     strategy:
       fail-fast: false
       matrix:
-        image: ["sharedpy3keras1.2", "sharedpy3keras2tf1", "sharedpy3keras2tf2", "mpra-dragonn", "extended_coda",
-          "mmsplice", "mmsplice-mtsplice", "deepmel", "framepool", "kipoisplice",
-          "deeptarget", "attentivechrome", "bpnet-oskn", "seqvec", "deepflybrain",
-          "aparent-site_probabilities", "aparent-veff", "deepstarr"]
+        image: ["sharedpy3keras1.2", "sharedpy3keras2tf1", "sharedpy3keras2tf2", "mpra-dragonn",
+          "extended_coda", "mmsplice", "mmsplice-mtsplice", "deepmel", "framepool",
+          "kipoisplice", "deeptarget", "attentivechrome", "bpnet-oskn", "seqvec",
+          "deepflybrain", "aparent-site_probabilities", "aparent-veff", "deepstarr"]
     runs-on: ubuntu-latest
     env:
       SINGULARITY_PULL_FOLDER: "/home/runner/singularity/"
