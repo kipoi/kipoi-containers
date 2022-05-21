@@ -56,7 +56,12 @@ class DockerUpdater:
                 f"Dockerfile.{self.model_group.split('/')[0].lower()}"
             )
         dockerfile_path = Path.cwd() / "dockerfiles" / dockerfile_name
+        if "slim" in self.name_of_docker_image:
+            dockerfile_path = Path(f"{dockerfile_path}-slim")
         if dockerfile_path.exists():
+            print(
+                f"Building {self.name_of_docker_image} with {dockerfile_path}"
+            )
             build_docker_image(
                 dockerfile_path=dockerfile_path,
                 name_of_docker_image=self.name_of_docker_image,
