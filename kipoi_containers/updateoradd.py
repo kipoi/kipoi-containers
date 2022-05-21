@@ -164,7 +164,8 @@ class ModelSyncer:
             singularity_handler.add(
                 model_adder.list_of_models
                 if model_adder.list_of_models
-                else [model_adder.model_group]
+                else [model_adder.model_group],
+                self.docker_to_model_dict,
             )
 
     def sync(self) -> None:

@@ -2088,7 +2088,8 @@
         "Xpresso/human_median",
         "Xpresso/human_K562",
         "Xpresso/mouse_ESCs",
-        "Xpresso/mouse_median"
+        "Xpresso/mouse_median",
+        "scbasset"
     ],
     "kipoi/kipoi-docker:mpra-dragonn": [
         "MPRA-DragoNN/DeepFactorizedModel",
