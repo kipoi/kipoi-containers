@@ -46,7 +46,12 @@ class SingularityHandler:
             if k in ["url", "name", "md5"]
         }
 
-    def add(self, models_to_test: List, push: bool = True) -> None:
+    def add(
+        self,
+        models_to_test: List,
+        docker_to_model_dict: Dict = {},
+        push: bool = True,
+    ) -> None:
         """Adds a new singularity image. The steps are as follows -
         1. First, the new image is built and saved in
         singularity_image_folder from the docker image
@@ -56,9 +61,14 @@ class SingularityHandler:
         the modified url, name and md5 as a dict
         4. Update <model_group_to_singularity_dict> with the new model
         group as key and the dictionary with url, md5, key as values"""
-        self.singularity_image_name = (
-            f"kipoi-docker_{self.model_group.lower()}.sif"
-        )
+        if "shared" in self.docker_image_name:
+            self.singularity_image_name = (
+                f"kipoi-docker_{self.docker_image_name.split(':')[1]}.sif"
+            )
+        else:
+            self.singularity_image_name = (
+                f"kipoi-docker_{self.model_group.lower()}.sif"
+            )
         self.singularity_dict = {
             "url": "",
             "name": self.singularity_image_name.replace(".sif", ""),
@@ -75,14 +85,21 @@ class SingularityHandler:
                 singularity_image_name=self.singularity_image_name,
                 model=model,
             )
-
-        new_singularity_dict = push_new_singularity_image(
-            zenodo_client=self.zenodo_client,
-            singularity_image_folder=self.singularity_image_folder,
-            singularity_dict=self.singularity_dict,
-            model_group=self.model_group,
-            push=push,
-        )
+        if "shared" not in self.docker_image_name:
+            new_singularity_dict = push_new_singularity_image(
+                zenodo_client=self.zenodo_client,
+                singularity_image_folder=self.singularity_image_folder,
+                singularity_dict=self.singularity_dict,
+                model_group=self.model_group,
+                push=push,
+            )
+        else:
+            example_model = docker_to_model_dict[
+                self.docker_image_name.replace("-slim", "")
+            ][0]
+            new_singularity_dict = self.model_group_to_singularity_dict[
+                example_model.split("/")[0]
+            ]
         self.update_container_info(new_singularity_dict)
 
     def update(self, models_to_test: List, push: bool = True) -> None:
