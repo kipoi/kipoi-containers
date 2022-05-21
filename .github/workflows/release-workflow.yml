@@ -1,4 +1,4 @@
-diname: Build, test and push images on demand
+name: Build, test and push images on demand
 on:
   repository_dispatch:
     types: [updateall]
