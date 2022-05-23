@@ -68,7 +68,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        modelgroup: ["Basenji,CleTimer,FactorNet", "DeepBind", "lsgkm-SVM", "rbp_eclip"]
+        modelgroup: ["Basenji", "CleTimer", "FactorNet", "DeepBind", "lsgkm-SVM", "rbp_eclip"]
     runs-on: ubuntu-latest
     env:
       SINGULARITY_PULL_FOLDER: "/home/runner/singularity/"
@@ -193,33 +193,37 @@ jobs:
         sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config
         python -m pip install --upgrade pip
         pip install .
-    - name: Build sharedpy3keras2tf1, sharedpy3keras2tf1-slim and kipoi-base-env
+    - name: Build and push sharedpy3keras2tf1 and kipoi-base-env
       shell: bash -l {0}
       run: |
         docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env . 
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf1 -t kipoi/kipoi-docker:sharedpy3keras2tf1 . 
-        docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf1-slim -t kipoi/kipoi-docker:sharedpy3keras2tf1-slim . 
-    - name: Push sharedpy3keras2tf1, sharedpy3keras2tf1-slim and kipoi-base-env
+        docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
+        docker push kipoi/kipoi-docker:kipoi-base-env
+        docker push kipoi/kipoi-docker:sharedpy3keras2tf1
+        docker system prune -a -f
+    - name: Build and push sharedpy3keras2tf1-slim
       shell: bash -l {0}
       if: ${{ success() }}
       run: |
         docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
-        docker push kipoi/kipoi-docker:kipoi-base-env
-        docker push kipoi/kipoi-docker:sharedpy3keras2tf1
+        docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf1-slim -t kipoi/kipoi-docker:sharedpy3keras2tf1-slim . 
         docker push kipoi/kipoi-docker:sharedpy3keras2tf1-slim
         docker system prune -a -f
-    - name: Build sharedpy3keras2tf2, sharedpy3keras2tf2-slim and kipoi-base-env
+    - name: Build and push sharedpy3keras2tf2
       shell: bash -l {0}
       run: |
         docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env . 
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf2 -t kipoi/kipoi-docker:sharedpy3keras2tf2 . 
-        docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf2-slim -t kipoi/kipoi-docker:sharedpy3keras2tf2-slim . 
-    - name: Push sharedpy3keras2tf2 and sharedpy3keras2tf2-slim
+        docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
+        docker push kipoi/kipoi-docker:sharedpy3keras2tf2
+        docker system prune -a -f
+    - name: Build and push sharedpy3keras2tf2-slim
       shell: bash -l {0}
       if: ${{ success() }}
       run: |
+        docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf2-slim -t kipoi/kipoi-docker:sharedpy3keras2tf2-slim . 
         docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
-        docker push kipoi/kipoi-docker:sharedpy3keras2tf2
         docker push kipoi/kipoi-docker:sharedpy3keras2tf2-slim
         docker system prune -a -f
   buildtestandpushsingularity:
