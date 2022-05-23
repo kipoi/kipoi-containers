@@ -256,7 +256,13 @@ def test_singularityhandler_add(
         docker_image_name="kipoi/kipoi-docker:mpra-dragonn",
         singularity_image_folder=cwd,
         model_group_to_singularity_dict=model_group_to_singularity_dict,
-        workflow_release_data={},
+        workflow_release_data={
+            "jobs": {
+                "buildtestandpushsingularity": {
+                    "strategy": {"matrix": {"image": ["dummy"]}}
+                }
+            }
+        },
     )
     monkeypatch.setattr(
         "kipoi_containers.singularityhandler.cleanup", mock_cleanup
@@ -297,3 +303,6 @@ def test_singularityhandler_add(
         original_container_dict
         != singularity_handler.model_group_to_singularity_dict
     )
+    assert singularity_handler.workflow_release_data["jobs"][
+        "buildtestandpushsingularity"
+    ]["strategy"]["matrix"]["image"] == ["dummy", "mpra-dragonn"]
