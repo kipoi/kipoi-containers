@@ -127,6 +127,7 @@ class ModelSyncer:
                 model_group=model_group,
                 docker_image_name=slim_docker_image,
                 model_group_to_singularity_dict=self.model_group_to_singularity_dict,
+                workflow_release_data=self.workflow_release_data,
             )
             if "shared" not in name_of_docker_image:
                 docker_updater = DockerUpdater(

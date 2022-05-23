@@ -25,9 +25,9 @@ class SingularityHandler:
     model_group: str
     docker_image_name: str
     model_group_to_singularity_dict: Dict
+    workflow_release_data: Dict
     singularity_image_folder: Union[str, Path] = None
     zenodo_client: zenodoclient.Client = zenodoclient.Client()
-    workflow_release_data: Dict = {}
 
     def __post_init__(self):
         """If a location has not been specified for saving the downloaded
