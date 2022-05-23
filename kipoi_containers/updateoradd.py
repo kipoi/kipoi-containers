@@ -160,6 +160,7 @@ class ModelSyncer:
                 model_group=model_group,
                 docker_image_name=f"{model_adder.image_name}-slim",
                 model_group_to_singularity_dict=self.model_group_to_singularity_dict,
+                workflow_release_data=self.workflow_release_data,
             )
             singularity_handler.add(
                 model_adder.list_of_models

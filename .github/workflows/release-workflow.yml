@@ -213,7 +213,6 @@ jobs:
     - name: Build and push sharedpy3keras2tf2
       shell: bash -l {0}
       run: |
-        docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env . 
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf2 -t kipoi/kipoi-docker:sharedpy3keras2tf2 . 
         docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
         docker push kipoi/kipoi-docker:sharedpy3keras2tf2
