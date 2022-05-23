@@ -143,7 +143,7 @@ class ModelSyncer:
                 singularity_handler.update(models_to_test)
             else:
                 print(
-                    f"We will not be updating {name_of_docker_image} an {slim_docker_image}"
+                    f"We will not be updating {name_of_docker_image} and {slim_docker_image}"
                 )
         else:
             model_adder = DockerAdder(
