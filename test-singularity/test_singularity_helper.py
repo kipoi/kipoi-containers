@@ -43,9 +43,7 @@ def test_get_available_sc_depositions(zenodo_client):
         MODEL_GROUP_TO_SINGULARITY_JSON, kipoi_model_repo
     )
     singularity_handler = singularityhandler.SingularityHandler(
-        "Basset",
-        "Dummy",
-        original_container_dict,
+        "Basset", "Dummy", original_container_dict, {}
     )
     available_singularity_containers = [
         container["name"]

@@ -70,6 +70,7 @@ def run_update(docker_image: str) -> None:
         docker_image_name=docker_image,
         singularity_image_folder=singularity_pull_folder,
         model_group_to_singularity_dict=model_group_to_singularity_dict,
+        workflow_release_data={},
     )
     if "slim" in docker_image:
         models_to_test = one_model_per_modelgroup(

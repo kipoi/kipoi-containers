@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Dict, Union, List, Type
 import os
 
+from ruamel.yaml.scalarstring import DoubleQuotedScalarString
 
 from kipoi_containers.singularityhelper import (
     build_singularity_image,
@@ -24,6 +25,7 @@ class SingularityHandler:
     model_group: str
     docker_image_name: str
     model_group_to_singularity_dict: Dict
+    workflow_release_data: Dict
     singularity_image_folder: Union[str, Path] = None
     zenodo_client: zenodoclient.Client = zenodoclient.Client()
 
@@ -45,6 +47,16 @@ class SingularityHandler:
             for k, v in updated_singularity_dict.items()
             if k in ["url", "name", "md5"]
         }
+
+    def update_release_workflow(self) -> None:
+        """Update .github/workflows/release-workflow.yml with the newly
+        added model group if it is not using one of the shared environments"""
+        if "shared" not in self.singularity_image_name:
+            self.workflow_release_data["jobs"]["buildtestandpushsingularity"][
+                "strategy"
+            ]["matrix"]["image"].append(
+                DoubleQuotedScalarString(self.docker_image_name.split(":")[1])
+            )
 
     def add(
         self,
@@ -101,6 +113,7 @@ class SingularityHandler:
                 example_model.split("/")[0]
             ]
         self.update_container_info(new_singularity_dict)
+        self.update_release_workflow()
 
     def update(self, models_to_test: List, push: bool = True) -> None:
         """Updates an existing singularity image. The steps are as follows -
