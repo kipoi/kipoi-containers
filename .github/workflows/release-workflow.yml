@@ -106,11 +106,13 @@ jobs:
         docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env . 
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf1 -t kipoi/kipoi-docker:sharedpy3keras2tf1 . 
         pytest -s test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2tf1 --modelgroup=${{ matrix.modelgroup }}
+        docker system prune -af
     - name: Build and test sharedpy3keras2tf1-slim with ${{ matrix.modelgroup }}
       shell: bash -l {0}
       run: |
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf1-slim -t kipoi/kipoi-docker:sharedpy3keras2tf1-slim . 
         pytest -s test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2tf1-slim --modelgroup=${{ matrix.modelgroup }}
+        docker system prune -af
   buildandtestsharedpy3keras2tf2:
     # The type of runner that the job will run on
     strategy:
@@ -155,11 +157,13 @@ jobs:
         docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env . 
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf2 -t kipoi/kipoi-docker:sharedpy3keras2tf2 . 
         pytest -s test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2tf2 --modelgroup=${{ matrix.modelgroup }}
+        docker system prune -af
     - name: Build and test sharedpy3keras2tf2-slim with ${{ matrix.modelgroup }}
       shell: bash -l {0}
       run: |
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf2-slim -t kipoi/kipoi-docker:sharedpy3keras2tf2-slim . 
         pytest -s test-containers/test_containers_from_command_line.py --image=kipoi/kipoi-docker:sharedpy3keras2tf2-slim --modelgroup=${{ matrix.modelgroup }}
+        docker system prune -af
   buildandpushkipoibaseenvandsharedpy3keras2:
     needs: [buildandtestsharedpy3keras2tf1, buildandtestsharedpy3keras2tf2, buildtestandpush]
     runs-on: ubuntu-latest

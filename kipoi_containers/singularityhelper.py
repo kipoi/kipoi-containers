@@ -163,37 +163,46 @@ def update_existing_singularity_container(
     deposition_id = singularity_dict["url"].split("/")[4]
     new_deposition_id = create_new_deposition(zenodo_client, deposition_id)
     response = get_deposit(zenodo_client, new_deposition_id)
-    bucket_url, file_id = (
-        response["links"]["bucket"],
-        response["files"][0]["id"],
-    )
-
-    # Delete existing file from this new version
-    zenodo_client.delete_content(
-        f"{ZENODO_DEPOSITION}/{new_deposition_id}/files/{file_id}"
-    )
-
-    # Add a new file to this new version
+    bucket_url = response["links"]["bucket"]
     filename = (
         file_to_upload if file_to_upload else f"{singularity_dict['name']}.sif"
     )
+    file_id = ""
+    for fileobj in response["files"]:
+        if fileobj["filename"] == filename:
+            file_id = fileobj["id"]  # Assuming only 1 version is added
+    # Delete existing file from this new version
+    if file_id:
+        zenodo_client.delete_content(
+            f"{ZENODO_DEPOSITION}/{new_deposition_id}/files/{file_id}"
+        )
+
+    # Add a new file to this new version
     upload_file(
         zenodo_client,
         f"{bucket_url}/{filename}",
         singularity_image_folder,
         filename,
     )
-
+    url = f"{ZENODO_DEPOSITION}/{new_deposition_id}"
+    upload_metadata(zenodo_client, url, model_group)
     # publish the newly created revision
     if push:
         response = push_deposition(zenodo_client, new_deposition_id)
         record_id = response["metadata"]["prereserve_doi"]["recid"]
+        print(response["files"])
+        file_id, file_name, file_md5 = "", "", ""
+        for fileobj in response["files"]:
+            if fileobj["filename"] == filename:
+                file_id = fileobj["id"]  # Assuming only 1 version is added
+                file_name = fileobj["filename"].replace(".sif", "")
+                file_md5 = fileobj["checksum"]
         return {
             "new_deposition_id": new_deposition_id,
-            "file_id": response["files"][0]["id"],
+            "file_id": file_id,
             "url": f"{ZENODO_BASE}/record/{record_id}/files/{filename}?download=1",
-            "name": response["files"][0]["filename"].replace(".sif", ""),
-            "md5": response["files"][0]["checksum"],
+            "name": file_name,
+            "md5": file_md5,
         }
     else:
         return singularity_dict | {

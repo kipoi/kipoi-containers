@@ -23,7 +23,7 @@ def zenodo_client():
 @pytest.fixture(scope="module")
 def test_singularity_dict():
     return {
-        "url": f"{singularityhelper.ZENODO_BASE}/record/5822698/files/tiny-container_latest.sif?download=1",
+        "url": f"{singularityhelper.ZENODO_BASE}/record/6576723/files/tiny-container_latest.sif?download=1",
         "name": "tiny-container_latest",
         "md5": "0a85bfc85e749894210d1e53b4add11d",
     }
@@ -64,13 +64,6 @@ def test_get_available_sc_depositions(zenodo_client):
     )
 
     assert len(response_json) == singularity_container_number
-    # TODO: The test below does not seem to be working
-    # for index, item in enumerate(response_json):
-    #     for file_obj in item["files"]:
-    #         assert (
-    #             "kipoi-docker" in file_obj["filename"]
-    #             or "busybox_latest" in file_obj["filename"]
-    #         )
 
 
 def test_get_existing_sc_by_recordid(zenodo_client):
