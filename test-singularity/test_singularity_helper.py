@@ -2,6 +2,7 @@ import os
 import requests
 import json
 from pathlib import Path
+from datetime import datetime
 
 from github import Github
 import pytest
@@ -64,13 +65,6 @@ def test_get_available_sc_depositions(zenodo_client):
     )
 
     assert len(response_json) == singularity_container_number
-    # TODO: The test below does not seem to be working
-    # for index, item in enumerate(response_json):
-    #     for file_obj in item["files"]:
-    #         assert (
-    #             "kipoi-docker" in file_obj["filename"]
-    #             or "busybox_latest" in file_obj["filename"]
-    #         )
 
 
 def test_get_existing_sc_by_recordid(zenodo_client):
@@ -95,13 +89,22 @@ def test_update_existing_singularity_container(
             push=False,
         )
     )
+    new_deposition_id = new_test_singularity_dict.get("new_deposition_id")
+    response = singularityhelper.get_deposit(zenodo_client, new_deposition_id)
+    respone_metadata = response["metadata"]
+    assert respone_metadata["publication_date"] == datetime.today().strftime(
+        "%Y-%m-%d"
+    )
+    assert respone_metadata["title"] == "Test singularity container"
+
     for key in ["url", "md5", "name"]:
         assert new_test_singularity_dict.get(key) == test_singularity_dict.get(
             key
         )  # If push=True this will be different
     assert new_test_singularity_dict["file_id"] == ""
+
     zenodo_client.delete_content(
-        f"{singularityhelper.ZENODO_DEPOSITION}/{new_test_singularity_dict.get('new_deposition_id')}"
+        f"{singularityhelper.ZENODO_DEPOSITION}/{new_deposition_id}"
     )
 
 
