@@ -68,7 +68,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        modelgroup: ["Basenji", "CleTimer", "FactorNet", "DeepBind", "lsgkm-SVM", "rbp_eclip"]
+        modelgroup: ["Basenji", "CleTimer", "FactorNet", "DeepBind", "lsgkm-SVM",
+          "rbp_eclip"]
     runs-on: ubuntu-latest
     env:
       SINGULARITY_PULL_FOLDER: "/home/runner/singularity/"
