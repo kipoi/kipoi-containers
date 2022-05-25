@@ -59,7 +59,7 @@ jobs:
       shell: bash -l {0}
       if: ${{ success() }}
       run: |
-        docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
+        echo ${{ secrets.DOCKERPASSWORD }} | docker login --username ${{ secrets.DOCKERUSERNAME }} --password-stdin
         docker push kipoi/kipoi-docker:${{ matrix.image }} 
         docker push kipoi/kipoi-docker:${{ matrix.image }}-slim
         docker system prune -a -f
@@ -202,7 +202,7 @@ jobs:
       run: |
         docker build -f dockerfiles/Dockerfile.kipoi-base-env -t kipoi/kipoi-docker:kipoi-base-env . 
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf1 -t kipoi/kipoi-docker:sharedpy3keras2tf1 . 
-        docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
+        echo ${{ secrets.DOCKERPASSWORD }} | docker login --username ${{ secrets.DOCKERUSERNAME }} --password-stdin
         docker push kipoi/kipoi-docker:kipoi-base-env
         docker push kipoi/kipoi-docker:sharedpy3keras2tf1
         docker system prune -a -f
@@ -210,7 +210,7 @@ jobs:
       shell: bash -l {0}
       if: ${{ success() }}
       run: |
-        docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
+        echo ${{ secrets.DOCKERPASSWORD }} | docker login --username ${{ secrets.DOCKERUSERNAME }} --password-stdin
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf1-slim -t kipoi/kipoi-docker:sharedpy3keras2tf1-slim . 
         docker push kipoi/kipoi-docker:sharedpy3keras2tf1-slim
         docker system prune -a -f
@@ -218,7 +218,7 @@ jobs:
       shell: bash -l {0}
       run: |
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf2 -t kipoi/kipoi-docker:sharedpy3keras2tf2 . 
-        docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
+        echo ${{ secrets.DOCKERPASSWORD }} | docker login --username ${{ secrets.DOCKERUSERNAME }} --password-stdin
         docker push kipoi/kipoi-docker:sharedpy3keras2tf2
         docker system prune -a -f
     - name: Build and push sharedpy3keras2tf2-slim
@@ -226,7 +226,7 @@ jobs:
       if: ${{ success() }}
       run: |
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2tf2-slim -t kipoi/kipoi-docker:sharedpy3keras2tf2-slim . 
-        docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
+        echo ${{ secrets.DOCKERPASSWORD }} | docker login --username ${{ secrets.DOCKERUSERNAME }} --password-stdin
         docker push kipoi/kipoi-docker:sharedpy3keras2tf2-slim
         docker system prune -a -f
   buildtestandpushsingularity:
