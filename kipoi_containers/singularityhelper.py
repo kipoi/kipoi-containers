@@ -184,8 +184,10 @@ def update_existing_singularity_container(
         singularity_image_folder,
         filename,
     )
+
     url = f"{ZENODO_DEPOSITION}/{new_deposition_id}"
     upload_metadata(zenodo_client, url, model_group)
+
     # publish the newly created revision
     if push:
         response = push_deposition(zenodo_client, new_deposition_id)
