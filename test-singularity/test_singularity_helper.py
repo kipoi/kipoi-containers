@@ -24,7 +24,7 @@ def zenodo_client():
 @pytest.fixture(scope="module")
 def test_singularity_dict():
     return {
-        "url": f"{singularityhelper.ZENODO_BASE}/record/5822698/files/tiny-container_latest.sif?download=1",
+        "url": f"{singularityhelper.ZENODO_BASE}/record/6576723/files/tiny-container_latest.sif?download=1",
         "name": "tiny-container_latest",
         "md5": "0a85bfc85e749894210d1e53b4add11d",
     }
@@ -76,7 +76,7 @@ def test_get_existing_sc_by_recordid(zenodo_client):
     )
 
 
-def test_update_existing_singularity_container(
+def test_update_existing_singularity_container_newfile(
     zenodo_client, test_singularity_dict
 ):
     new_test_singularity_dict = (
@@ -91,11 +91,52 @@ def test_update_existing_singularity_container(
     )
     new_deposition_id = new_test_singularity_dict.get("new_deposition_id")
     response = singularityhelper.get_deposit(zenodo_client, new_deposition_id)
-    respone_metadata = response["metadata"]
-    assert respone_metadata["publication_date"] == datetime.today().strftime(
+    uploaded_files = [fileobj["filename"] for fileobj in response["files"]]
+    assert len(uploaded_files) == 2
+    assert "busybox_1.34.1.sif" in uploaded_files
+    assert "tiny-container_latest.sif" in uploaded_files
+
+    response_metadata = response["metadata"]
+    assert response_metadata["publication_date"] == datetime.today().strftime(
         "%Y-%m-%d"
     )
-    assert respone_metadata["title"] == "Test singularity container"
+    assert response_metadata["title"] == "Test singularity container"
+
+    for key in ["url", "md5", "name"]:
+        assert new_test_singularity_dict.get(key) == test_singularity_dict.get(
+            key
+        )  # If push=True this will be different
+    assert new_test_singularity_dict["file_id"] == ""
+
+    zenodo_client.delete_content(
+        f"{singularityhelper.ZENODO_DEPOSITION}/{new_deposition_id}"
+    )
+
+
+def test_update_existing_singularity_container_newversion(
+    zenodo_client, test_singularity_dict
+):
+    new_test_singularity_dict = (
+        singularityhelper.update_existing_singularity_container(
+            zenodo_client=zenodo_client,
+            singularity_dict=test_singularity_dict,
+            singularity_image_folder=Path(__file__).parent.resolve(),
+            model_group="Test",
+            push=False,
+        )
+    )
+    new_deposition_id = new_test_singularity_dict.get("new_deposition_id")
+    response = singularityhelper.get_deposit(zenodo_client, new_deposition_id)
+    uploaded_files = [fileobj["filename"] for fileobj in response["files"]]
+    assert len(uploaded_files) == 2
+    assert "busybox_1.34.1.sif" in uploaded_files
+    assert "tiny-container_latest.sif" in uploaded_files
+
+    response_metadata = response["metadata"]
+    assert response_metadata["publication_date"] == datetime.today().strftime(
+        "%Y-%m-%d"
+    )
+    assert response_metadata["title"] == "Test singularity container"
 
     for key in ["url", "md5", "name"]:
         assert new_test_singularity_dict.get(key) == test_singularity_dict.get(
@@ -117,8 +158,20 @@ def test_push_new_singularity_image(zenodo_client, test_singularity_dict):
         file_to_upload="busybox_1.34.1.sif",
         push=False,
     )
+    new_deposition_id = new_singularity_dict.get("new_deposition_id")
+    response = singularityhelper.get_deposit(zenodo_client, new_deposition_id)
+    uploaded_files = [fileobj["filename"] for fileobj in response["files"]]
+    assert len(uploaded_files) == 1
+    assert "busybox_1.34.1.sif" in uploaded_files
+
+    response_metadata = response["metadata"]
+    assert response_metadata["publication_date"] == datetime.today().strftime(
+        "%Y-%m-%d"
+    )
+    assert response_metadata["title"] == "Dummy singularity container"
+
     for key in ["url", "md5", "name"]:
         assert test_singularity_dict.get(key) == new_singularity_dict.get(key)
     zenodo_client.delete_content(
-        f"{singularityhelper.ZENODO_DEPOSITION}/{new_singularity_dict.get('new_deposition_id')}"
+        f"{singularityhelper.ZENODO_DEPOSITION}/{new_deposition_id}"
     )
