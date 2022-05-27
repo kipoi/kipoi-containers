@@ -2,12 +2,12 @@ from collections import Counter
 from datetime import datetime
 import os
 import requests
+from subprocess import Popen, PIPE
 from pathlib import Path
 import json
 from typing import Dict, Union, TYPE_CHECKING
 
 from kipoi_utils.external.torchvision.dataset_utils import download_url
-from spython.main import Client
 
 if TYPE_CHECKING:
     import zenodoclient
@@ -41,11 +41,25 @@ def build_singularity_image(
     """
     if isinstance(singularity_image_folder, Path):
         singularity_image_folder = str(singularity_image_folder)
-    singularity_image_path = Client.pull(
-        image=f"docker://{name_of_docker_image}",
-        pull_folder=singularity_image_folder,
-        force=True,
-        name=singularity_image_name,
+    pull_cmd = [
+        "singularity",
+        "pull",
+        "--name",
+        f"{singularity_image_folder}/{singularity_image_name}",
+        "--force",
+        f"docker://{name_of_docker_image}",
+    ]
+    print(f"Building {singularity_image_name} - {' '.join(pull_cmd)}")
+    process = Popen(pull_cmd, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode != 0:
+        print(stderr)
+        print(stdout)
+        raise ValueError(
+            f"Singularity image {singularity_image_name} can not be built"
+        )
+    singularity_image_path = (
+        f"{singularity_image_folder}/{singularity_image_name}"
     )
     return singularity_image_path
 
@@ -62,20 +76,30 @@ def test_singularity_image(
         f"Testing {model} with {singularity_image_folder}/{singularity_image_name}"
     )
     if model == "Basenji":
-        test_cmd = f"kipoi test {model} --source=kipoi --batch_size=2"
+        test_cmd = [
+            "kipoi",
+            "test",
+            f"{model}",
+            "--source=kipoi",
+            "--batch_size=2",
+        ]
     else:
-        test_cmd = f"kipoi test {model} --source=kipoi"
+        test_cmd = ["kipoi", "test", f"{model}", "--source=kipoi"]
     if isinstance(singularity_image_folder, str):
         singularity_image_folder = Path(singularity_image_folder)
     if isinstance(singularity_image_name, str):
         singularity_image_name = Path(singularity_image_name)
-    result = Client.execute(
-        singularity_image_folder / singularity_image_name,
-        test_cmd,
-        return_result=True,
-    )
-    if result["return_code"] != 0:
-        print(result["message"])
+    exec_cmd = [
+        "singularity",
+        "exec",
+        f"{singularity_image_folder}/{singularity_image_name}",
+    ]
+    exec_cmd.extend(test_cmd)
+    process = Popen(exec_cmd, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode != 0:
+        print(stdout)
+        print(stderr)
         raise ValueError(
             f"Singularity image {singularity_image_name} for {model} did not pass relevant tests"
         )
@@ -192,7 +216,6 @@ def update_existing_singularity_container(
     if push:
         response = push_deposition(zenodo_client, new_deposition_id)
         record_id = response["metadata"]["prereserve_doi"]["recid"]
-        print(response["files"])
         file_id, file_name, file_md5 = "", "", ""
         for fileobj in response["files"]:
             if fileobj["filename"] == filename:

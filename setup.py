@@ -12,7 +12,6 @@ requirements = [
     "ruamel.yaml",
     "ruamel.yaml.clib",
     "pandas",
-    "spython",
     "pre-commit",
     "click",
     "kipoi",
