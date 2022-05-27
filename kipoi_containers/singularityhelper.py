@@ -50,9 +50,10 @@ def build_singularity_image(
         f"docker://{name_of_docker_image}",
     ]
     process = Popen(pull_cmd, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = process.communicate()
     if process.returncode != 0:
-        _, stderr = process.communicate()
         print(stderr)
+        print(stdout)
         raise ValueError(
             f"Singularity image {singularity_image_name} can not be built"
         )
@@ -60,12 +61,6 @@ def build_singularity_image(
         f"{singularity_image_folder}/{singularity_image_name}"
     )
     return singularity_image_path
-    # singularity_image_path = Client.pull(
-    #     image=f"docker://{name_of_docker_image}",
-    #     pull_folder=singularity_image_folder,
-    #     force=True,
-    #     name=singularity_image_name,
-    # )
 
 
 def test_singularity_image(
@@ -80,9 +75,15 @@ def test_singularity_image(
         f"Testing {model} with {singularity_image_folder}/{singularity_image_name}"
     )
     if model == "Basenji":
-        test_cmd = f"kipoi test {model} --source=kipoi --batch_size=2"
+        test_cmd = [
+            "kipoi",
+            "test",
+            f"{model}",
+            "--source=kipoi",
+            "--batch_size=2",
+        ]
     else:
-        test_cmd = f"kipoi test {model} --source=kipoi"
+        test_cmd = ["kipoi", "test", f"{model}", "--source=kipoi"]
     if isinstance(singularity_image_folder, str):
         singularity_image_folder = Path(singularity_image_folder)
     if isinstance(singularity_image_name, str):
@@ -91,26 +92,16 @@ def test_singularity_image(
         "singularity",
         "exec",
         f"{singularity_image_folder}/{singularity_image_name}",
-        test_cmd,
     ]
+    exec_cmd.extend(test_cmd)
     process = Popen(exec_cmd, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = process.communicate()
     if process.returncode != 0:
-        _, stderr = process.communicate()
+        print(stdout)
         print(stderr)
         raise ValueError(
             f"Singularity image {singularity_image_name} for {model} did not pass relevant tests"
         )
-
-    # result = Client.execute(
-    #     singularity_image_folder / singularity_image_name,
-    #     test_cmd,
-    #     return_result=True,
-    # )
-    # if result["return_code"] != 0:
-    #     print(result["message"])
-    #     raise ValueError(
-    #         f"Singularity image {singularity_image_name} for {model} did not pass relevant tests"
-    #     )
 
 
 def create_new_deposition(
@@ -224,7 +215,6 @@ def update_existing_singularity_container(
     if push:
         response = push_deposition(zenodo_client, new_deposition_id)
         record_id = response["metadata"]["prereserve_doi"]["recid"]
-        print(response["files"])
         file_id, file_name, file_md5 = "", "", ""
         for fileobj in response["files"]:
             if fileobj["filename"] == filename:
