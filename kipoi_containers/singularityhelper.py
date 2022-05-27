@@ -2,12 +2,12 @@ from collections import Counter
 from datetime import datetime
 import os
 import requests
+from subprocess import Popen, PIPE
 from pathlib import Path
 import json
 from typing import Dict, Union, TYPE_CHECKING
 
 from kipoi_utils.external.torchvision.dataset_utils import download_url
-from spython.main import Client
 
 if TYPE_CHECKING:
     import zenodoclient
@@ -41,13 +41,31 @@ def build_singularity_image(
     """
     if isinstance(singularity_image_folder, Path):
         singularity_image_folder = str(singularity_image_folder)
-    singularity_image_path = Client.pull(
-        image=f"docker://{name_of_docker_image}",
-        pull_folder=singularity_image_folder,
-        force=True,
-        name=singularity_image_name,
+    pull_cmd = [
+        "singularity",
+        "pull",
+        "--name",
+        f"{singularity_image_folder}/{singularity_image_name}",
+        "--force",
+        f"docker://{name_of_docker_image}",
+    ]
+    process = Popen(pull_cmd, stdout=PIPE, stderr=PIPE)
+    if process.returncode != 0:
+        _, stderr = process.communicate()
+        print(stderr)
+        raise ValueError(
+            f"Singularity image {singularity_image_name} can not be built"
+        )
+    singularity_image_path = (
+        f"{singularity_image_folder}/{singularity_image_name}"
     )
     return singularity_image_path
+    # singularity_image_path = Client.pull(
+    #     image=f"docker://{name_of_docker_image}",
+    #     pull_folder=singularity_image_folder,
+    #     force=True,
+    #     name=singularity_image_name,
+    # )
 
 
 def test_singularity_image(
@@ -69,16 +87,30 @@ def test_singularity_image(
         singularity_image_folder = Path(singularity_image_folder)
     if isinstance(singularity_image_name, str):
         singularity_image_name = Path(singularity_image_name)
-    result = Client.execute(
-        singularity_image_folder / singularity_image_name,
+    exec_cmd = [
+        "singularity",
+        "exec",
+        f"{singularity_image_folder}/{singularity_image_name}",
         test_cmd,
-        return_result=True,
-    )
-    if result["return_code"] != 0:
-        print(result["message"])
+    ]
+    process = Popen(exec_cmd, stdout=PIPE, stderr=PIPE)
+    if process.returncode != 0:
+        _, stderr = process.communicate()
+        print(stderr)
         raise ValueError(
             f"Singularity image {singularity_image_name} for {model} did not pass relevant tests"
         )
+
+    # result = Client.execute(
+    #     singularity_image_folder / singularity_image_name,
+    #     test_cmd,
+    #     return_result=True,
+    # )
+    # if result["return_code"] != 0:
+    #     print(result["message"])
+    #     raise ValueError(
+    #         f"Singularity image {singularity_image_name} for {model} did not pass relevant tests"
+    #     )
 
 
 def create_new_deposition(
