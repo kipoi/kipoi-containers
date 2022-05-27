@@ -49,6 +49,7 @@ def build_singularity_image(
         "--force",
         f"docker://{name_of_docker_image}",
     ]
+    print(f"Building {singularity_image_name} - {' '.join(pull_cmd)}")
     process = Popen(pull_cmd, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
     if process.returncode != 0:
