@@ -1,10 +1,12 @@
+import pytest
+
 from kipoi_containers.singularityhelper import (
     build_singularity_image,
     test_singularity_image,
 )
 
 
-def buildandtest_singularity_image(tmp_path):
+def test_singularity_buildandtest(tmp_path):
     singularity_dir = tmp_path / "singularity"
     singularity_dir.mkdir()
     singularity_image = "kipoi-docker_aparent-veff-slim.sif"
