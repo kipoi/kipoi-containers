@@ -15,8 +15,6 @@ requirements = [
     "pre-commit",
     "click",
     "kipoi",
-    "sorted-nearest==0.0.33",
-    "protobuf==3.20",
 ]
 setup_requirements = []
 
