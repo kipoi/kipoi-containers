@@ -2,7 +2,8 @@ FROM kipoi/kipoi-docker:kipoi-base-env
 
 COPY ./envfiles/sharedpy3keras2tf1.yml ./app
 
-RUN conda env create -n kipoi-shared__envs__kipoi-py3-keras2-tf1 -f ./app/sharedpy3keras2tf1.yml && conda clean -afy
+RUN conda env create -n kipoi-shared__envs__kipoi-py3-keras2-tf1 -f ./app/sharedpy3keras2tf1.yml --experimental-solver=libmamba && \
+    conda clean -afy
 
 RUN echo "source activate kipoi-shared__envs__kipoi-py3-keras2-tf1" > ~/.bashrc
 ENV PATH /opt/conda/envs/kipoi-shared__envs__kipoi-py3-keras2-tf1/bin:$PATH

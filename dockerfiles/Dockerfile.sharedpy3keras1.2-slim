@@ -7,8 +7,9 @@ RUN mkdir -p /app
 
 ADD ./envfiles/sharedpy3keras12.yml /app/
 
-RUN conda install -y -c conda-forge conda-libmamba-solver && \
-    conda env create -n kipoi-shared__envs__kipoi-py3-keras1.2 -f ./app/sharedpy3keras12.yml && \ 
+RUN conda update conda && \
+    conda install -y -c conda-forge conda-libmamba-solver && \
+    conda env create -n kipoi-shared__envs__kipoi-py3-keras1.2 -f ./app/sharedpy3keras12.yml --experimental-solver=libmamba && \ 
     conda clean -afy
 
 FROM continuumio/miniconda3:latest 

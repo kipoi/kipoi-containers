@@ -5,8 +5,9 @@ RUN mkdir -p /app
 
 ADD dockerfiles/environment.kipoi.yml /app/environment.kipoi.yml
 
-RUN conda install -y -c conda-forge conda-libmamba-solver && \
-    conda env create -f /app/environment.kipoi.yml && \ 
+RUN conda update conda && \
+    conda install -y -c conda-forge conda-libmamba-solver && \
+    conda env create -f /app/environment.kipoi.yml --experimental-solver=libmamba && \ 
     conda clean -afy
 
 FROM continuumio/miniconda3:latest
