@@ -31,4 +31,6 @@ dependencies:
     - kipoiseq
     - pyfaidx==0.6.4
     - pyvcf==0.4.3
+    - sorted-nearest==0.0.33
+    - protobuf==3.20
 prefix: /opt/conda/envs/kipoi-shared__envs__kipoi-py3-keras2-tf2

@@ -6,9 +6,10 @@ RUN mkdir -p /app
 
 ADD dockerfiles/environment.kipoi.yml /app/environment.kipoi.yml
 
-RUN conda env create -f /app/environment.kipoi.yml
+RUN conda update conda && \
+    conda install -y -c conda-forge conda-libmamba-solver && \
+    conda env create -f /app/environment.kipoi.yml --experimental-solver=libmamba && \
+    conda clean -afy
 
 RUN echo "source activate kipoi-env" > ~/.bashrc
 ENV PATH /opt/conda/envs/kipoi-env/bin:$PATH
-
-RUN conda clean -afy
