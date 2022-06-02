@@ -2,9 +2,7 @@ import json
 import os
 from pathlib import Path
 from typing import Dict, Tuple, Union
-from time import sleep
 
-from numpy.random import default_rng
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
@@ -57,13 +55,8 @@ class Client:
         return response.json()
 
     def post_content(self, url: str, **kwargs) -> Tuple[int, Dict]:
-        """Sleeps for a random time between 5 and 20 seconds to ensure
-        zenodo backend is not receiving too many concurrent post requests.
-        After that, perform POST request to an url and returns the response status
+        """Performs POST request to an url and returns the response status
         and body"""
-        rng = default_rng()
-        time_to_sleep = rng.uniform(5, 20)
-        sleep(time_to_sleep)
         response = requests.post(url, params=(self.params | kwargs), json={})
         response.raise_for_status()
         return response.status_code, response.json()
