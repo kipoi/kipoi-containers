@@ -1,0 +1,10 @@
+FROM kipoi/kipoi-docker:kipoi-base-env
+
+SHELL ["conda", "run", "-n", "kipoi-env", "/bin/bash", "-c"]
+
+RUN kipoi env create TREDNet --verbose
+
+RUN echo "source activate kipoi-TREDNet" > ~/.bashrc
+ENV PATH /opt/conda/envs/kipoi-TREDNet/bin:$PATH
+
+SHELL ["conda", "run", "-n", "kipoi-TREDNet", "/bin/bash", "-c"]
