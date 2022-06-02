@@ -30,6 +30,24 @@ def test_singularity_dict():
     }
 
 
+@pytest.fixture(scope="module")
+def test_singularity_dict_sharedenv():
+    return {
+        "url": f"{singularityhelper.ZENODO_BASE}/record/6603044/files/kipoi-docker_sharedpy3keras2tf1-slim.sif?download=1",
+        "name": "kipoi-docker_sharedpy3keras2tf1-slim",
+        "md5": "fc7271fcaf16884ec7f306a5b12e34c7",
+    }
+
+
+@pytest.fixture(scope="module")
+def test_singularity_dict_mmsplice():
+    return {
+        "url": f"{singularityhelper.ZENODO_BASE}/record/6603220/files/kipoi-docker_mmsplice-slim.sif?download=1",
+        "name": "kipoi-docker_mmsplice-slim",
+        "md5": "1f2ee90e10c762cf20dd2f768a4aac97",
+    }
+
+
 def test_zenodo_get_access(zenodo_client):
     response_json = zenodo_client.get_content(
         f"{singularityhelper.ZENODO_DEPOSITION}"
@@ -172,6 +190,104 @@ def test_push_new_singularity_image(zenodo_client, test_singularity_dict):
 
     for key in ["url", "md5", "name"]:
         assert test_singularity_dict.get(key) == new_singularity_dict.get(key)
+    zenodo_client.delete_content(
+        f"{singularityhelper.ZENODO_DEPOSITION}/{new_deposition_id}"
+    )
+
+
+def test_upload_metadata_fail(zenodo_client, test_singularity_dict):
+    with pytest.raises(ValueError) as error:
+        singularityhelper.upload_metadata(
+            zenodo_client, test_singularity_dict["url"]
+        )
+    assert error.type is ValueError
+    assert (
+        "You need to provide atlease a shared env name or a model group name"
+        in error.value.args[0]
+    )
+
+
+def test_upload_metadata_fail_sharedenv(zenodo_client, test_singularity_dict):
+    with pytest.raises(ValueError) as error:
+        singularityhelper.upload_metadata(
+            zenodo_client, test_singularity_dict["url"], shared_env="abc"
+        )
+    assert error.type is ValueError
+    assert (
+        "Available options are - mmsplice, sharedpy3keras2tf1, sharedpy3keras2tf2, sharedpy3keras1.2"
+        in error.value.args[0]
+    )
+
+
+def test_upload_metadata_sharedenv(
+    zenodo_client, test_singularity_dict_sharedenv, monkeypatch
+):
+    def mock_upload_file(*args, **kwargs):
+        return
+
+    monkeypatch.setattr(
+        "kipoi_containers.singularityhelper.upload_file",
+        mock_upload_file,
+    )
+    new_test_singularity_dict = (
+        singularityhelper.update_existing_singularity_container(
+            zenodo_client=zenodo_client,
+            singularity_dict=test_singularity_dict_sharedenv,
+            singularity_image_folder=Path(__file__).parent.resolve(),
+            model_group="Test",
+            push=False,
+        )
+    )
+    new_deposition_id = new_test_singularity_dict.get("new_deposition_id")
+    response = singularityhelper.get_deposit(zenodo_client, new_deposition_id)
+    response_metadata = response["metadata"]
+    assert response_metadata["publication_date"] == datetime.today().strftime(
+        "%Y-%m-%d"
+    )
+    env_url = "https://github.com/kipoi/kipoi-containers/blob/main/envfiles/sharedpy3keras2tf1.yml"
+    assert (
+        response_metadata["title"]
+        == "sharedpy3keras2tf1 singularity container"
+    )
+    assert env_url in response_metadata["description"]
+    zenodo_client.delete_content(
+        f"{singularityhelper.ZENODO_DEPOSITION}/{new_deposition_id}"
+    )
+
+
+def test_upload_metadata_mmsplice(
+    zenodo_client, test_singularity_dict_mmsplice, monkeypatch
+):
+    def mock_upload_file(*args, **kwargs):
+        return
+
+    monkeypatch.setattr(
+        "kipoi_containers.singularityhelper.upload_file",
+        mock_upload_file,
+    )
+    new_test_singularity_dict = (
+        singularityhelper.update_existing_singularity_container(
+            zenodo_client=zenodo_client,
+            singularity_dict=test_singularity_dict_mmsplice,
+            singularity_image_folder=Path(__file__).parent.resolve(),
+            model_group="Test",
+            push=False,
+        )
+    )
+    new_deposition_id = new_test_singularity_dict.get("new_deposition_id")
+    response = singularityhelper.get_deposit(zenodo_client, new_deposition_id)
+    response_metadata = response["metadata"]
+    assert response_metadata["publication_date"] == datetime.today().strftime(
+        "%Y-%m-%d"
+    )
+    assert (
+        "MMSplice singularity container except mtsplice"
+        in response_metadata["title"]
+    )
+    assert (
+        "Singularity container for MMSplice models except mtsplice"
+        in response_metadata["description"]
+    )
     zenodo_client.delete_content(
         f"{singularityhelper.ZENODO_DEPOSITION}/{new_deposition_id}"
     )

@@ -113,6 +113,8 @@ class DockerAdder:
                     content_file.download_url, delimiter="\t"
                 )
                 return [f"{self.model_group}/{m}" for m in model_tsv["model"]]
+        # No models.tsv is present - populate using folder names
+        return [content_file.path for content_file in contents]
 
     def is_compatible_with_existing_image(self) -> bool:
         """

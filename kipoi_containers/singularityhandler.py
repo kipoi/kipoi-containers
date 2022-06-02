@@ -55,7 +55,9 @@ class SingularityHandler:
             self.workflow_release_data["jobs"]["buildtestandpushsingularity"][
                 "strategy"
             ]["matrix"]["image"].append(
-                DoubleQuotedScalarString(self.docker_image_name.split(":")[1])
+                DoubleQuotedScalarString(
+                    self.docker_image_name.split(":")[1].replace("-slim", "")
+                )
             )
 
     def add(
@@ -79,7 +81,7 @@ class SingularityHandler:
             )
         else:
             self.singularity_image_name = (
-                f"kipoi-docker_{self.model_group.lower()}.sif"
+                f"kipoi-docker_{self.model_group.lower()}-slim.sif"
             )
         self.singularity_dict = {
             "url": "",

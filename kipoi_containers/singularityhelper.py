@@ -138,22 +138,69 @@ def upload_file(
 
 
 def upload_metadata(
-    zenodo_client: "zenodoclient.Client", url: str, model_group: str
+    zenodo_client: "zenodoclient.Client",
+    url: str,
+    model_group: str = "",
+    shared_env: str = "",
 ) -> None:
     """Upload metadata for a model group to a given url"""
-    data = {
-        "metadata": {
-            "title": f"{model_group} singularity container",
-            "upload_type": "physicalobject",
-            "description": "This is a singularity container for models "
-            f"under https://kipoi.org/models/{model_group}/",
-            "creators": [
-                {"name": "Haimasree, Bhattacharya", "affiliation": "EMBL"}
-            ],
-            "publication_date": datetime.today().strftime("%Y-%m-%d"),
-            "license": "MIT",
+    if not model_group and not shared_env:
+        raise ValueError(
+            "You need to provide atlease a shared env name or a model group name"
+        )
+    if model_group:
+        data = {
+            "metadata": {
+                "title": f"{model_group} singularity container",
+                "upload_type": "physicalobject",
+                "description": "This is a singularity container for models "
+                f"under https://kipoi.org/models/{model_group}/",
+                "creators": [
+                    {"name": "Haimasree, Bhattacharya", "affiliation": "EMBL"}
+                ],
+                "publication_date": datetime.today().strftime("%Y-%m-%d"),
+                "license": "MIT",
+            }
         }
-    }
+    elif shared_env:
+        if "shared" in shared_env:
+            data = {
+                "metadata": {
+                    "title": f"{shared_env} singularity container",
+                    "upload_type": "physicalobject",
+                    "description": "Singularity container with conda environment "
+                    f"https://github.com/kipoi/kipoi-containers/blob/main/envfiles/{shared_env}.yml",
+                    "creators": [
+                        {
+                            "name": "Haimasree, Bhattacharya",
+                            "affiliation": "EMBL",
+                        }
+                    ],
+                    "publication_date": datetime.today().strftime("%Y-%m-%d"),
+                    "license": "MIT",
+                }
+            }
+        elif shared_env == "mmsplice":
+            data = {
+                "metadata": {
+                    "title": "MMSplice singularity container except mtsplice",
+                    "upload_type": "physicalobject",
+                    "description": "Singularity container for MMSplice models except mtsplice "
+                    "under http://kipoi.org/models/MMSplice/",
+                    "creators": [
+                        {
+                            "name": "Haimasree, Bhattacharya",
+                            "affiliation": "EMBL",
+                        }
+                    ],
+                    "publication_date": datetime.today().strftime("%Y-%m-%d"),
+                    "license": "MIT",
+                }
+            }
+        else:
+            raise ValueError(
+                "Available options are - mmsplice, sharedpy3keras2tf1, sharedpy3keras2tf2, sharedpy3keras1.2"
+            )
     zenodo_client.put_content(url, data=data)
 
 
@@ -210,7 +257,18 @@ def update_existing_singularity_container(
     )
 
     url = f"{ZENODO_DEPOSITION}/{new_deposition_id}"
-    upload_metadata(zenodo_client, url, model_group)
+    if (
+        "shared" in singularity_dict["name"]
+        or singularity_dict["name"] == "kipoi-docker_mmsplice-slim"
+    ):
+        shared_env_name = (
+            singularity_dict["name"]
+            .replace("kipoi-docker_", "")
+            .replace("-slim", "")
+        )
+        upload_metadata(zenodo_client, url, shared_env=shared_env_name)
+    else:
+        upload_metadata(zenodo_client, url, model_group=model_group)
 
     # publish the newly created revision
     if push:
@@ -267,7 +325,16 @@ def push_new_singularity_image(
     )
 
     url = f"{ZENODO_DEPOSITION}/{deposition_id}"
-    upload_metadata(zenodo_client, url, model_group)
+    if "shared" in singularity_dict["name"]:
+        shared_env_name = (
+            singularity_dict["name"]
+            .replace("kipoi-docker_", "")
+            .replace("-slim", "")
+        )
+        upload_metadata(zenodo_client, url, shared_env=shared_env_name)
+    else:
+        upload_metadata(zenodo_client, url, model_group=model_group)
+
     if push:
         push_deposition(zenodo_client, deposition_id)
         response = get_deposit(zenodo_client, deposition_id)
