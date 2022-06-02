@@ -12,7 +12,7 @@ jobs:
         image: ["sharedpy3keras1.2", "mpra-dragonn", "extended_coda", "mmsplice",
           "mmsplice-mtsplice", "deepmel", "framepool", "kipoisplice", "deeptarget",
           "attentivechrome", "bpnet-oskn", "seqvec", "deepflybrain", "aparent-site_probabilities",
-          "aparent-veff", "deepstarr"]
+          "aparent-veff", "deepstarr", "trednet"]
     runs-on: ubuntu-latest
     env:
       SINGULARITY_PULL_FOLDER: "/home/runner/singularity/"
@@ -239,7 +239,8 @@ jobs:
         image: ["sharedpy3keras1.2", "sharedpy3keras2tf1", "sharedpy3keras2tf2", "mpra-dragonn",
           "extended_coda", "mmsplice", "mmsplice-mtsplice", "deepmel", "framepool",
           "kipoisplice", "deeptarget", "attentivechrome", "bpnet-oskn", "seqvec",
-          "deepflybrain", "aparent-site_probabilities", "aparent-veff", "deepstarr"]
+          "deepflybrain", "aparent-site_probabilities", "aparent-veff", "deepstarr",
+          "trednet"]
     runs-on: ubuntu-latest
     env:
       SINGULARITY_PULL_FOLDER: "/home/runner/singularity/"

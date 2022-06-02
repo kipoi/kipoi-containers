@@ -2197,5 +2197,11 @@
     ],
     "kipoi/kipoi-docker:deepstarr": [
         "DeepSTARR"
+    ],
+    "kipoi/kipoi-docker:trednet": [
+        "TREDNet/phase_one",
+        "TREDNet/phase_two_HepG2",
+        "TREDNet/phase_two_K562",
+        "TREDNet/phase_two_islet"
     ]
 }
