@@ -127,7 +127,6 @@ class DockerAdder:
         to the compatible image name and returns True. It will
         return False otherwise.
         """
-        return False
         for slim_image in [
             "kipoi/kipoi-docker:sharedpy3keras2tf1-slim",
             "kipoi/kipoi-docker:sharedpy3keras2tf2-slim",
