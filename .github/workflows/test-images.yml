@@ -29,15 +29,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        model: ["Basset,HAL","DeepSEA/variantEffects,Optimus_5Prime", "labranchor,SiSp", "MaxEntScan/5prime,pwm_HOCOMOCO/human/AHR",
-          "FactorNet/FOXA2/onePeak_Unique35_DGF,Basenji","CleTimer/customBP,DeepBind/Arabidopsis_thaliana/RBP/D00283.001_RNAcompete_At_0284", 
-          "lsgkm-SVM/Chip/OpenChrom/Cmyc/K562,rbp_eclip/AARS",
-          "CpGenie/A549_ENCSR000DDI,Divergent421,DeepCpG_DNA/Hou2016_HepG2_dna", "MPRA-DragoNN/DeepFactorizedModel",
-          "extended_coda", "MMSplice/deltaLogitPSI", "MMSplice/mtsplice", "DeepMEL/DeepMEL",
-          "Framepool", "KipoiSplice/4", "deepTarget", "AttentiveChrome/E003", "BPNet-OSKN",
-          "SeqVec/embedding", "Xpresso/human_GM12878", "epidermal_basset/encode-roadmap.basset.clf.testfold-0",
-          "DeepFlyBrain", "APARENT/site_probabilities", "APARENT/veff", "DeepSTARR",
-          "scbasset", "TREDNet/phase_one"]
+        model: ["Basset,HAL", "DeepSEA/variantEffects,Optimus_5Prime", "labranchor,SiSp",
+          "MaxEntScan/5prime,pwm_HOCOMOCO/human/AHR", "FactorNet/FOXA2/onePeak_Unique35_DGF,Basenji",
+          "CleTimer/customBP,DeepBind/Arabidopsis_thaliana/RBP/D00283.001_RNAcompete_At_0284",
+          "lsgkm-SVM/Chip/OpenChrom/Cmyc/K562,rbp_eclip/AARS", "CpGenie/A549_ENCSR000DDI,Divergent421,DeepCpG_DNA/Hou2016_HepG2_dna",
+          "MPRA-DragoNN/DeepFactorizedModel", "extended_coda", "MMSplice/deltaLogitPSI",
+          "MMSplice/mtsplice", "DeepMEL/DeepMEL", "Framepool", "KipoiSplice/4", "deepTarget",
+          "AttentiveChrome/E003", "BPNet-OSKN", "SeqVec/embedding", "Xpresso/human_GM12878",
+          "epidermal_basset/encode-roadmap.basset.clf.testfold-0", "DeepFlyBrain",
+          "APARENT/site_probabilities", "APARENT/veff", "DeepSTARR", "scbasset", "TREDNet/phase_one"]
     runs-on: ubuntu-latest
     env:
       SINGULARITY_PULL_FOLDER: "/home/runner/singularity/"
