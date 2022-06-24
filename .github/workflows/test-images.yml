@@ -37,7 +37,8 @@ jobs:
           "MMSplice/mtsplice", "DeepMEL/DeepMEL", "Framepool", "KipoiSplice/4", "deepTarget",
           "AttentiveChrome/E003", "BPNet-OSKN", "SeqVec/embedding", "Xpresso/human_GM12878",
           "epidermal_basset/encode-roadmap.basset.clf.testfold-0", "DeepFlyBrain",
-          "APARENT/site_probabilities", "APARENT/veff", "DeepSTARR", "scbasset", "TREDNet/phase_one"]
+          "APARENT/site_probabilities", "APARENT/veff", "DeepSTARR", "scbasset", "TREDNet/phase_one",
+          "a2z-chromatin/a2z-accessibility"]
     runs-on: ubuntu-latest
     env:
       SINGULARITY_PULL_FOLDER: "/home/runner/singularity/"

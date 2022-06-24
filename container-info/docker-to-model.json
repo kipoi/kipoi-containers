@@ -2089,7 +2089,9 @@
         "Xpresso/human_K562",
         "Xpresso/mouse_ESCs",
         "Xpresso/mouse_median",
-        "scbasset"
+        "scbasset",
+        "a2z-chromatin/a2z-accessibility",
+        "a2z-chromatin/a2z-methylation"
     ],
     "kipoi/kipoi-docker:mpra-dragonn": [
         "MPRA-DragoNN/DeepFactorizedModel",

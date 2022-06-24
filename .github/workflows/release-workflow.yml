@@ -120,7 +120,7 @@ jobs:
       fail-fast: true
       matrix:
         modelgroup: ["Basset,HAL,DeepSEA,Optimus_5Prime,labranchor,SiSp,MaxEntScan,pwm_HOCOMOCO",
-          "Xpresso", "scbasset"]
+          "Xpresso", "scbasset", "a2z-chromatin"]
     runs-on: ubuntu-latest
     env:
       SINGULARITY_PULL_FOLDER: "/home/runner/singularity/"
