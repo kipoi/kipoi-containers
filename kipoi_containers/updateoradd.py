@@ -17,6 +17,12 @@ from kipoi_containers.helper import (
     create_pr,
 )
 
+import logging
+import logging.config
+
+logging.config.fileConfig(Path(__file__).parent.resolve() / "logging.conf")
+logger = logging.getLogger("kipoi_containers")
+
 CONTAINER_PREFIX = Path.cwd() / "container-info"
 WORKFLOW_PREFIX = Path.cwd() / ".github/workflows"
 MODEL_GROUP_TO_DOCKER_JSON = "model-to-docker.json"
@@ -112,7 +118,10 @@ class ModelSyncer:
                     if mg not in mmsplice_models_to_remove
                 ]
 
-        print(self.list_of_updated_model_groups)
+        logger.info(
+            f"Images need to be updated/added are - {self.list_of_updated_model_groups}"
+        )
+        exit()
 
     def update_or_add_model_container(self, model_group: str) -> None:
         """
