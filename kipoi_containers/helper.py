@@ -1,5 +1,7 @@
 from collections import Counter
 import json
+import logging
+import logging.config
 from pathlib import Path
 from typing import Dict, List, Union, TYPE_CHECKING
 
@@ -11,6 +13,9 @@ if TYPE_CHECKING:
 
 FileType = Union[str, Path]
 CONTAINER_PREFIX = "shared/containers"
+
+logging.config.fileConfig(Path(__file__).parent.resolve() / "logging.conf")
+logger = logging.getLogger("kipoi_containers")
 
 
 def populate_json(json_file: FileType) -> Dict:

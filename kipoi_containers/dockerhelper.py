@@ -4,6 +4,8 @@ from pathlib import Path
 from typing import Union, Dict
 import docker
 
+from kipoi_containers.helper import logger
+
 
 def cleanup(images: bool = False) -> None:
     """
@@ -69,7 +71,7 @@ def test_docker_image(image_name: str, model_name: str) -> None:
     except docker.errors.APIError as e:
         raise (e)
     cleanup()
-    print(container_log.decode("utf-8"))
+    logger.info(container_log.decode("utf-8"))
 
 
 def test_docker_image_without_exception(
@@ -96,7 +98,7 @@ def test_docker_image_without_exception(
         cleanup()
         return False
     cleanup()
-    print(container_log.decode("utf-8"))
+    logger.info(container_log.decode("utf-8"))
     return True
 
 
