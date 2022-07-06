@@ -118,7 +118,6 @@ class ModelSyncer:
         bot.info(
             f"Images need to be updated/added are - {self.list_of_updated_model_groups}"
         )
-        exit()
 
     def update_or_add_model_container(self, model_group: str) -> None:
         """
