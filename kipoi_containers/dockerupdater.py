@@ -9,7 +9,7 @@ from kipoi_containers.dockerhelper import (
     test_docker_image,
 )
 
-from kipoi_containers.logger import bot
+from kipoi_containers.helper import logger
 
 
 class DockerUpdater:
@@ -37,7 +37,7 @@ class DockerUpdater:
         ValueError
             If the dockerfile path for the given model group does not exist
         """
-        bot.info(
+        logger.info(
             f"Updating {self.model_group} and {self.name_of_docker_image}"
         )
         if self.model_group in [
@@ -63,7 +63,7 @@ class DockerUpdater:
         if "slim" in self.name_of_docker_image:
             dockerfile_path = Path(f"{dockerfile_path}-slim")
         if dockerfile_path.exists():
-            bot.info(
+            logger.info(
                 f"Building {self.name_of_docker_image} with {dockerfile_path}"
             )
             build_docker_image(

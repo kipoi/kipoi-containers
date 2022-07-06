@@ -2,8 +2,11 @@ import os
 from pathlib import Path
 
 from kipoi_containers.updateoradd import DOCKER_TO_MODEL_JSON
-from kipoi_containers.helper import populate_json, one_model_per_modelgroup
-from kipoi_containers.logger import bot
+from kipoi_containers.helper import (
+    populate_json,
+    one_model_per_modelgroup,
+    logger,
+)
 
 
 class TestContainers:
@@ -34,7 +37,7 @@ class TestContainers:
                 raise ValueError("Each model group must have one model")
             for model in models:
                 if model.split("/")[0] in self.modelgroup_name:
-                    bot.info(f"Testing {model} with {self.image_name}")
+                    logger.info(f"Testing {model} with {self.image_name}")
                     test_docker_image(
                         model_name=model, image_name=self.image_name
                     )
@@ -50,5 +53,5 @@ class TestContainers:
             if "shared" in self.image_name:
                 models = one_model_per_modelgroup(models)
             for model in models:
-                bot.info(f"Testing {model} with {self.image_name}")
+                logger.info(f"Testing {model} with {self.image_name}")
                 test_docker_image(model_name=model, image_name=self.image_name)

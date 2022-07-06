@@ -5,6 +5,7 @@ import os
 
 from ruamel.yaml.scalarstring import DoubleQuotedScalarString
 
+from kipoi_containers.helper import logger
 from kipoi_containers.singularityhelper import (
     build_singularity_image,
     update_existing_singularity_container,
@@ -15,7 +16,6 @@ from kipoi_containers.singularityhelper import (
 from kipoi_containers import zenodoclient
 
 from kipoi_utils.external.torchvision.dataset_utils import check_integrity
-from kipoi_containers.logger import bot
 
 
 @dataclass
@@ -144,7 +144,7 @@ class SingularityHandler:
             singularity_image_path, self.singularity_dict["md5"]
         )
         if checksum_match:
-            bot.info(
+            logger.info(
                 f"No need to update the existing singularity container for {self.model_group}"
             )
             cleanup(singularity_image_path)
