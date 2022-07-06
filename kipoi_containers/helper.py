@@ -5,7 +5,6 @@ import logging.config
 from pathlib import Path
 from typing import Dict, List, Union, TYPE_CHECKING
 
-import pkg_resources
 from ruamel.yaml import round_trip_load, round_trip_dump
 import kipoi
 
@@ -15,11 +14,8 @@ if TYPE_CHECKING:
 FileType = Union[str, Path]
 CONTAINER_PREFIX = "shared/containers"
 
-print(pkg_resources.resource_filename(__name__, "logging.conf"))
-logging.config.fileConfig(
-    (pkg_resources.resource_filename(__name__, "logging.conf"))
-)
-logger = logging.getLogger(__name__)
+logging.config.fileConfig(Path(__file__).resolve().parent / "logging_conf.ini")
+logger = logging.getLogger("kipoi_containers")
 
 
 def populate_json(json_file: FileType) -> Dict:
