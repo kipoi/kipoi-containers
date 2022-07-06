@@ -139,7 +139,8 @@ def test_singularityhandler_noupdate(
     )
     singularity_handler.update(models_to_test, push=False)
     assert (
-        "No need to update the existing singularity container for DeepMEL" in caplog.text
+        "No need to update the existing singularity container for DeepMEL"
+        in caplog.text
     )
     updated_container_dict = original_container_dict
     assert original_container_dict == updated_container_dict

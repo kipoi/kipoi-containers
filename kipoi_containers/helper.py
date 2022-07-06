@@ -14,9 +14,7 @@ if TYPE_CHECKING:
 FileType = Union[str, Path]
 CONTAINER_PREFIX = "shared/containers"
 
-print(Path(__file__).parent.resolve() / "logging.conf")
-exit()
-logging.config.fileConfig(Path(__file__).parent.resolve() / "logging.conf")
+logging.config.fileConfig(Path(__file__).resolve().parent / "logging.conf")
 logger = logging.getLogger("kipoi_containers")
 
 
