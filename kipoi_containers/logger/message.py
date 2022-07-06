@@ -1,13 +1,7 @@
-# Copyright (C) 2017-2022 Vanessa Sochat.
-
-# This Source Code Form is subject to the terms of the
-# Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed
-# with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# Adapted from https://github.com/singularityhub/singularity-cli
 
 import os
 import sys
-
-# from .spinner import Spinner
 
 ABORT = -5
 CRITICAL = -4
@@ -336,5 +330,4 @@ def convert2boolean(arg):
     return arg
 
 
-# KipoiContainersMessage.spinner = Spinner()
 bot = KipoiContainersMessage()

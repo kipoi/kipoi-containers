@@ -66,9 +66,6 @@ class TestModels:
                 test_docker_image(image_name=image_name, model_name=model)
                 bot.info(f"Testing {model} with {slim_image}")
                 test_docker_image(image_name=slim_image, model_name=model)
-                bot.info(
-                    f"Testing {model} with {singularity_pull_folder}/{singularity_image}"
-                )
                 test_singularity_image(
                     singularity_image_folder=singularity_pull_folder,
                     singularity_image_name=singularity_image,
@@ -88,9 +85,6 @@ class TestModels:
                 test_docker_image(image_name=image_name, model_name=model)
                 bot.info(f"Testing {model} with {slim_image}")
                 test_docker_image(image_name=slim_image, model_name=model)
-                bot.info(
-                    f"Testing {model} with {singularity_pull_folder}/{singularity_image}"
-                )
                 test_singularity_image(
                     singularity_image_folder=singularity_pull_folder,
                     singularity_image_name=singularity_image,
