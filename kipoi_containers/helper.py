@@ -5,6 +5,7 @@ import logging.config
 from pathlib import Path
 from typing import Dict, List, Union, TYPE_CHECKING
 
+import pkg_resources
 from ruamel.yaml import round_trip_load, round_trip_dump
 import kipoi
 
@@ -14,7 +15,10 @@ if TYPE_CHECKING:
 FileType = Union[str, Path]
 CONTAINER_PREFIX = "shared/containers"
 
-logging.config.fileConfig(Path(__file__).resolve().parent / "logging.conf")
+logging.config.fileConfig(
+    (pkg_resources.resource_filename(__name__, "logging.conf"))
+)
+print(pkg_resources.resource_filename(__name__, "logging.conf"))
 logger = logging.getLogger("kipoi_containers")
 
 
