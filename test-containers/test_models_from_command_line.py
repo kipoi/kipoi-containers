@@ -11,6 +11,8 @@ from kipoi_containers.updateoradd import (
 from kipoi_containers.helper import populate_json, populate_json_from_kipoi
 from kipoi_containers.singularityhelper import get_singularity_image
 
+from kipoi_containers.logger import bot
+
 
 class TestModels:
     model_name = None
@@ -53,7 +55,6 @@ class TestModels:
         if self.list_of_models:
             for model in self.list_of_models:
                 image_name = self.get_image_name(model=model)
-                test_docker_image(image_name=image_name, model_name=model)
                 singularity_image = get_singularity_image(
                     singularity_pull_folder,
                     self.model_group_to_singularity_dict,
@@ -61,8 +62,13 @@ class TestModels:
                 )
                 image_name = self.get_image_name(model=model)
                 slim_image = f"{image_name}-slim"
+                bot.info(f"Testing {model} with {image_name}")
                 test_docker_image(image_name=image_name, model_name=model)
+                bot.info(f"Testing {model} with {slim_image}")
                 test_docker_image(image_name=slim_image, model_name=model)
+                bot.info(
+                    f"Testing {model} with {singularity_pull_folder}/{singularity_image}"
+                )
                 test_singularity_image(
                     singularity_image_folder=singularity_pull_folder,
                     singularity_image_name=singularity_image,
@@ -71,7 +77,6 @@ class TestModels:
         elif self.model_name is not None:
             for model in self.model_name:
                 image_name = self.get_image_name(model=model)
-                test_docker_image(image_name=image_name, model_name=model)
                 singularity_image = get_singularity_image(
                     singularity_pull_folder,
                     self.model_group_to_singularity_dict,
@@ -79,8 +84,13 @@ class TestModels:
                 )
                 image_name = self.get_image_name(model=model)
                 slim_image = f"{image_name}-slim"
+                bot.info(f"Testing {model} with {image_name}")
                 test_docker_image(image_name=image_name, model_name=model)
+                bot.info(f"Testing {model} with {slim_image}")
                 test_docker_image(image_name=slim_image, model_name=model)
+                bot.info(
+                    f"Testing {model} with {singularity_pull_folder}/{singularity_image}"
+                )
                 test_singularity_image(
                     singularity_image_folder=singularity_pull_folder,
                     singularity_image_name=singularity_image,
