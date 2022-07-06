@@ -17,8 +17,8 @@ from kipoi_containers.helper import (
     populate_yaml,
     write_yaml,
     create_pr,
-    logger,
 )
+from kipoi_containers.logger import bot
 
 CONTAINER_PREFIX = Path.cwd() / "container-info"
 WORKFLOW_PREFIX = Path.cwd() / ".github/workflows"
@@ -115,9 +115,10 @@ class ModelSyncer:
                     if mg not in mmsplice_models_to_remove
                 ]
 
-        logger.info(
+        bot.info(
             f"Images need to be updated/added are - {self.list_of_updated_model_groups}"
         )
+        exit()
 
     def update_or_add_model_container(self, model_group: str) -> None:
         """
@@ -147,7 +148,7 @@ class ModelSyncer:
                 slim_docker_updater.update(models_to_test)
                 singularity_handler.update(models_to_test)
             else:
-                logger.info(
+                bot.info(
                     f"We will not be updating {name_of_docker_image} and {slim_docker_image}"
                 )
         else:
@@ -200,7 +201,7 @@ class ModelSyncer:
             if update_docker_json or update_singularity_json:
                 create_pr(self.kipoi_model_repo)
         else:
-            logger.info("No need to update the repo")
+            bot.info("No need to update the repo")
 
         # If everything has gone well so far update kipoi-model-hash
         with open(
