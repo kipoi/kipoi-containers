@@ -15,11 +15,11 @@ if TYPE_CHECKING:
 FileType = Union[str, Path]
 CONTAINER_PREFIX = "shared/containers"
 
+print(pkg_resources.resource_filename(__name__, "logging.conf"))
 logging.config.fileConfig(
     (pkg_resources.resource_filename(__name__, "logging.conf"))
 )
-print(pkg_resources.resource_filename(__name__, "logging.conf"))
-logger = logging.getLogger("kipoi_containers")
+logger = logging.getLogger(__name__)
 
 
 def populate_json(json_file: FileType) -> Dict:
