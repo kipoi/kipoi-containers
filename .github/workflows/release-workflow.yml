@@ -43,7 +43,7 @@ jobs:
       run: |
         mkdir -p /home/runner/singularity/
         python -m pip install --upgrade pip
-        pip install .
+        pip install -e .
     - name: Build and test ${{ matrix.image }}
       shell: bash -l {0}
       run: |
@@ -100,7 +100,7 @@ jobs:
         mkdir -p /home/runner/singularity/
         sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config
         python -m pip install --upgrade pip
-        pip install .
+        pip install -e .
     - name: Build and test sharedpy3keras2tf1 with ${{ matrix.modelgroup }}
       shell: bash -l {0}
       run: |
@@ -151,7 +151,7 @@ jobs:
         mkdir -p /home/runner/singularity/
         sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config
         python -m pip install --upgrade pip
-        pip install .
+        pip install -e .
     - name: Build and test sharedpy3keras2tf2 with ${{ matrix.modelgroup }}
       shell: bash -l {0}
       run: |
@@ -197,7 +197,7 @@ jobs:
         mkdir -p /home/runner/singularity/
         sudo apt-get update && sudo apt-get install -y libhdf5-serial-dev pkg-config
         python -m pip install --upgrade pip
-        pip install .
+        pip install -e .
     - name: Build and push sharedpy3keras2tf1 and kipoi-base-env
       shell: bash -l {0}
       run: |
@@ -270,7 +270,7 @@ jobs:
       run: |
         mkdir -p /home/runner/singularity/
         python -m pip install --upgrade pip
-        pip install . 
+        pip install -e . 
     - name: Update the singularity image of kipoi/kipoi-docker:${{ matrix.image }}-slim
       shell: bash -l {0}
       if: ${{ success() }}

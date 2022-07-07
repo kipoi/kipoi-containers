@@ -100,7 +100,7 @@ def test_singularityhandler_update_container_info(
 
 
 def test_singularityhandler_noupdate(
-    capsys, monkeypatch, model_group_to_singularity_dict, cwd
+    caplog, monkeypatch, model_group_to_singularity_dict, cwd
 ):
     def mock_build_singularity_image(*args, **kwargs):
         return cwd / "kipoi-docker_deepmel-slim.sif"
@@ -138,10 +138,9 @@ def test_singularityhandler_noupdate(
         singularity_json, kipoi_model_repo
     )
     singularity_handler.update(models_to_test, push=False)
-    captured = capsys.readouterr()
     assert (
-        captured.out.strip()
-        == "No need to update the existing singularity container for DeepMEL"
+        "No need to update the existing singularity container for DeepMEL"
+        in caplog.text
     )
     updated_container_dict = original_container_dict
     assert original_container_dict == updated_container_dict

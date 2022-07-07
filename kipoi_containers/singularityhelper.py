@@ -9,6 +9,8 @@ from typing import Dict, Union, TYPE_CHECKING
 
 from kipoi_utils.external.torchvision.dataset_utils import download_url
 
+from kipoi_containers.helper import logger
+
 if TYPE_CHECKING:
     import zenodoclient
 
@@ -49,12 +51,12 @@ def build_singularity_image(
         "--force",
         f"docker://{name_of_docker_image}",
     ]
-    print(f"Building {singularity_image_name} - {' '.join(pull_cmd)}")
+    logger.info(f"Building {singularity_image_name} - {' '.join(pull_cmd)}")
     process = Popen(pull_cmd, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
     if process.returncode != 0:
-        print(stderr)
-        print(stdout)
+        logger.error(stderr)
+        logger.info(stdout)
         raise ValueError(
             f"Singularity image {singularity_image_name} can not be built"
         )
@@ -72,7 +74,7 @@ def test_singularity_image(
 
     Raises:
         ValueError: Raise valueerror if the test is not successful"""
-    print(
+    logger.info(
         f"Testing {model} with {singularity_image_folder}/{singularity_image_name}"
     )
     if model == "Basenji":
@@ -98,8 +100,8 @@ def test_singularity_image(
     process = Popen(exec_cmd, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
     if process.returncode != 0:
-        print(stdout)
-        print(stderr)
+        logger.info(stdout)
+        logger.error(stderr)
         raise ValueError(
             f"Singularity image {singularity_image_name} for {model} did not pass relevant tests"
         )

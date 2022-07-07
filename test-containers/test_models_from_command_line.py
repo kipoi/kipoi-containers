@@ -8,7 +8,11 @@ from kipoi_containers.updateoradd import (
     MODEL_GROUP_TO_SINGULARITY_JSON,
     MODEL_GROUP_TO_DOCKER_JSON,
 )
-from kipoi_containers.helper import populate_json, populate_json_from_kipoi
+from kipoi_containers.helper import (
+    populate_json,
+    populate_json_from_kipoi,
+    logger,
+)
 from kipoi_containers.singularityhelper import get_singularity_image
 
 
@@ -61,7 +65,9 @@ class TestModels:
                 )
                 image_name = self.get_image_name(model=model)
                 slim_image = f"{image_name}-slim"
+                logger.info(f"Testing {model} with {image_name}")
                 test_docker_image(image_name=image_name, model_name=model)
+                logger.info(f"Testing {model} with {slim_image}")
                 test_docker_image(image_name=slim_image, model_name=model)
                 test_singularity_image(
                     singularity_image_folder=singularity_pull_folder,
@@ -79,7 +85,9 @@ class TestModels:
                 )
                 image_name = self.get_image_name(model=model)
                 slim_image = f"{image_name}-slim"
+                logger.info(f"Testing {model} with {image_name}")
                 test_docker_image(image_name=image_name, model_name=model)
+                logger.info(f"Testing {model} with {slim_image}")
                 test_docker_image(image_name=slim_image, model_name=model)
                 test_singularity_image(
                     singularity_image_folder=singularity_pull_folder,
