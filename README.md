@@ -5,6 +5,23 @@
 [![Coverage Status](https://coveralls.io/repos/github/kipoi/kipoi-containers/badge.svg)](https://coveralls.io/github/kipoi/kipoi-containers)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+
+> [!WARNING]
+> ### **Kipoi Project - Sunset Announcement**
+> 
+> After several impactful years, we have made the decision to **archive the Kipoi repositories and end active maintenance** of the project.
+> 
+> This is a bittersweet moment. While it’s always a little sad to sunset a project, the field of machine learning in genomics has evolved rapidly, with new technologies and platforms emerging that better meet current needs. Kipoi played an important role in its time, helping researchers **share, reuse, and benchmark trained models** in regulatory genomics. We’re proud of what it accomplished and grateful for the strong community support that made it possible.
+> 
+> Kipoi’s impact continues, however:
+> 
+> *   [The Kipoi webinar series](seminar.html) will carry on, supporting discussions around model reuse and interpretability.
+> *   [Kipoiseq](https://github.com/kipoi/kipoiseq), our standard set of data-loaders for sequence-based modeling, also remains active and relevant.
+> 
+> Thanks to everyone who contributed, used, or supported Kipoi. It’s been a fantastic journey, and we're glad the project helped shape how models are shared in the field.
+> 
+> \- The Kipoi Team
+
 ![alt text](misc/kipoicontainers.png?raw=true "kipoi-containers")
 This repository contains necessary infrastructure elements for adding and updating docker and singularity images for models and model groups in [Kipoi model zoo](https://kipoi.org/). These images are pre-activated with a compatible conda environment where all the model (group) specific dependencies have been installed.
 
